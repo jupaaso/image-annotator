@@ -5,7 +5,7 @@
 * ASSISTANTS: Mika Oja
 
 ### Minutes
-*Summary of what was discussed during the meeting
+Summary of what was discussed during the meeting
 
 The aim of the project, Image Annotator (IA) Web API, was briefly introduced and presented with wiki documentation of the project. We briefly discussed the content of the aimed IA Web API, the objectives of the PWP course, and the objectives of the documentation in the wiki. For the most part, text of wiki project documentation was acceptable, but it needed some refining, additions, and transfers to meet the aimed specifications.
 
@@ -16,16 +16,16 @@ The chapter 'Main concepts and relations' were discussed in more detailed manner
 The chapter 'API uses' described well the potential use case of the IA REST API attached to a third-party client. However, the ideas of the planned own clients and their description must be added to this chapter. Text should describe how REST API can be used, and what kind of client design the group has planned to on this course - for example 'Hate Speech Anno API Client' for annotation of hate speech images memes, and 'My Photo Label API Client' for collecting and labeling private photographs.
 
 Good examples were found on the chapter 'Related work', so text did not need any changes.
-*
+
 
 ### Action points
-*List here the actions points discussed with assistants
+List here the actions points discussed with assistants
 
 - The chapter 'Overview' did not need any changes.
 - From the chapter 'Main concepts and relations' descriptions of uses and operations should be removed elsewhere, and new text should describe and focus on the concepts.
 - Add project clients and their descriptions to the chapter 'API uses'.
 - The chapter 'Related work' did not need any changes.
-*
+
 
 ### Comments from staff
 *ONLY USED BY COURSE STAFF: Additional comments from the course staff*
