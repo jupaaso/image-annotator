@@ -15,10 +15,11 @@ Good examples were found on the chapter 'Related work', so text did not need any
 
 ### Action points
 *List here the actions points discussed with assistants*
-* -	The chapter 'Overview' did not need any changes.
--	From the chapter 'Main concepts and relations' descriptions of uses and operations should be removed elsewhere, and new text should describe and focus on the concepts.
--	Add project clients and their descriptions to the chapter 'API uses'.
--	The chapter 'Related work' did not need any changes.
+* 
+- The chapter 'Overview' did not need any changes.
+- From the chapter 'Main concepts and relations' descriptions of uses and operations should be removed elsewhere, and new text should describe and focus on the concepts.
+- Add project clients and their descriptions to the chapter 'API uses'.
+- The chapter 'Related work' did not need any changes.
 *
 
 
