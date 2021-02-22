@@ -17,7 +17,7 @@ Next open Python Terminal "Terminal > New Terminal". In the terminal give follow
 
 <li>  python -m venv .venv </li>
 <li>  python -m venv /path/to/the/virtualenv (e.g. in Win10 "python -m D:\folder\venv") </li>
-
+</li>
 You will see a dialog box opening "We noticed a new virtual environment has been created. Do you want to select it for the workspace folder?" and answer to that question "YES". 
 
 Next on VSCodes bottom status bar, left side, there is text like "Python 3.7.4.64-bit". Press that test and select environment that was just created. Select environment "Python 3.7 (venv) ./venv/Scripts/python.exe" so that the text is changed into "Python 3.7.4.64-bit ('.venv')", text needs to end with the "('.venv'), as this venv is your virtual enviroment folder name in VSCode, and that can be seen in the VSCode Explorer view, on the left side. 
@@ -27,7 +27,7 @@ You also notice that in VSCode terminal the command line starts now with "(venv)
 <li>  pip install Flask</li>
 <li>  pip install pysqlite3</li>
 <li>  pip install flask_sqlalchemy</li>
-
+</li>
 Note! When you later run the code, there may be need to install some other missing package. 
 
 Next check "launch.jason" file that it has right content. File is in sw_code folder. Correct location for this file in in ".vscode" folder.
