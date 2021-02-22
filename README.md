@@ -15,20 +15,18 @@ Next start VSCode, and in VSCode open "File > Open Folder", open that folder.
 
 Next open Python Terminal "Terminal > New Terminal". In the terminal give following command (either one): 
 
-<li>  python -m venv .venv
-<li>  python -m venv /path/to/the/virtualenv (e.g. in Win10 "python -m D:\folder\venv")
-</li>  
+<li>  python -m venv .venv </li>
+<li>  python -m venv /path/to/the/virtualenv (e.g. in Win10 "python -m D:\folder\venv") </li>
+
 You will see a dialog box opening "We noticed a new virtual environment has been created. Do you want to select it for the workspace folder?" and answer to that question "YES". 
 
 Next on VSCodes bottom status bar, left side, there is text like "Python 3.7.4.64-bit". Press that test and select environment that was just created. Select environment "Python 3.7 (venv) ./venv/Scripts/python.exe" so that the text is changed into "Python 3.7.4.64-bit ('.venv')", text needs to end with the "('.venv'), as this venv is your virtual enviroment folder name in VSCode, and that can be seen in the VSCode Explorer view, on the left side. 
 
 You also notice that in VSCode terminal the command line starts now with "(venv)" text. Step into terminal command line and install necessary packages for the virtualenvironment using these commands:
 
-  pip install Flask
-  
-  pip install pysqlite3
-  
-  pip install flask_sqlalchemy
+<li>  pip install Flask</li>
+<li>  pip install pysqlite3</li>
+<li>  pip install flask_sqlalchemy</li>
   
 Note! When you later run the code, there may be need to install some other missing package. 
 
