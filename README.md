@@ -27,7 +27,8 @@ You also notice that in VSCode terminal the command line starts now with "(venv)
 <li>  pip install Flask</li>
 <li>  pip install pysqlite3</li>
 <li>  pip install flask_sqlalchemy</li>
-  
+
+
 Note! When you later run the code, there may be need to install some other missing package. 
 
 Next check "launch.jason" file that it has right content. File is in sw_code folder. Correct location for this file in in ".vscode" folder.
