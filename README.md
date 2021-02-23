@@ -16,7 +16,7 @@ Next start VSCode, and in VSCode open "File > Open Folder", open that folder.
 Next open Python Terminal "Terminal > New Terminal". In the terminal give following command (either one): 
 
 <li>  python -m venv .venv </li>
-<li>  python -m venv /path/to/the/virtualenv (e.g. in Win10 "python -m D:\folder\venv") </li>
+<li>  python -m venv /path/to/the/.virtualenv (e.g. in Win10 "python -m D:\folder\.venv") </li>
 <li>  </li>    
 You will see a dialog box opening "We noticed a new virtual environment has been created. Do you want to select it for the workspace folder?" and answer to that question "YES". 
 
