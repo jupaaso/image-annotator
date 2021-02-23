@@ -35,6 +35,8 @@ Note! When you later run the code, there may be need to install some other missi
 Next check "launch.jason" file that it has right content. File is in sw_code folder. Correct location for this file in in ".vscode" folder.
 
 # requirements.txt with dependencies
+inageAnnotator uses partly python language. The "requirements.txt" file is availabe from source_code folder.
+
 Inside virtual environment there are following libraries
 <li> click </li>
 <li> Flask-SQLAlchemy </li>
