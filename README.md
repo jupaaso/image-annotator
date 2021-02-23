@@ -46,7 +46,8 @@ Inside virtual environment there are following libraries
 <li> Werkzeug </li>
 
 # Instruction how to populate the database
-
+Place the file "test_API_dbPopulation.py" into your project folder. Run the codeline below and that will create three users into database's User-table. Then it finds all images loaded by User3 ("Meria Developer") and prints image information but not print the actual pictures.
+<li>  python test_API_dbPopulation.py
 
 # Instruction how to run and test API
 Isdas
