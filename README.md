@@ -17,26 +17,36 @@ Next open Python Terminal "Terminal > New Terminal". In the terminal give follow
 
 <li>  python -m venv .venv </li>
 <li>  python -m venv /path/to/the/virtualenv (e.g. in Win10 "python -m D:\folder\venv") </li>
-    
+<li>  </li>    
 You will see a dialog box opening "We noticed a new virtual environment has been created. Do you want to select it for the workspace folder?" and answer to that question "YES". 
 
 Next on VSCodes bottom status bar, left side, there is text like "Python 3.7.4.64-bit". Press that test and select environment that was just created. Select environment "Python 3.7 (venv) ./venv/Scripts/python.exe" so that the text is changed into "Python 3.7.4.64-bit ('.venv')", text needs to end with the "('.venv'), as this venv is your virtual enviroment folder name in VSCode, and that can be seen in the VSCode Explorer view, on the left side. 
 
-You also notice that in VSCode terminal the command line starts now with "(venv)" text. Step into terminal command line and install necessary packages for the virtualenvironment using these commands:
+You also notice that in VSCode terminal the command line starts now with "(.venv)" text. Step into terminal command line and install necessary packages for the virtualenvironment using these commands:
 
 <li>  pip install Flask</li>
 <li>  pip install pysqlite3</li>
 <li>  pip install flask_sqlalchemy</li>
-  
-Note! When you later run the code, there may be need to install some other missing package. 
+<li>   </li>  
+
+# Installing required libraries
+Note! When you later run the code, there may be need to install some other missing package. You can install all missing packages now by using following command in the same virtual environment terminal when (.venv) is at the beginning of the command line. First copy requirements.txt into project folder and then give this command:
+<li>  pip install -r requirements.txt
 
 Next check "launch.jason" file that it has right content. File is in sw_code folder. Correct location for this file in in ".vscode" folder.
 
-# Installing required libraries
-asd
+# requirements.txt with dependencies
+Inside virtual environment there are following libraries
+<li> click </li>
+<li> Flask-SQLAlchemy </li>
+<li> itsdangerous </li>
+<li> Jinja2 </li>
+<li> Markupsafe </li>
+<li> SQLAlchemy </li>
+<li> Werkzeug </li>
 
 # Instruction how to populate the database
-asda
+
 
 # Instruction how to run and test API
 Isdas
