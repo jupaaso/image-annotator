@@ -30,8 +30,7 @@ You also notice that in VSCode terminal the command line starts now with "(.venv
 <li>   </li>  
 
 # Installing required libraries
-Note! When you later run the code, there may be need to install some other missing package. You can install all missing packages now by using following command in the same virtual environment terminal when (.venv) is at the beginning of the command line. First copy requirements.txt into project folder and then give this command:
-<li>  pip install -r requirements.txt
+Note! When you later run the code, there may be need to install some other missing package. You can install missing packages with pip install command inside the same virtual environment terminal when (.venv) is at the beginning of the command line. 
 
 Next check "launch.jason" file that it has right content. File is in sw_code folder. Correct location for this file in in ".vscode" folder.
 
@@ -46,22 +45,7 @@ Inside virtual environment there are following libraries
 <li> Werkzeug </li>
 
 # Instruction how to populate the database
-Place the file "test_API_dbPopulation.py" into your project folder. Run the codeline below and that will create three users into database's User-table. Then it finds all images loaded by User3 ("Meria Developer") and prints image information but not print the actual pictures.
+Database is based on SQLite. The "imageAnnoAPI.py" does not need to be running to create the database but file needs to be available int the project folder. First copy that file into project folder. Next place some (two or three) photos into your project folder with file names ending to ".jpg" format. These photos are used for database testing. Next place the file "test_API_dbPopulation.py" into your project folder. Run the codeline below and that will create the whole database and creates few instances into every data table with pre-set parameters and also copies the images into database. Database is created into project folder by name "imageAnno.db". 
+
+Runninng the code below also makes some necessary test for the database..
 <li>  python test_API_dbPopulation.py
-
-
-The code repository must contain:
-The ORM models and functions
-A .sql dump of a database or the .db file (if you are using SQlite). You must provide a populated database in order to test your models.
-The scripts used to generate your database (if any)
-If you are using python, the requirements.txt file.
-A README.md file containing:
-All dependencies (external libraries) and how to install them
-Define database (MySQL, SQLite, MariaDB, MongoDB...) and version utilized
-Instructions how to setup the database framework and external libraries you might have used, or a link where it is clearly explained.
-Instructions on how to setup and populate the database.
-Instruction on how to run the tests of your database.
-If you are using python a `requirements.txt` with the dependencies
-NOTE: Your code MUST be clearly documented. Check Exercise 1 for examples on how to document the code.
-
-In addition, it should be clear which is the code you have implemented yourself and which is the code that you have borrowed from other sources.
