@@ -43,3 +43,18 @@ Isdas
 
 # Instruction how to set-up and run the client
 
+The code repository must contain:
+The ORM models and functions
+A .sql dump of a database or the .db file (if you are using SQlite). You must provide a populated database in order to test your models.
+The scripts used to generate your database (if any)
+If you are using python, the requirements.txt file.
+A README.md file containing:
+All dependencies (external libraries) and how to install them
+Define database (MySQL, SQLite, MariaDB, MongoDB...) and version utilized
+Instructions how to setup the database framework and external libraries you might have used, or a link where it is clearly explained.
+Instructions on how to setup and populate the database.
+Instruction on how to run the tests of your database.
+If you are using python a `requirements.txt` with the dependencies
+NOTE: Your code MUST be clearly documented. Check Exercise 1 for examples on how to document the code.
+
+In addition, it should be clear which is the code you have implemented yourself and which is the code that you have borrowed from other sources.
