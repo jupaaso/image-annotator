@@ -54,18 +54,17 @@ Populated database of Image Annotator can be created with test code ‘test_APId
 The ‘imageAnnoAPI.py’ -file includes all models of ‘imageAnno.db’ SQLite database. Database can be created in python virtual environment (defined above) for example by command – ‘python imageAnnoAPI.py’. Image Annotator database ‘imageAnno’ is created on the same path and folder with ‘imageAnnoAPI.py’ -file which creates the database. Size of created empty 'imageAnno.db' database is about 24 kt.
 
 ### Populating database
-During development and testing phases database creation, population and query has been tested with a variety of testing codes. Database population test codes are available at ‘Database_test_code’ -folder:
-<li> test_APIdb_populate1.py </li>
-<li> test_APIdb_populate2.py </li>
-<li> test_APIdb_populate3.py </li>
-<li> test_APIdb_populate4.py </li>
-...
-In order to populate database the "imageAnnoAPI.py" -file including database models, ImageTest and PhotoTest folders, and the population test code (for example ‘test_APIdb_populate4.py’) needs to be located in the same path and folder. 
+During development and testing phases database creation, population and query has been tested with a variety of testing codes. In order to populate database the "imageAnnoAPI.py" -file including database models, ImageTest and PhotoTest folders, and the population test code (for example ‘test_APIdb_populate4.py’) needs to be located in the same path and folder. 
+
 The test code ‘test_APIdb_populate4.py’ creates and populates all database models of Image Annotator.
 
 Activate python virtual environment before test code execution. Run the ‘test_APIdb_populate4.py’ with command  ‘python test_APIdb_populate4.py’. The test code will create the SQLite database and populate few instances into every data table with pre-set parameters. The test code copies images, image data, and ascii data into database. 
 
-Database is created into project folder and named as "imageAnno.db".
+Database is created into project folder and named as "imageAnno.db". Database population test codes are available at ‘Database_test_code’ -folder:
+<li> test_APIdb_populate1.py </li>
+<li> test_APIdb_populate2.py </li>
+<li> test_APIdb_populate3.py </li>
+<li> test_APIdb_populate4.py </li>
 
 ## Testing during SW development phases
 During API SW development cycles the code was tested with Visual Studio Code (VSC) debugger, Postman, and DB Browser.
