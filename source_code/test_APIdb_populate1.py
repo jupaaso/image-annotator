@@ -168,69 +168,51 @@ for item in results2:
 RESULTS  ---------------------------------------------------------------
 
 User in database: Meria Developer
-
 User in database: Juha Engineer
-
 User in database: Matti Meikäläinen
 
 Images saved by user: Meria Developer
 
-halla-aho meemi1.jpg
-2021-02-24 00:57:55.059068
-C:\PWBproject\ImageAnnotator\ImageTest\halla-aho meemi1.jpg
-
-halla-aho meemi2.jpg
-2021-02-24 00:57:55.059068
-C:\PWBproject\ImageAnnotator\ImageTest\halla-aho meemi2.jpg
+halla-aho meemi32.jpg
+2021-02-24 19:04:29.223310
+C:\PWBproject\ImageAnnotator\ImageTest\halla-aho meemi32.jpg
 
 kuha meemi1.jpg
-2021-02-24 00:57:55.059068
+2021-02-24 19:04:29.223310
 C:\PWBproject\ImageAnnotator\ImageTest\kuha meemi1.jpg
 
 kuha meemi3.jpg
-2021-02-24 00:57:55.059068
+2021-02-24 19:04:29.224307
 C:\PWBproject\ImageAnnotator\ImageTest\kuha meemi3.jpg
 
 vihreät meemi16.jpg
-2021-02-24 00:57:55.059068
+2021-02-24 19:04:29.224307
 C:\PWBproject\ImageAnnotator\ImageTest\vihreät meemi16.jpg
 
 vihreät meemi77.jpg
-2021-02-24 00:57:55.059068
+2021-02-24 19:04:29.224307
 C:\PWBproject\ImageAnnotator\ImageTest\vihreät meemi77.jpg
 
 Photos saved by user: Matti Meikäläinen
 
 20200725_215012.jpg
-2021-02-24 00:57:55.156868
+2021-02-24 19:04:29.314511
 C:\PWBproject\ImageAnnotator\PhotoTest\20200725_215012.jpg
 
-20200725_215534.jpg
-2021-02-24 00:57:55.168836
-C:\PWBproject\ImageAnnotator\PhotoTest\20200725_215534.jpg
-
-20200801_191056.jpg
-2021-02-24 00:57:55.173825
-C:\PWBproject\ImageAnnotator\PhotoTest\20200801_191056.jpg
-
 Iitukka =).JPG
-2021-02-24 00:57:55.178809
+2021-02-24 19:04:29.319497
 C:\PWBproject\ImageAnnotator\PhotoTest\Iitukka =).JPG
 
 lampaat tauolla.JPG
-2021-02-24 00:57:55.205770
+2021-02-24 19:04:29.346453
 C:\PWBproject\ImageAnnotator\PhotoTest\lampaat tauolla.JPG
 
 Norja 2020.jpg
-2021-02-24 00:57:55.212750
+2021-02-24 19:04:29.353434
 C:\PWBproject\ImageAnnotator\PhotoTest\Norja 2020.jpg
 
 Omakuva.jpg
-2021-02-24 00:57:55.217735
+2021-02-24 19:04:29.358421
 C:\PWBproject\ImageAnnotator\PhotoTest\Omakuva.jpg
-
-sinisävyinen.JPG
-2021-02-24 00:57:55.227706
-C:\PWBproject\ImageAnnotator\PhotoTest\sinisävyinen.JPG
 
 """

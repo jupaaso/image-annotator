@@ -176,13 +176,13 @@ print("Photo annotation slideshow_class:        ", lampaat_annotoitu.slideshow_c
 """
 RESULTS  ---------------------------------------------------------------
 
-Photo content:            <PhotoContent 5>
-Photo content id:         5
+Photo content:            <PhotoContent 3>
+Photo content id:         3
 Photo content user_id:    3
 
 Photo annotation:                         <PhotoAnnotation 1>
 Photo annotation id:                      1
-Photo annotation photo_id:                5
+Photo annotation photo_id:                3
 Photo annotation user_id:                 3
 Photo annotation persons_class:           True
 Photo annotation text_persons:            Lampaita

@@ -179,15 +179,11 @@ print("Photo annotation slideshow_class:        ", results4.slideshow_class)
 RESULTS  ---------------------------------------------------------------
 
  User in database: Meria Developer
-
  User in database: Juha Engineer
-
  User in database: Matti Meikäläinen
 
  user1:  <User 1> , id: 1 and name:  Meria Developer
-
- user2:  <User 2> , id: 2 and name:  Juha Engineer
-
+ user2:  <User 2> , id: 2 and name:  Juha Engineer  
  user3:  <User 3> , id: 3 and name:  Matti Meikäläinen
 
 Photos saved by user: Matti Meikäläinen
@@ -195,58 +191,40 @@ Photos saved by user: Matti Meikäläinen
 Photo id:        1
 Photo user_id:   3
 Photo name:      20200725_215012.jpg
-Photo date:      2021-02-24 00:45:08.856758
+Photo date:      2021-02-24 19:07:45.805001
 Photo location:  C:\PWBproject\ImageAnnotator\PhotoTest\20200725_215012.jpg
 
 Photo id:        2
 Photo user_id:   3
-Photo name:      20200725_215534.jpg
-Photo date:      2021-02-24 00:45:08.868753
-Photo location:  C:\PWBproject\ImageAnnotator\PhotoTest\20200725_215534.jpg
+Photo name:      Iitukka =).JPG
+Photo date:      2021-02-24 19:07:45.809988
+Photo location:  C:\PWBproject\ImageAnnotator\PhotoTest\Iitukka =).JPG
 
 Photo id:        3
 Photo user_id:   3
-Photo name:      20200801_191056.jpg
-Photo date:      2021-02-24 00:45:08.873713
-Photo location:  C:\PWBproject\ImageAnnotator\PhotoTest\20200801_191056.jpg
+Photo name:      lampaat tauolla.JPG
+Photo date:      2021-02-24 19:07:45.837941
+Photo location:  C:\PWBproject\ImageAnnotator\PhotoTest\lampaat tauolla.JPG
 
 Photo id:        4
 Photo user_id:   3
-Photo name:      Iitukka =).JPG
-Photo date:      2021-02-24 00:45:08.878729
-Photo location:  C:\PWBproject\ImageAnnotator\PhotoTest\Iitukka =).JPG
+Photo name:      Norja 2020.jpg
+Photo date:      2021-02-24 19:07:45.843926
+Photo location:  C:\PWBproject\ImageAnnotator\PhotoTest\Norja 2020.jpg
 
 Photo id:        5
 Photo user_id:   3
-Photo name:      lampaat tauolla.JPG
-Photo date:      2021-02-24 00:45:08.906654
-Photo location:  C:\PWBproject\ImageAnnotator\PhotoTest\lampaat tauolla.JPG
-
-Photo id:        6
-Photo user_id:   3
-Photo name:      Norja 2020.jpg
-Photo date:      2021-02-24 00:45:08.912636
-Photo location:  C:\PWBproject\ImageAnnotator\PhotoTest\Norja 2020.jpg
-
-Photo id:        7
-Photo user_id:   3
 Photo name:      Omakuva.jpg
-Photo date:      2021-02-24 00:45:08.917623
+Photo date:      2021-02-24 19:07:45.848914
 Photo location:  C:\PWBproject\ImageAnnotator\PhotoTest\Omakuva.jpg
 
-Photo id:        8
-Photo user_id:   3
-Photo name:      sinisävyinen.JPG
-Photo date:      2021-02-24 00:45:08.928605
-Photo location:  C:\PWBproject\ImageAnnotator\PhotoTest\sinisävyinen.JPG
-
-Photo content:            <PhotoContent 7>
-Photo content id:         7
+Photo content:            <PhotoContent 5>
+Photo content id:         5
 Photo content user_id:    3
 
 Photo annotation:                         <PhotoAnnotation 1>
 Photo annotation id:                      1
-Photo annotation photo_id:                7
+Photo annotation photo_id:                5
 Photo annotation user_id:                 None
 Photo annotation persons_class:           True
 Photo annotation text_persons:            John Doe
