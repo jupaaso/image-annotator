@@ -60,6 +60,7 @@ During development and testing phases database creation, population and query ha
 <li> test_APIdb_populate3.py </li>
 <li> test_APIdb_populate4.py </li>
 
+
 The test code ‘test_APIdb_populate4.py’ creates and populates all database models of Image Annotator.
 
 In order to populate database the "imageAnnoAPI.py" -file including database models, ImageTest and PhotoTest folders, and the population test code (for example ‘test_APIdb_populate4.py’) needs to be located in the same path and folder. 
