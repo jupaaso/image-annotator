@@ -9,7 +9,7 @@ __Remember to include all required documentation and HOWTOs, including how to cr
 ## Getting started
 It is recommended to use virtual environment for using and testing the code. It is recommended to use VSCode.  Usage of Python 3.7 or newer version is required. Use "pip install" to install virtual environment packages.
 
-## Setting up virtual environment
+### Setting up virtual environment
 First, create a folder for this project on your computer, where you will install the virtual environment. 
 Next start VSCode, and in VSCode open "File > Open Folder", open that folder.
 
@@ -28,12 +28,12 @@ You also notice that in VSCode terminal the command line starts now with "(.venv
 <li>  pip install pysqlite3</li>
 <li>  pip install flask_sqlalchemy</li>
 
-## Installing required libraries
+### Installing required libraries
 Note! When you later run the code, there may be need to install some other missing package. You can install missing packages with pip install command inside the same virtual environment terminal when (.venv) is at the beginning of the command line. 
 
 Next check "launch.jason" file that it has right content. File is in sw_code folder. Correct location for this file in in ".vscode" folder.
 
-## requirements.txt with dependencies
+### requirements.txt with dependencies
 Image Annotator is created on python. The "requirements.txt" file is availabe from source_code folder.
 Inside virtual environment there are following libraries
 <li> click </li>
