@@ -30,6 +30,7 @@ You also notice that in VSCode terminal the command line starts now with "(.venv
 
 ## Installing required libraries
 Note! When you later run the code, there may be need to install some other missing package. You can install missing packages with pip install command inside the same virtual environment terminal when (.venv) is at the beginning of the command line. 
+
 Next check "launch.jason" file that it has right content. File is in sw_code folder. Correct location for this file in in ".vscode" folder.
 
 ## requirements.txt with dependencies
@@ -58,6 +59,7 @@ During development and testing phases database creation, population and query ha
 <li> test_APIdb_populate2.py </li>
 <li> test_APIdb_populate3.py </li>
 <li> test_APIdb_populate4.py </li>
+
 The test code ‘test_APIdb_populate4.py’ creates and populates all database models of Image Annotator.
 In order to populate database the "imageAnnoAPI.py" -file including database models, ImageTest and PhotoTest folders, and the population test code (for example ‘test_APIdb_populate4.py’) needs to be located in the same path and folder. 
 Activate python virtual environment before test code execution. Run the ‘test_APIdb_populate4.py’ with command  ‘python test_APIdb_populate4.py’. The test code will create the SQLite database and populate few instances into every data table with pre-set parameters. The test code copies images, image data, and ascii data into database. 
@@ -65,8 +67,11 @@ Database is created into project folder and named as "imageAnno.db".
 
 ## Testing during SW development phases
 During API SW development cycles the code was tested with Visual Studio Code (VSC) debugger, Postman, and DB Browser.
+
 VSC debugger utilized Python debugging support (Python extension for Visual Studio Code, GitHub homepage: https://github.com/Microsoft/vscode-python ), and required defined launch.json -file in order to function correctly. Utilized launch.json and settings.json -files are available at source_control -folder.
+
 During API SW development steps Postman API Client (Google Chrome app) was used in testing to send REST Post request queries, and to read their responses within Postman. (Link to Postman website: https://www.postman.com/ )
+
 DB Browser was used to check created and tested databases (DB Browser for SQLite, link to website: https://sqlitebrowser.org/ ). DB Browser provides possibility to execute for example simple integrity and foreign key checking. Created databases were check occasionally during API SW development steps.
 
 ## Database testing
