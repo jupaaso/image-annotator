@@ -292,18 +292,18 @@ print("Photo annotation slideshow_class:        ", lampaat_annotoitu.slideshow_c
 """
 RESULTS  ---------------------------------------------------------------
 
-Users in database:
+Users in database: 
  user1:  <User 1> , id: 1 and name:  Meria Developer
- user2:  <User 2> , id: 2 and name:  Juha Engineer
+ user2:  <User 2> , id: 2 and name:  Juha Engineer  
  user3:  <User 3> , id: 3 and name:  Matti Meikäläinen
 
-Image content:            <ImageContent 3>
-Image content id:         3
+Image content:            <ImageContent 2>
+Image content id:         2
 Image content user_id:    1
 
 Image annotation:                     <ImageAnnotation 1>
 Image annotation id:                  1
-Image annotation image_id:            3
+Image annotation image_id:            2
 Image annotation user_id:             1
 Image annotation meme_class:          True
 Image annotation HS_class:            False
@@ -315,13 +315,13 @@ Image annotation HS_category:         bully
 Image annotation text_text:           Tähän jotain suomenkielistä tekstiä ;-)))) !!
 Image annotation text_language:       finnish
 
-Photo content:            <PhotoContent 5>
-Photo content id:         5
+Photo content:            <PhotoContent 3>
+Photo content id:         3
 Photo content user_id:    3
 
 Photo annotation:                         <PhotoAnnotation 1>
 Photo annotation id:                      1
-Photo annotation photo_id:                5
+Photo annotation photo_id:                3
 Photo annotation user_id:                 3
 Photo annotation persons_class:           True
 Photo annotation text_persons:            Lampaita
