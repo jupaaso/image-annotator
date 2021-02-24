@@ -46,6 +46,9 @@ Inside virtual environment there are following libraries
 <li> SQLAlchemy </li>
 <li> Werkzeug </li>
 
+# Data
+Data of memes and images was created by scraping Google image search with Beautiful Soup python library (https://pypi.org/project/beautifulsoup4/). Beautiful Soup library can be installed with ‘pip install beautifulsoup4’, if needed. Web scraping source code ‘WebScrapGoogle_images.py’ was used to collect raw data from web. Small test data folder ‘ImageTest’ includes some original images scrapped from web. Private photographs were used to create ‘PhotoTest’ -folder. ImageTest and PhotoTest are available at Data -folder.
+
 # Instruction how to populate the database
 Database is based on SQLite. The "imageAnnoAPI.py" does not need to be running to create the database but file needs to be available int the project folder. First copy that file into project folder. Next place some (two or three) photos into your project folder with file names ending to ".jpg" format. These photos are used for database testing. Next place the file "test_API_dbPopulation.py" into your project folder. Run the codeline below and that will create the whole database and creates few instances into every data table with pre-set parameters and also copies the images into database. Database is created into project folder by name "imageAnno.db". 
 
