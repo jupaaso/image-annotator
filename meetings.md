@@ -31,15 +31,38 @@ List here the actions points discussed with assistants
 *ONLY USED BY COURSE STAFF: Additional comments from the course staff*
 
 ## Meeting 2.
-* **DATE:**
-* **ASSISTANTS:**
+* DATE: 26.2.2021 12:30-13:00
+* ASSISTANTS: Mika Oja
 
 ### Minutes
-*Summary of what was discussed during the meeting*
+Summary of what was discussed during the meeting
+
+The Entity Relationship (ER) -diagram is confusing, as nnly tables and their relationships shoul be displayed in the ER diagram — balls should be removed. Currently, the size of the work, database and models meet the resource requirements of the assignment.
+
+Because SQLite was selected as database engine, enum cannot be used as parameter for models, although this could be done for SQL tables. When using SQLite, integer enum values and constraints are modified on code that defines server. On SQLite applications, when a request is received on the server, the condition statements check whether the value is within the allowed limits and whether the type is correct.
+
+On API model tables, the  __init__ configurations are incorrectly encoded and unnecessary, because  SQLAlchemy automatically configures inits configurations by itself. Init codes should be removed  from  model configurations.
+
+It was suggested that ImageContent and PhotoContent models could be combined into one single model since they are so similar. For example, when merging Content models, it is possible to add new field (eg. called private), where the sharing of images as web images or private photos is defined by boolean True/False parameter. This proposal is likely to be implemented using Boolean data type parameter. We also discussed about merging Annotation -models, but since there are a lot of differences on tables, this combination is unlikely to be done.
+
+We discussed that as a part of testing we could try:
+
+- It should be tested, if you destroy a user, Content data and Annotation data will also be deleted in connection with the user's data, or whether the user will only change to null.  When designing a database, you usually decide what happens when user deleted. In other words, in connection with the design, it must be decided whether all user-specific data (including image content and annotation data) will be deleted during user deletion, e.g.  null, or whether only user-specific data will be deleted as null.  One option is that images and annotations remain in the database, meaning that they cannot be discarded from the database when the user leaves. The last option is most likely to be implemented.
+- Test the functionality of database and database cells in various update situations.
+- Test that the database allows annotation data to be altered so that the entire annotation table is updated, deleted, or added at once per user, if possible.
+
+We discussed shortly about testing strategies. It was mentioned that the method used so far to test the database and code is useful, but laborious when pytest testing has not been utilized. It was recommended that we should learn how to use the pytest. We also discussed the fact that testing can be improved and developed throughout the assignment work. The results will be assessed only in the end of the course.
+
 
 ### Action points
-*List here the actions points discussed with assistants*
+List here the actions points discussed with assistants
 
+- Define new and more visual ER diagram
+- Remove __init__ definitions from API -models
+- Merge ImageContent and PhotoContent -models
+- Add boolean data parameter for work related ImageContent and private PhotoContent data
+- More test cases can be created as the course progress further
+- We should learn how to use pytest during the course
 
 ### Comments from staff
 *ONLY USED BY COURSE STAFF: Additional comments from the course staff*
