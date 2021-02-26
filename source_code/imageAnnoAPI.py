@@ -38,7 +38,7 @@ Run file by command:
 python imageAnnoAPI.py
 
 RUN
-* This code creates database 'imageAnno.db' in to the same folder as the code is
+* This code creates database 'imageAnno.db' into the same folder as the code is
 
 RESULTS
 * Created empty database 'imageAnno.db' 24 kt 
@@ -211,9 +211,7 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(db.String(64), nullable=False)
-    #user_name = db.Column(db.String(64, nullable=False, unique=true))
-    #user_nick = db.Column(db.String(16, nullable=False, unique=true))
-    #user_password = db.Column(db.String(16, nullable=False))
+    user_password = db.Column(db.String(16, nullable=False))
 
     image_user = db.relationship("ImageContent", back_populates="img_user")
     photo_user = db.relationship("PhotoContent", back_populates="pho_user")
@@ -221,11 +219,9 @@ class User(db.Model):
     image_annotator = db.relationship("ImageAnnotation", back_populates="img_annotator")
     photo_annotator = db.relationship("PhotoAnnotation", back_populates="pho_annotator")
     
-    #def _init_(self, user_name, user_nick, user_password):
-    def _init_(self, user_name):
+    def _init_(self, user_name, user_password):
         self.user_name = user_name
-        #self.user_nick = user_nick
-        #self.user_password = user_password
+        self.user_password = user_password
 
 # -------------------------------------------------------
 
