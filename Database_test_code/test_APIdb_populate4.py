@@ -2,9 +2,8 @@
 # created by Merja Kreivi-Kauppinen and Juha Paaso
 
 # test_APIdb_populate4.py
-# testing population of imageAnnoAPI database models of Image Annotator
 
-# run by command - python test_APIdb_populate4.py
+# testing population of imageAnnoAPI database models of Image Annotator
 
 """
 In order to run this test code of ImageAnnotator flask API.
@@ -13,7 +12,7 @@ Add following files and folders to ImageAnnotator -folder:
 * ImageTest -folder including test images from web
 * Phototest -folder including test private photos
 * imageAnnoAPI.py -file
-* python test_APIdb_populate4.py
+* test_APIdb_populate4.py
 
 ImageAnnotator -folder includes also
 * .venv -folder (python virtual environment)
@@ -30,9 +29,8 @@ Run test file by command:
     python test_APIdb_populate4.py
 
 TESTING
-* This code creates database, 
-* and populates User, PhotoContent, and PhotoAnnotation tables
-* This test code fails to add user_id on annotation step from user table
+* This code creates database models, 
+* and populates User, PhotoContent, PhotoAnnotation, ImageContent and ImageAnnotation models
 
 RESULTS
 * available in the end of the code
@@ -49,36 +47,34 @@ from io import BytesIO
 import os
 
 # -------------------------------------------------------------------
-
 # Testing User -model population
 
-# Create new users to database
+# Create new row for new user to database by using User -model
 user1 = User(user_name = "Meria Developer")
 user2 = User(user_name = "Juha Engineer")
 user3 = User(user_name = "Matti Meikäläinen")
-db.session.add(user1)
-db.session.add(user2)
-db.session.add(user3)
+user4 = User(user_name = "Katti ole' Matikainen")
+user5 = User(user_name = "Hessu Hopo :-) ")
+user6 = User(user_name = "Juha Engineer")
+
+# Add model to the session
+db.session.add_all([user1, user2, user3, user4, user5, user6])
+
+# Save session to database with commit
 db.session.commit()
 
-"""
+print("\nADD USER \n")
+
+# Execute SQL query for database by using Model.query
+# OR for db.session.query(Model)
+# query.all() get all rows in the database as a list
 result_users = User.query.all()
 for item in result_users:
-    print("\n User in database: " + item.user_name)
-"""
+    print("User object:  ", item ,"   User ID: ", item.id, "   Username:  ", item.user_name)
 
-print("\nUsers in database: ")
-
-# Print users without data
-userqueried1 = User.query.filter_by(user_name="Meria Developer").first()
-userqueried2 = User.query.filter_by(user_name="Juha Engineer").first()
-userqueried3 = User.query.filter_by(user_name="Matti Meikäläinen").first()
-print(" user1: ", userqueried1, ", id:", userqueried1.id, "and name: ", userqueried1.user_name)
-print(" user2: ", userqueried2, ", id:", userqueried2.id, "and name: ", userqueried2.user_name)
-print(" user3: ", userqueried3, ", id:", userqueried3.id, "and name: ", userqueried3.user_name)
+print("\nADD images, photos and annotation for defined image/photo name ")
 
 # -------------------------------------------------------------------
-
 # Testing ImageContent -model population
 
 # Collect images and image data from defined ImageTest -folder to image_list
@@ -127,7 +123,6 @@ for item in results1:
         print(image.location)
 """
 # -------------------------------------------------------------------
-
 # Testing ImageAnnotation -model population
 
 def getImageAnnoData():
@@ -190,7 +185,6 @@ print("Image annotation text_text:          ", kuhakuva_annotoitu.text_text)
 print("Image annotation text_language:      ", kuhakuva_annotoitu.text_language)
 
 # -------------------------------------------------------------------
-
 # Testing PhotoContent -model population
 
 # Collect photos and photo data from defined PhotoTest -folder to photo_list
@@ -240,7 +234,6 @@ for item in results2:
         print("Photo location: ", photo.location)
 """
 # -------------------------------------------------------------------
-
 # Testing PhotoAnnotation -model population
 
 def getPhotoAnnoData():
@@ -292,10 +285,16 @@ print("Photo annotation slideshow_class:        ", lampaat_annotoitu.slideshow_c
 """
 RESULTS  ---------------------------------------------------------------
 
-Users in database: 
- user1:  <User 1> , id: 1 and name:  Meria Developer
- user2:  <User 2> , id: 2 and name:  Juha Engineer  
- user3:  <User 3> , id: 3 and name:  Matti Meikäläinen
+ADD USER 
+
+User object:   <User 1>    User ID:  1    Username:   Meria Developer
+User object:   <User 2>    User ID:  2    Username:   Juha Engineer
+User object:   <User 3>    User ID:  3    Username:   Matti Meikäläinen
+User object:   <User 4>    User ID:  4    Username:   Katti ole' Matikainen
+User object:   <User 5>    User ID:  5    Username:   Hessu Hopo :-)
+User object:   <User 6>    User ID:  6    Username:   Juha Engineer
+
+ADD images, photos and annotation for defined image/photo name
 
 Image content:            <ImageContent 2>
 Image content id:         2

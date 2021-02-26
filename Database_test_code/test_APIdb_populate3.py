@@ -2,9 +2,8 @@
 # created by Merja Kreivi-Kauppinen and Juha Paaso
 
 # test_APIdb_populate3.py
-# testing population of imageAnnoAPI database models of Image Annotator
 
-# run by command - python test_APIdb_populate3.py
+# testing population of imageAnnoAPI database models of Image Annotator
 
 """
 In order to run this test code of ImageAnnotator flask API.
@@ -13,26 +12,25 @@ Add following files and folders to ImageAnnotator -folder:
 * ImageTest -folder including test images from web
 * Phototest -folder including test private photos
 * imageAnnoAPI.py -file
-* python test_APIdb_populate3.py
+* test_APIdb_populate3.py
 
 ImageAnnotator -folder includes also
 * .venv -folder (python virtual environment)
 * .vscode -folder (VSC launch and settings)
 
 Activate created python virtual environment (on VSC cmd):
-cd C:\PWBproject\ImageAnnotator\.venv\Scripts
-activate.bat
+    cd C:\PWBproject\ImageAnnotator\.venv\Scripts
+    activate.bat
 
 Go to ImageAnnotator folder:
-(.venv) C:\PWBproject\ImageAnnotator>
+    (.venv) C:\PWBproject\ImageAnnotator>
 
 Run test file by command:
-python test_APIdb_populate3.py
+    python test_APIdb_populate3.py
 
 TESTING
 * This code creates database, 
 * and populates User, PhotoContent, and PhotoAnnotation tables
-* This test code fails to add user_id on annotation step from user table
 
 RESULTS
 * available in the end of the code
@@ -49,7 +47,6 @@ from io import BytesIO
 import os
 
 # -------------------------------------------------------------------
-
 # Testing User -model population
 
 # Create new users to database
@@ -76,7 +73,6 @@ print("\n user2: ", userqueried2, ", id:", userqueried2.id, "and name: ", userqu
 print("\n user3: ", userqueried3, ", id:", userqueried3.id, "and name: ", userqueried3.user_name)
 """
 # -------------------------------------------------------------------
-
 # Testing PhotoContent -model population
 
 # Collect photos and photo data from defined PhotoTest -folder to photo_list
