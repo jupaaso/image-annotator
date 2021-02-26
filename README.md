@@ -84,4 +84,5 @@ Run the codes defined below to test the database. Test codes are available at â€
 <li> test_APIdb_populate2.py </li>
 <li> test_APIdb_populate3.py </li>
 <li> test_APIdb_populate4.py </li>
+<li> test_APIdb_crudUser1.py </li>
 
