@@ -328,7 +328,6 @@ Get the API entry point
             }
 
 
-# ------------------------------------------------------------------------------------------
 
 
 # Group Users
@@ -369,11 +368,11 @@ Get a list of all users known to the API.
                     "self": {
                         "href": "/api/users/"
                     },
-                    "mumeta:users-all": {
+                    "annometa:users-all": {
                         "href": "/api/users/",
                         "title": "GET All users"                                                
                     },
-                    "mumeta:add-user": {
+                    "annometa:add-user": {
                         "href": "/api/users/",
                         "title": "Add a new user",
                         "encoding": "json",
@@ -452,8 +451,6 @@ Adds a new user. The user representation must be valid against the user schema.
         
             ...
             
-
-# ------------------------------------------------------------------------------------------
 
 
 ## User [/api/users/{user}/]
@@ -542,11 +539,11 @@ Get the user representation.
                         "user_name": "merja",
                         "user_password": "pass",
                         "@controls": {
-                        "self": {
-                            "href": "/api/users/merja/"
-                            },
-                            "profile": {
-                                "href": "/profiles/user/"
+                            "self": {
+                                "href": "/api/users/merja/"
+                                },
+                                "profile": {
+                                    "href": "/profiles/user/"
                             }
                         }
                     }
@@ -651,8 +648,6 @@ Deletes the user.
             ...
 
 
-# ------------------------------------------------------------------------------------------
-
 
 # Group ImageAnnotations
 
@@ -664,7 +659,7 @@ In error scenarios [Error Profile](reference/profiles/error-profile) is used.
 A list of all imageannotations known to the API. 
 
 This collection can be sorted using the sortby query parameter. 
-For each imageannotation only  ---  name is included, 
+For each imageannotation only  ---  id is included, 
 more information can be found by following the `self` relation of each user. 
 
 ### List all imageannotations [GET]
@@ -704,6 +699,10 @@ Get a list of all imageannotationss known to the API.
                         "schema": {
                             "type": "object",
                             "properties": {
+                                "id": {
+                                    "description": "ImageAnnotation unique name",
+                                    "type": "integer"
+                                },
                                 "meme_class": {
                                     "description": "ImageAnnotation meme class",
                                     "type": "boolean"
@@ -741,20 +740,28 @@ Get a list of all imageannotationss known to the API.
                                     "type": "string"
                                 }
                             },
-                            "required": ["HS_class"]
+                            "required": ["id", "HS_class"]
                         }
                     }
                 },
                 "items": [
                     {
-                        "user_name": "Merja",
-                        "user_password": "pass",
+                        "id": 1,
+                        "meme_class": True,
+                        "HS_class": True,
+                        "text_class": True,
+                        "polarity_classA": -2,
+                        "polarity_classB": -4,
+                        "HS_strength": -3,
+                        "HS_category": "ethnic, sexual, bully, troll, coded, idiom",
+                        "text_text": "PARENTS NAMED HIM MIKA PEOPLE CALL HIM BUBBA TUHNULA",
+                        "text_language": "english, finnish",
                         "@controls": {
                             "self": {
-                                "href": "/api/imageannotation/merja/"
+                                "href": "/api/imageannotation/1/"
                             }, 
                             "profile": {
-                                "href": "/profiles/user/"
+                                "href": "/profiles/imageannotation/"
                             }
                         }
                     }
@@ -776,15 +783,23 @@ Adds a new imageannotation. The imageannotation representation must be valid aga
     + Body
     
             {
-                "user_name": "Merja",
-                "user_password": "pass"
+                "id": 1,
+                "meme_class": True,
+                "HS_class": True,
+                "text_class": True,
+                "polarity_classA": -2,
+                "polarity_classB": -4,
+                "HS_strength": -3,
+                "HS_category": "ethnic, sexual, bully, troll, coded, idiom",
+                "text_text": "PARENTS NAMED HIM MIKA PEOPLE CALL HIM BUBBA TUHNULA",
+                "text_language": "english, finnish"
             }
 
 + Response 201
 
     + Headers
     
-            Location: /api/imageannotations/merja/
+            Location: /api/imageannotations/1/
 
 + Response 400 (application/vnd.mason+json)
 
@@ -804,7 +819,250 @@ Adds a new imageannotation. The imageannotation representation must be valid aga
             ...
             
             
+
+
+
+
+## ImageAnnotation [/api/imageannotations/{imageannotation}/]
+
+This is a single imageannotation item by given user using the imageannotation's unique id. 
+For each imageannotation only --- imageannotation id is included, 
+more information can be found by following the `self` relation of each artist. 
+
++ Parameters
+
+    + imageannotation: 1 (integer) - imageannotation's unique id
+
+
+### ImageAnnotation information [GET]
+
+Get the imageannotation representation.
+
++ Relation: self
++ Request
+
+    + Headers
+    
+            Accept: application/vnd.mason+json
+        
++ Response 200 (application/vnd.mason+json)
+
+    + Body
+    
+            {
+                "@namespaces": {
+                    "annometa": {
+                        "name": "/link-relations#"
+                    }
+                },
+                "id": 1,
+                "meme_class": True,
+                "HS_class": True,
+                "text_class": True,
+                "polarity_classA": -2,
+                "polarity_classB": -4,
+                "HS_strength": -3,
+                "HS_category": "ethnic, sexual, bully, troll, coded, idiom",
+                "text_text": "PARENTS NAMED HIM MIKA PEOPLE CALL HIM BUBBA TUHNULA",
+                "text_language": "english, finnish",
+                "@controls": {
+                    "self": {
+                        "href": "/api/imageannotation/1/"
+                    },
+                    "collection": {
+                        "href": "/api/imageannotations/",
+                        "title": "API entry point to imageannotation collection",
+                        "method": "GET"
+                    },
+                    "edit": {
+                        "href": "/api/imageannotations/1/",
+                        "title": "Edit this imageannotation",
+                        "encoding": "json",
+                        "method": "PUT",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "description": "ImageAnnotation unique name",
+                                    "type": "integer"
+                                },
+                                "meme_class": {
+                                    "description": "ImageAnnotation meme class",
+                                    "type": "boolean"
+                                },
+                                "HS_class": {
+                                    "description": "ImageAnnotation HS class",
+                                    "type": "boolean"
+                                },
+                                "text_class": {
+                                    "description": "ImageAnnotation text class",
+                                    "type": "boolean"
+                                },
+                                "polarity_classA": {
+                                    "description": "ImageAnnotation polarity classA",
+                                    "type": "integer"
+                                },
+                                "polarity_classB": {
+                                    "description": "ImageAnnotation polarity classB",
+                                    "type": "integer"
+                                },
+                                "HS_strength": {
+                                    "description": "ImageAnnotation HS stregth",
+                                    "type": "integer"
+                                },
+                                "HS_category": {
+                                    "description": "ImageAnnotation HS category",
+                                    "type": "string"
+                                },
+                                "text_text": {
+                                    "description": "ImageAnnotation image text",
+                                    "type": "string"
+                                },
+                                "text_language": {
+                                    "description": "ImageAnnotation image text language",
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["id"]
+                        }
+                    },
+                    "annometa:delete": {
+                        "href": "/api/imageannotations/1/",
+                        "title": "Delete this imageannotation",
+                        "method": "DELETE"
+                    }
+                },
+                "items": [
+                    { 
+                        "id": 1,
+                        "meme_class": True,
+                        "HS_class": True,
+                        "text_class": True,
+                        "polarity_classA": -2,
+                        "polarity_classB": -4,
+                        "HS_strength": -3,
+                        "HS_category": "ethnic, sexual, bully, troll, coded, idiom",
+                        "text_text": "PARENTS NAMED HIM MIKA PEOPLE CALL HIM BUBBA TUHNULA",
+                        "text_language": "english, finnish",
+                        "@controls": {
+                            "self": {
+                                "href": "/api/imageannotations/1/"
+                                },
+                                "profile": {
+                                    "href": "/profiles/imageannotation/"
+                            }
+                        }
+                    }
+                ]
+            }
+
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to access an artist that doesn't exist.
+
+    + Body
+    
+            {
+                "resource_url": "/api/imageannotations/1/",
+                "@error": {
+                    "@message": "ImageAnnotation not found",
+                    "@messages": [null]
+                },
+                "@controls": {
+                    "profile": {
+                        "href": "/profiles/error/"
+                    }
+                }
+            }
+
             
+
+### Edit ImageAnnotation information [PUT]
+
+Replace the imageannotation's representation with a new one. 
+Missing optional fields will be set to null. 
+Must validate against the user schema. 
+
++ Relation: edit
++ Request (application/json)
+
+    + Headers
+        
+            Accept: application/vnd.mason+json
+        
+    + Body
+    
+            {
+                "id": 1,
+                "meme_class": True,
+                "HS_class": True,
+                "text_class": True,
+                "polarity_classA": -2,
+                "polarity_classB": -4,
+                "HS_strength": -3,
+                "HS_category": "ethnic, sexual, bully, troll, coded, idiom",
+                "text_text": "PARENTS NAMED HIM MIKA PEOPLE CALL HIM BUBBA TUHNULA",
+                "text_language": "english, finnish"
+            }
+        
++ Response 204
+
+
++ Response 400 (application/vnd.mason+json)
+
+    The client is trying to send a JSON document that doesn't validate against the schema, or has non-existent release date.
+
+    + Body
+    
+            ...
+
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to access an artist that doesn't exist.
+
+    + Body
+    
+            ...
+        
++ Response 415 (application/vnd.mason+json)
+
+    The client sent a request with the wrong content type or the request body was not valid JSON.
+
+    + Body
+        
+            ...
+
+### Delete ImageAnnotation [DELETE]
+
+Deletes the imageannotation.
+
++ Relation: delete
++ Request
+
+    + Headers
+        
+            Accept: application/vnd.mason+json
+        
++ Response 204
+
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to send a JSON document that doesn't validate against the schema, or has non-existent release date.
+
+    + Body
+    
+            ...
+
+
+        
++ Response 415 (application/vnd.mason+json)
+
+    The client sent a request with the wrong content type or the request body was not valid JSON.
+
+    + Body
+        
+            ...
+
 
 
 
