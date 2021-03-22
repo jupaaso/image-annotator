@@ -651,7 +651,7 @@ Deletes the user.
 
 # Group ImageAnnotations
 
-All of these resources use the [User Profile](reference/profiles/imageannotator-profile). 
+All of these resources use the [User Profile](reference/profiles/imageannotation-profile). 
 In error scenarios [Error Profile](reference/profiles/error-profile) is used.
 
 ## ImageAnnotation Collection [/api/imageannotations/]
@@ -758,7 +758,7 @@ Get a list of all imageannotationss known to the API.
                         "text_language": "english, finnish",
                         "@controls": {
                             "self": {
-                                "href": "/api/imageannotation/1/"
+                                "href": "/api/imageannotations/1/"
                             }, 
                             "profile": {
                                 "href": "/profiles/imageannotation/"
@@ -867,7 +867,7 @@ Get the imageannotation representation.
                 "text_language": "english, finnish",
                 "@controls": {
                     "self": {
-                        "href": "/api/imageannotation/1/"
+                        "href": "/api/imageannotations/1/"
                     },
                     "collection": {
                         "href": "/api/imageannotations/",
@@ -1062,6 +1062,389 @@ Deletes the imageannotation.
     + Body
         
             ...
+
+
+
+
+
+# Group PhotoAnnotations
+
+All of these resources use the [User Profile](reference/profiles/photoannotation-profile). 
+In error scenarios [Error Profile](reference/profiles/error-profile) is used.
+
+## PhotoAnnotation Collection [/api/photoannotations/]
+
+A list of all photoannotations known to the API. 
+
+This collection can be sorted using the sortby query parameter. 
+For each photoannotation only  ---  id is included, 
+more information can be found by following the `self` relation of each user. 
+
+### List all PhotoAnnotations [GET]
+
+Get a list of all photoannotations known to the API.
+
++ Relation: photoannotations-all
++ Request
+
+    + Headers
+    
+            Accept: application/vnd.mason+json
+
++ Response 200 (application/vnd.mason+json)
+    
+    + Body
+
+            {
+                "@namespaces": {
+                    "annometa": {
+                        "name": "/link-relations#"
+                    }
+                },
+                "@controls": {
+                    "self": {
+                        "href": "/api/photoannotations/"
+                    },
+                    "annometa:imageannotations-all": {
+                        "href": "/api/photoannotations/",
+                        "title": "GET All photoannotations"                                                
+                    },
+                    "annometa:add-imageannotation": {
+                        "href": "/api/photoannotations/",
+                        "title": "Add a new photoannotation",
+                        "encoding": "json",
+                        "method": "POST",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "description": "Photoannotation unique id",
+                                    "type": "integer"
+                                },
+                                "persons_class": {
+                                    "description": "Persons in photo",
+                                    "type": "boolean"
+                                },
+                                "slideshow_class": {
+                                    "description": "Suitable for slideshow",
+                                    "type": "boolean"
+                                },
+                                "positivity_class": {
+                                    "description": "Photo positivity index",
+                                    "type": "integer"
+                                },
+                                "text_free_comment": {
+                                    "description": "Photo's free text comment",
+                                    "type": "string"
+                                },
+                                "text_persons": {
+                                    "description": "Person names in photo",
+                                    "type": "string"
+                                },
+                                "text_persons_comment": {
+                                    "description": "Free text comment of persons",
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["id"]
+                        }
+                    }
+                },
+                "items": [
+                    {
+                        "id": 1,
+                        "persons_class": "True",
+                        "slideshow_class": "False",
+                        "positivity_class": 6,
+                        "text_free_comment": "Lomalla Norjassa kesällä 2020",
+                        "text_persons": "Hessu Hopo, Iines Ankka",
+                        "text_persons_comment": "Hauskat ilmeet kavereilla",
+                        "@controls": {
+                            "self": {
+                                "href": "/api/photoannotations/1/"
+                            }, 
+                            "profile": {
+                                "href": "/profiles/photoannotation/"
+                            }
+                        }
+                    }
+                ]
+            }
+
+
+### Add PhotoAnnotation [POST]
+
+Adds a new photoannotation. The photoannotation representation must be valid against the user schema.
+
++ Relation: add-photoannotation
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+        
+    + Body
+    
+            {
+                "id": 1,
+                "persons_class": "True",
+                "slideshow_class": "False",
+                "positivity_class": 6,
+                "text_free_comment": "Lomalla Norjassa kesällä 2020",
+                "text_persons": "Hessu Hopo, Iines Ankka",
+                "text_persons_comment": "Hauskat ilmeet kavereilla"
+            }
+
++ Response 201
+
+    + Headers
+    
+            Location: /api/photoannotations/1/
+
++ Response 400 (application/vnd.mason+json)
+
+    The client is trying to send a JSON document 
+    that doesn't validate against the schema, or has non-existent release date.
+
+    + Body
+    
+            ...
+
++ Response 415 (application/vnd.mason+json)
+
+    The client did not use the proper content type, or the request body was not valid JSON.
+
+    + Body
+        
+            ...
+            
+            
+
+
+## PhotoAnnotation [/api/photoannotations/{photoannotation}/]
+
+This is a single photoannotation item by given user using the photoannotation's unique id. 
+For each photoannotation only --- photoannotation id is included, 
+more information can be found by following the `self` relation of each artist. 
+
++ Parameters
+
+    + photoannotation: 1 (integer) - photoannotation's unique id
+
+
+### PhotoAnnotation information [GET]
+
+Get the photoannotation representation.
+
++ Relation: self
++ Request
+
+    + Headers
+    
+            Accept: application/vnd.mason+json
+        
++ Response 200 (application/vnd.mason+json)
+
+    + Body
+    
+            {
+                "@namespaces": {
+                    "annometa": {
+                        "name": "/link-relations#"
+                    }
+                },
+                "id": 1,
+                "persons_class": "True",
+                "slideshow_class": "False",
+                "positivity_class": 6,
+                "text_free_comment": "Lomalla Norjassa kesällä 2020",
+                "text_persons": "Hessu Hopo, Iines Ankka",
+                "text_persons_comment": "Hauskat ilmeet kavereilla",
+                "@controls": {
+                    "self": {
+                        "href": "/api/photoannotations/1/"
+                    },
+                    "collection": {
+                        "href": "/api/photoannotations/",
+                        "title": "API entry point to photoannotation collection",
+                        "method": "GET"
+                    },
+                    "edit": {
+                        "href": "/api/photoannotations/1/",
+                        "title": "Edit this photoannotation",
+                        "encoding": "json",
+                        "method": "PUT",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                               "id": {
+                                    "description": "Photoannotation unique id",
+                                    "type": "integer"
+                                },
+                                "persons_class": {
+                                    "description": "Persons in photo",
+                                    "type": "boolean"
+                                },
+                                "slideshow_class": {
+                                    "description": "Suitable for slideshow",
+                                    "type": "boolean"
+                                },
+                                "positivity_class": {
+                                    "description": "Photo positivity index",
+                                    "type": "integer"
+                                },
+                                "text_free_comment": {
+                                    "description": "Photo's free text comment",
+                                    "type": "string"
+                                },
+                                "text_persons": {
+                                    "description": "Person names in photo",
+                                    "type": "string"
+                                },
+                                "text_persons_comment": {
+                                    "description": "Free text comment of persons",
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["id"]
+                        }
+                    },
+                    "annometa:delete": {
+                        "href": "/api/photoannotations/1/",
+                        "title": "Delete this photoannotation",
+                        "method": "DELETE"
+                    }
+                },
+                "items": [
+                    { 
+                        "id": 1,
+                        "persons_class": "True",
+                        "slideshow_class": "False",
+                        "positivity_class": 6,
+                        "text_free_comment": "Lomalla Norjassa kesällä 2020",
+                        "text_persons": "Hessu Hopo, Iines Ankka",
+                        "text_persons_comment": "Hauskat ilmeet kavereilla",
+                        "@controls": {
+                            "self": {
+                                "href": "/api/photoannotations/1/"
+                                },
+                                "profile": {
+                                    "href": "/profiles/photoannotation/"
+                            }
+                        }
+                    }
+                ]
+            }
+
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to access an artist that doesn't exist.
+
+    + Body
+    
+            {
+                "resource_url": "/api/photoannotations/1/",
+                "@error": {
+                    "@message": "PhotoAnnotation not found",
+                    "@messages": [null]
+                },
+                "@controls": {
+                    "profile": {
+                        "href": "/profiles/error/"
+                    }
+                }
+            }
+
+            
+
+### Edit PhotoAnnotation information [PUT]
+
+Replace the photoannotation's representation with a new one. 
+Missing optional fields will be set to null. 
+Must validate against the user schema. 
+
++ Relation: edit
++ Request (application/json)
+
+    + Headers
+        
+            Accept: application/vnd.mason+json
+        
+    + Body
+    
+            {
+                "id": 1,
+                "meme_class": True,
+                "HS_class": True,
+                "text_class": True,
+                "polarity_classA": -2,
+                "polarity_classB": -4,
+                "HS_strength": -3,
+                "HS_category": "ethnic, sexual, bully, troll, coded, idiom",
+                "text_text": "PARENTS NAMED HIM MIKA PEOPLE CALL HIM BUBBA TUHNULA",
+                "text_language": "english, finnish"
+            }
+        
++ Response 204
+
+
++ Response 400 (application/vnd.mason+json)
+
+    The client is trying to send a JSON document that doesn't validate against the schema, or has non-existent release date.
+
+    + Body
+    
+            ...
+
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to access an artist that doesn't exist.
+
+    + Body
+    
+            ...
+        
++ Response 415 (application/vnd.mason+json)
+
+    The client sent a request with the wrong content type or the request body was not valid JSON.
+
+    + Body
+        
+            ...
+
+### Delete PhotoAnnotation [DELETE]
+
+Deletes the photoannotation.
+
++ Relation: delete
++ Request
+
+    + Headers
+        
+            Accept: application/vnd.mason+json
+        
++ Response 204
+
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to send a JSON document that doesn't validate against the schema, or has non-existent release date.
+
+    + Body
+    
+            ...
+
+
+        
++ Response 415 (application/vnd.mason+json)
+
+    The client sent a request with the wrong content type or the request body was not valid JSON.
+
+    + Body
+        
+            ...
+
+
+
 
 
 
