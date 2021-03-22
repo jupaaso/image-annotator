@@ -1,9 +1,292 @@
 FORMAT: 1A
 HOST: https://polls.apiblueprint.org/
 
-# imageAnnotator
+# Image Annotator
 
-API is used for annotating images and photos.
+Image Annotator is a RESTful API for collecting and annotating public images and private photographs to SQLite database. 
+
+Image Annotator API is designed to be used as a part of scientific hate speech study analysis whereas the aim is collect and annotate of social media images which include text for example memes. Image Annotator API includes also private part which is designed for collecting and annotating private photographs.
+
+Images and photographs create collections which include image or photo related metadata and user identity to identify the owner of the images and photos. Image and photo annotations include image or photo specific annotations created by registered user. Accordingly, annotations are collected to Image Annotation and Photo Annotation Collections. Users need to be registered, and registered users are collected User Collection.
+
+
+
+# Group Link Relations
+
+This section describes custom link relations defined in Image Annotator API. 
+These are not resources. Custom link relations are CURIEs that use the annometa prefix.
+Image Annotator API utilizes defined custom link relations, and [IANA link relations] 
+(http://www.iana.org/assignments/link-relations/link-relations.xhtml) where applicable. 
+
+
+## add-user
+
+The control for adding new user to the API. The control includes a JSON schema and must be accessed with POST.
+
+## add-image
+
+The control for adding new image resource or new resources to the API. The control includes a JSON schema and must be accessed with POST.
+
+## add-photo
+
+The control for adding new photo resource or new resources to the API. The control includes a JSON schema and must be accessed with POST.
+
+## add-photoannotation
+
+The control for adding new annotation for specified photograph. The control includes a JSON schema and must be accessed with POST.
+
+## add-imageannotation
+
+The control for adding new annotation for specified image. The control includes a JSON schema and must be accessed with POST.
+
+## images-by
+
+Leads to list of images collected by registered user. The control includes a JSON schema and must be accessed with GET.
+
+## photos-by
+
+Leads to list of photographs collected by registered user. The control includes a JSON schema and must be accessed with GET.
+
+## photoannotations-by
+
+Leads to list of photoannotations collected by registered user. The control includes a JSON schema and must be accessed with GET.
+
+## imageannotations-by
+
+Leads to list of imageannotations collected by registered user. The control includes a JSON schema and must be accessed with GET.
+
+## users-all
+
+Leads to list of users that are registered to the API. The control includes a JSON schema and must be accessed with GET.
+
+## photos-all
+
+Leads to list of photographs that are collected to the API. The control includes a JSON schema and must be accessed with GET.
+
+## images-all
+
+Leads to list of images that are collected to the API. The control includes a JSON schema and must be accessed with GET.
+
+## photoannotations-all
+
+Leads to list of photographs that are collected to the API. The control includes a JSON schema and must be accessed with GET.
+
+## imageannotations-all
+
+Leads to list of images that are collected to the API. The control includes a JSON schema and must be accessed with GET.
+
+## delete
+
+The control for deleting the specific resource. Must be accessed with DELETE.
+
+
+# ----------------------------------------------------------------------------
+
+
+# Group Profiles
+
+This section includes resource profiles which provide semantic descriptions for the attributes of each resource, as well as the list of controls (by link relation) available from that resource.
+
+
+# ----------------------------------------------------------------------------
+
+
+## User Profile
+
+This Profile define the User related information.
+
+### Description
+
+Registered user can import, annotate, edit and delete images and photographs, and related annotations. 
+Logging into API is done by using get method to User resource. 
+Access is denied if the correct secret apikey is not found in the header.
+
+
+### Dependencies
+ - none
+ 
+### Related Profile
+ - none
+
+### Link relations
+
+This section lists all possible link relations associated with User. 
+
+The following link relations from the annometa namespace are used for:
+
+ * [add-user](reference/link-relations/add-user)
+ * [add-photo](reference/link-relations/add-photo)
+ * [add-image](reference/link-relations/add-image)
+ * [add-photoannotation](reference/link-relations/add-photoannotation)
+ * [add-imageannotation](reference/link-relations/add-imageannotation)
+ * [photos-by](reference/link-relations/photos-by)
+ * [images-by](reference/link-relations/images-by)
+ * [photoannotations-by](reference/link-relations/photoannotations-by)
+ * [imageannotations-by](reference/link-relations/imageannotations-by)
+ * [users-all](reference/link-relations/users-all)
+ * [photos-all](reference/link-relations/photos-all)
+ * [images-all](reference/link-relations/images-all)
+ * [photoannotations-all](reference/link-relations/photoannotations-all)
+ * [imageannotations-all](reference/link-relations/imageannotations-all)
+ * [delete](reference/link-relations/delete)
+
+The following [IANA RFC5988](http://www.iana.org/assignments/link-relations/link-relations.xhtml) link relations are also used:
+
+ * author
+ * collection
+ * edit
+ * self
+
+### Semantic descriptors
+ * **user_name**: STRING. User name of the user that has registered to the API.
+ * **user_password**: STRING. Password of the registered user.
+
+# ----------------------------------------------------------------------------
+
+
+## Image Content Profile
+
+Image content profile define the image or photograph related information.
+
+### Description
+
+Registered user can import, delete and edit images and photographs in Image Annotator API.
+
+### Dependencies
+ * ISO 8601 (Date and Time format). More info at: http://en.wikipedia.org/wiki/ISO_8601
+
+### Related Profile
+ * *User*
+
+### Link relations
+
+This section lists all possible link relations associated with Image Content. 
+
+The following link relations from the annometa namespace are used for:
+
+ * [add-photo](reference/link-relations/add-photo)
+ * [add-image](reference/link-relations/add-image)
+ * [photos-all](reference/link-relations/photos-all)
+ * [images-all](reference/link-relations/images-all)
+ * [delete](reference/link-relations/delete)
+
+The following [IANA RFC5988](http://www.iana.org/assignments/link-relations/link-relations.xhtml) link relations are also used:
+
+ * author
+ * collection
+ * edit
+ * self
+
+### Semantic descriptors
+ * **data**: BINARY. Binary file of loaded image or photograph.
+ * **ascii_data**: STRING. ASCII file of loaded image or photograph.
+ * **name**: STRING. Name of the loaded image or photograph file.
+ * **publish_date**: DATE (ISO_8601)/NONE. If the device or user have updated or defined the date when image or photograph has been taken or published originally, the date is gathered as metadata. If it does not exist, it will contain None.
+ * **location**: STRING. Location of file from where image or photograph file has been loaded to API.
+ * **is_private**: BOOLEAN. Defines if loaded file is defined as private photograph (True) or public social media image (False). Default is True (as private photograph).
+ * **date**: DATE (ISO_8601). Date and time when the image or photograph has been loaded to API.
+
+ 
+# ----------------------------------------------------------------------------
+
+
+## Image Annotation Profile
+
+This Profile define the Image Annotation related information.
+
+### Description
+
+Registered user can annotate images for example for scientific social media study purposis. 
+Registered user can also add, delete or edit image related annotations. 
+Logging in as user is done by using get method to that resource. 
+Access is denied if the correct secret apikey is not found in the header.
+
+### Dependencies
+ * ISO 8601 (Date and Time format). More info at: http://en.wikipedia.org/wiki/ISO_8601
+
+### Related Profile
+ * *User*
+ * *ImageContent*
+
+### Link relations
+
+This section lists all possible link relations associated with Image Annotation. 
+
+The following link relations from the annometa namespace are used for:
+
+ * [add-imageannotation](reference/link-relations/add-imageannotation)
+ * [delete](reference/link-relations/delete)
+
+The following [IANA RFC5988](http://www.iana.org/assignments/link-relations/link-relations.xhtml) link relations are also used:
+
+ * author
+ * collection
+ * edit
+ * self
+
+### Semantic descriptors
+ * **meme_class**: BOOLEAN. Boolean classifier to identify meme images. Classified as True if image is meme. Classified as False if image is not meme.
+ * **HS_class**: BOOLEAN. Boolean classifier to identify hate speech images. Classified as True if image is or includes hate speech. Classified as False if image is not or does not include hate speech.
+ * **text_class**: BOOLEAN. Boolean classifier to identify images that includes text. Classified as True if image includes text. Classified as False if image does not include text.
+ * **polarity_classA**: INTEGER. Positive-neutral-negative polarity classifier for image. Integer can get value 2 or 1 if image is positive, value 0 if image is neutral, and value -1 or -2 if image is negative.
+ * **polarity_classB**: INTEGER. Positive-negative polarity strength classifier for image. Integer can get value between 1 to 5 if image is positive, and value between -1 or -5 if image is negative. Image cannot get value 0.
+ * **HS_strength**: INTEGER. Negative polarity strength classifier for hate speech images. Integer can get value between -1 to -5 according to how hateful it is defined.
+ * **HS_category**: STRING. Hate speech category classifier for hate speech images. Available hate speech (HS) categories are presented below.
+ * **text_text**: STRING. Text of image, if image includes text.
+ * **text_language**: STRING. Language of the text on image, if image includes text.
+
+ * Hate Speech (HS) categories: national, immigration, foreign, ethnic, religion, opinion, group, politics, health, sexual, socialMedia, socioeconomicStatus, appearance, gender, women, men, work, violence, family, swear, bully, troll, coded, idiom, joke, symbolic, other
+
+
+# ----------------------------------------------------------------------------------------
+
+
+## Photo Annotation Profile
+
+This Profile define the Photo Annotation related information.
+
+### Description
+
+Registered user can annotate photographs for example for private use. 
+Registered user can also add, delete or edit photo related annotations. 
+Logging in as user is done by using get method to that resource. 
+Access is denied if the correct secret apikey is not found in the header.
+
+### Dependencies
+ * ISO 8601 (Date and Time format). More info at: http://en.wikipedia.org/wiki/ISO_8601
+
+### Related Profile
+ * *User*
+ * *ImageContent*
+
+### Link relations
+
+This section lists all possible link relations associated with Photo Annotation. 
+
+The following link relations from the annometa namespace are used for:
+
+ * [add-photoannotation](reference/link-relations/add-photoannotation)
+ * [delete](reference/link-relations/delete)
+
+The following [IANA RFC5988](http://www.iana.org/assignments/link-relations/link-relations.xhtml) link relations are also used:
+
+ * author
+ * collection
+ * edit
+ * self
+
+### Semantic descriptors
+
+ * **persons_class**: BOOLEAN. Boolean classifier to identify persons in photo. Classified as True if image includes persons. Classified as False if image does not include persons.
+ * **slideshow_class**: BOOLEAN. Boolean classifier to identify photos suitable for photo-slide-show. Classified as True if image is suitable for show. Classified as False if image is not suitable for show.
+ * **positivity_class**: INTEGER. Neutral-positive polarity classifier for photo. Integer can get a value between 1 and 10 ( 1 - 10 ) according to how good photo is.
+ * **text_free_comment**: STRING. The free comment text made by user on the photo.
+ * **text_persons**: STRING. Text to identify persons and persons names on photo, if photo includes persons.
+ * **text_persons_comment**: STRING. Free comment text about persons on photo, if photo includes persons.
+
+
+# ------------------------------------------------------------------------------------------
+
 
 # Group Entry
 
@@ -43,6 +326,9 @@ Get the API entry point
                     }
                 }
             }
+
+
+# ------------------------------------------------------------------------------------------
 
 
 # Group Users
@@ -165,6 +451,10 @@ Adds a new user. The user representation must be valid against the user schema.
     + Body
         
             ...
+            
+
+# ------------------------------------------------------------------------------------------
+
 
 ## User [/api/users/{user}/]
 
@@ -359,6 +649,9 @@ Deletes the user.
     + Body
         
             ...
+
+
+# ------------------------------------------------------------------------------------------
 
 
 # Group ImageAnnotations
