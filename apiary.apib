@@ -1,0 +1,361 @@
+FORMAT: 1A
+HOST: https://polls.apiblueprint.org/
+
+# imageAnnotator
+
+API is used for annotating images and photos.
+
+# Group Entry
+
+This group contains the entry point of the API
+
+## Entry Point [/api/]
+
+### Get entry point [GET]
+
+Get the API entry point
+
++ Request
+
+    + Headers
+    
+            Accept: application/vnd.mason+json
+            
++ Response 200 (application/vnd.mason+json)
+
+    + Body
+    
+            {
+                "@namespaces": {
+                    "annometa": {
+                        "name": "/link-relations#"
+                    }
+                },
+                "@controls": {
+                    "annometa:photoannotations-all": {
+                        "href": "/api/photoannotations-all/"
+                    },
+                    "annometa:imageannotations-all": {
+                        "href": "/api/imageannotations-all/"
+                    },
+                    "annometa:users-all": {
+                        "href": "/api/users-all/"
+                    }
+                }
+            }
+
+
+# Group Users
+
+All of these resources use the [User Profile](reference/profiles/user-profile). 
+In error scenarios [Error Profile](reference/profiles/error-profile) is used.
+
+## Users Collection [/api/users/]
+
+A list of all userss known to the API. 
+
+This collection can be sorted using the sortby query parameter. 
+For each user only  ---  user name is included, 
+more information can be found by following the `self` relation of each user. 
+
+### List all users [GET]
+
+Get a list of all users known to the API.
+
++ Relation: users-all
++ Request
+
+    + Headers
+    
+            Accept: application/vnd.mason+json
+
++ Response 200 (application/vnd.mason+json)
+    
+    + Body
+
+            {
+                "@namespaces": {
+                    "annometa": {
+                        "name": "/link-relations#"
+                    }
+                },
+                "@controls": {
+                    "self": {
+                        "href": "/api/users/"
+                    },
+                    "mumeta:users-all": {
+                        "href": "/api/users/",
+                        "title": "GET All users"                                                
+                    },
+                    "mumeta:add-user": {
+                        "href": "/api/users/",
+                        "title": "Add a new user",
+                        "encoding": "json",
+                        "method": "POST",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "user_name": {
+                                    "description": "User name",
+                                    "type": "string"
+                                },
+                                "user_password": {
+                                    "description": "User password",
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["user_name", "user_password"]
+                        }
+                    }
+                },
+                "items": [
+                    {
+                        "user_name": "Merja",
+                        "user_password": "pass",
+                        "@controls": {
+                            "self": {
+                                "href": "/api/users/merja/"
+                            }, 
+                            "profile": {
+                                "href": "/profiles/user/"
+                            }
+                        }
+                    }
+                ]
+            }
+
+
+### Add user [POST]
+
+Adds a new user. The user representation must be valid against the user schema.
+
++ Relation: add-user
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+        
+    + Body
+    
+            {
+                "user_name": "Merja",
+                "user_password": "pass"
+            }
+
++ Response 201
+
+    + Headers
+    
+            Location: /api/users/merja/
+
++ Response 400 (application/vnd.mason+json)
+
+    The client is trying to send a JSON document 
+    that doesn't validate against the schema, or has non-existent release date.
+
+    + Body
+    
+            ...
+
++ Response 415 (application/vnd.mason+json)
+
+    The client did not use the proper content type, or the request body was not valid JSON.
+
+    + Body
+        
+            ...
+
+## User [/api/users/{user}/]
+
+This is a single user item by given user using the user's unique name. 
+For each user only --- user name is included, 
+more information can be found by following the `self` relation of each artist. 
+
++ Parameters
+
+    + user: merja (string) - user's unique user_name
+
+
+### User information [GET]
+
+Get the user representation.
+
++ Relation: self
++ Request
+
+    + Headers
+    
+            Accept: application/vnd.mason+json
+        
++ Response 200 (application/vnd.mason+json)
+
+    + Body
+    
+            {
+                "@namespaces": {
+                    "annometa": {
+                        "name": "/link-relations#"
+                    }
+                },
+                "user_name": "merja",
+                "user_password": "pass",
+                "@controls": {
+                    "self": {
+                        "href": "/api/users/merja/"
+                    },
+                    "annometa:photoannotations-by": {
+                        "href": "/api/users/merja/photoannotations/"
+                    },
+                    "annometa:imageannotations-by": {
+                        "href": "/api/users/merja/imageannotations/"
+                    },
+                    "annometa:photos-by": {
+                        "href": "/api/users/merja/photos/"
+                    },
+                    "annometa:images-by": {
+                        "href": "/api/users/merja/images/"
+                    },
+                    "collection": {
+                        "href": "/api/users/",
+                        "title": "API entry point to user collection",
+                        "method": "GET"
+                    },
+                    "edit": {
+                        "href": "/api/users/merja/",
+                        "title": "Edit this user",
+                        "encoding": "json",
+                        "method": "PUT",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "user_name": {
+                                    "description": "User name",
+                                    "type": "string"
+                                },
+                                "user_password": {
+                                    "description": "User password",
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["user_name"]
+                        }
+                    },
+                    "annometa:delete": {
+                        "href": "/api/users/merja/",
+                        "title": "Delete this user",
+                        "method": "DELETE"
+                    }
+                },
+                "items": [
+                    { 
+                        "user_name": "merja",
+                        "user_password": "pass",
+                        "@controls": {
+                        "self": {
+                            "href": "/api/users/merja/"
+                            },
+                            "profile": {
+                                "href": "/profiles/user/"
+                            }
+                        }
+                    }
+                ]
+            }
+
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to access an artist that doesn't exist.
+
+    + Body
+    
+            {
+                "resource_url": "/api/users/merja/",
+                "@error": {
+                    "@message": "User not found",
+                    "@messages": [null]
+                },
+                "@controls": {
+                    "profile": {
+                        "href": "/profiles/error/"
+                    }
+                }
+            }
+
+### Edit user information [PUT]
+
+Replace the user's representation with a new one. 
+Missing optional fields will be set to null. 
+Must validate against the user schema. 
+
++ Relation: edit
++ Request (application/json)
+
+    + Headers
+        
+            Accept: application/vnd.mason+json
+        
+    + Body
+    
+            {
+                "user_name": "merja",
+                "user_password": "pass"
+            }
+        
++ Response 204
+
+
++ Response 400 (application/vnd.mason+json)
+
+    The client is trying to send a JSON document that doesn't validate against the schema, or has non-existent release date.
+
+    + Body
+    
+            ...
+
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to access an artist that doesn't exist.
+
+    + Body
+    
+            ...
+        
++ Response 415 (application/vnd.mason+json)
+
+    The client sent a request with the wrong content type or the request body was not valid JSON.
+
+    + Body
+        
+            ...
+
+### Delete user [DELETE]
+
+Deletes the user.
+
++ Relation: delete
++ Request
+
+    + Headers
+        
+            Accept: application/vnd.mason+json
+        
++ Response 204
+
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to send a JSON document that doesn't validate against the schema, or has non-existent release date.
+
+    + Body
+    
+            ...
+
+
+        
++ Response 415 (application/vnd.mason+json)
+
+    The client sent a request with the wrong content type or the request body was not valid JSON.
+
+    + Body
+        
+            ...
