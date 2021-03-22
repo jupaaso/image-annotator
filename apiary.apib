@@ -359,3 +359,200 @@ Deletes the user.
     + Body
         
             ...
+
+
+# Group ImageAnnotations
+
+All of these resources use the [User Profile](reference/profiles/imageannotator-profile). 
+In error scenarios [Error Profile](reference/profiles/error-profile) is used.
+
+## ImageAnnotation Collection [/api/imageannotations/]
+
+A list of all imageannotations known to the API. 
+
+This collection can be sorted using the sortby query parameter. 
+For each imageannotation only  ---  name is included, 
+more information can be found by following the `self` relation of each user. 
+
+### List all imageannotations [GET]
+
+Get a list of all imageannotationss known to the API.
+
++ Relation: imageannotations-all
++ Request
+
+    + Headers
+    
+            Accept: application/vnd.mason+json
+
++ Response 200 (application/vnd.mason+json)
+    
+    + Body
+
+            {
+                "@namespaces": {
+                    "annometa": {
+                        "name": "/link-relations#"
+                    }
+                },
+                "@controls": {
+                    "self": {
+                        "href": "/api/imageannotations/"
+                    },
+                    "mumeta:imageannotations-all": {
+                        "href": "/api/imageannotations/",
+                        "title": "GET All imageannotations"                                                
+                    },
+                    "mumeta:add-imageannotation": {
+                        "href": "/api/imageannotations/",
+                        "title": "Add a new imageannotation",
+                        "encoding": "json",
+                        "method": "POST",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "meme_class": {
+                                    "description": "ImageAnnotation meme class",
+                                    "type": "boolean"
+                                },
+                                "HS_class": {
+                                    "description": "ImageAnnotation HS class",
+                                    "type": "boolean"
+                                },
+                                "text_class": {
+                                    "description": "ImageAnnotation text class",
+                                    "type": "boolean"
+                                },
+                                "polarity_classA": {
+                                    "description": "ImageAnnotation polarity classA",
+                                    "type": "integer"
+                                },
+                                "polarity_classB": {
+                                    "description": "ImageAnnotation polarity classB",
+                                    "type": "integer"
+                                },
+                                "HS_strength": {
+                                    "description": "ImageAnnotation HS stregth",
+                                    "type": "integer"
+                                },
+                                "HS_category": {
+                                    "description": "ImageAnnotation HS category",
+                                    "type": "string"
+                                },
+                                "text_text": {
+                                    "description": "ImageAnnotation image text",
+                                    "type": "string"
+                                },
+                                "text_language": {
+                                    "description": "ImageAnnotation image text language",
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["HS_class"]
+                        }
+                    }
+                },
+                "items": [
+                    {
+                        "user_name": "Merja",
+                        "user_password": "pass",
+                        "@controls": {
+                            "self": {
+                                "href": "/api/imageannotation/merja/"
+                            }, 
+                            "profile": {
+                                "href": "/profiles/user/"
+                            }
+                        }
+                    }
+                ]
+            }
+
+
+### Add imageannotation [POST]
+
+Adds a new imageannotation. The imageannotation representation must be valid against the user schema.
+
++ Relation: add-imageannotation
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+        
+    + Body
+    
+            {
+                "user_name": "Merja",
+                "user_password": "pass"
+            }
+
++ Response 201
+
+    + Headers
+    
+            Location: /api/imageannotations/merja/
+
++ Response 400 (application/vnd.mason+json)
+
+    The client is trying to send a JSON document 
+    that doesn't validate against the schema, or has non-existent release date.
+
+    + Body
+    
+            ...
+
++ Response 415 (application/vnd.mason+json)
+
+    The client did not use the proper content type, or the request body was not valid JSON.
+
+    + Body
+        
+            ...
+            
+            
+            
+
+
+
+
+
+            
+            LAITA NAMAT CONTENTTIIN
+            
+            "mumeta:add-imageannotation": {
+                        "href": "/api/imageannotations/",
+                        "title": "Add a new imageannotation",
+                        "encoding": "json",
+                        "method": "POST",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "description": "ImageAnnotation binary file",
+                                    "type": "binary"
+                                },
+                                "ascii_data": {
+                                    "description": "ImageAnnotation ascii file",
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "description": "ImageAnnotation name",
+                                    "type": "string"
+                                },
+                                "publish_date": {
+                                    "description": "ImageAnnotation publish date",
+                                    "type": "date"
+                                },
+                                "location": {
+                                    "description": "Location of image",
+                                    "type": "string"
+                                },
+                                "is_private": {
+                                    "description": "ImageAnnotation privacy",
+                                    "type": "string"
+                                },
+                                "date": {
+                                    "description": "ImageAnnotation date of loading to API",
+                                    "type": "string"
+                                }
