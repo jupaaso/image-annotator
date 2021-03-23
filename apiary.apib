@@ -80,7 +80,7 @@ Leads to list of images that are collected to the API. The control includes a JS
 The control for deleting the specific resource. Must be accessed with DELETE.
 
 
-# ----------------------------------------------------------------------------
+
 
 
 # Group Profiles
@@ -88,7 +88,7 @@ The control for deleting the specific resource. Must be accessed with DELETE.
 This section includes resource profiles which provide semantic descriptions for the attributes of each resource, as well as the list of controls (by link relation) available from that resource.
 
 
-# ----------------------------------------------------------------------------
+
 
 
 ## User Profile
@@ -141,7 +141,8 @@ The following [IANA RFC5988](http://www.iana.org/assignments/link-relations/link
  * **user_name**: STRING. User name of the user that has registered to the API.
  * **user_password**: STRING. Password of the registered user.
 
-# ----------------------------------------------------------------------------
+
+
 
 
 ## Image Content Profile
@@ -187,7 +188,7 @@ The following [IANA RFC5988](http://www.iana.org/assignments/link-relations/link
  * **date**: DATE (ISO_8601). Date and time when the image or photograph has been loaded to API.
 
  
-# ----------------------------------------------------------------------------
+
 
 
 ## Image Annotation Profile
@@ -238,7 +239,7 @@ The following [IANA RFC5988](http://www.iana.org/assignments/link-relations/link
  * Hate Speech (HS) categories: national, immigration, foreign, ethnic, religion, opinion, group, politics, health, sexual, socialMedia, socioeconomicStatus, appearance, gender, women, men, work, violence, family, swear, bully, troll, coded, idiom, joke, symbolic, other
 
 
-# ----------------------------------------------------------------------------------------
+
 
 
 ## Photo Annotation Profile
@@ -285,7 +286,7 @@ The following [IANA RFC5988](http://www.iana.org/assignments/link-relations/link
  * **text_persons_comment**: STRING. Free comment text about persons on photo, if photo includes persons.
 
 
-# ------------------------------------------------------------------------------------------
+
 
 
 # Group Entry
@@ -326,6 +327,7 @@ Get the API entry point
                     }
                 }
             }
+
 
 
 
@@ -451,6 +453,8 @@ Adds a new user. The user representation must be valid against the user schema.
         
             ...
             
+
+
 
 
 ## User [/api/users/{user}/]
@@ -649,6 +653,8 @@ Deletes the user.
 
 
 
+
+
 # Group ImageAnnotations
 
 All of these resources use the [User Profile](reference/profiles/imageannotation-profile). 
@@ -687,11 +693,11 @@ Get a list of all imageannotationss known to the API.
                     "self": {
                         "href": "/api/imageannotations/"
                     },
-                    "mumeta:imageannotations-all": {
+                    "annometa:imageannotations-all": {
                         "href": "/api/imageannotations/",
                         "title": "GET All imageannotations"                                                
                     },
-                    "mumeta:add-imageannotation": {
+                    "annometa:add-imageannotation": {
                         "href": "/api/imageannotations/",
                         "title": "Add a new imageannotation",
                         "encoding": "json",
@@ -819,7 +825,6 @@ Adds a new imageannotation. The imageannotation representation must be valid aga
             ...
             
             
-
 
 
 
@@ -1105,11 +1110,11 @@ Get a list of all photoannotations known to the API.
                     "self": {
                         "href": "/api/photoannotations/"
                     },
-                    "annometa:imageannotations-all": {
+                    "annometa:photoannotations-all": {
                         "href": "/api/photoannotations/",
                         "title": "GET All photoannotations"                                                
                     },
-                    "annometa:add-imageannotation": {
+                    "annometa:add-photoannotation": {
                         "href": "/api/photoannotations/",
                         "title": "Add a new photoannotation",
                         "encoding": "json",
@@ -1217,6 +1222,7 @@ Adds a new photoannotation. The photoannotation representation must be valid aga
     + Body
         
             ...
+            
             
             
 
@@ -1446,47 +1452,279 @@ Deletes the photoannotation.
 
 
 
+# Group Images and Photos
 
 
+## Image Collection [/api/images/]
 
+A list of all images known to the API. 
 
+This collection can be sorted using the sortby query parameter. 
+For each images only  ---  id is included, 
+more information can be found by following the `self` relation of each user. 
 
-            
-            LAITA NAMAT CONTENTTIIN
-            
-            "mumeta:add-imageannotation": {
-                        "href": "/api/imageannotations/",
-                        "title": "Add a new imageannotation",
+### List all Images [GET]
+
+Get a list of all images known to the API.
+
++ Relation: images-all
++ Request
+
+    + Headers
+    
+            Accept: application/vnd.mason+json
+
++ Response 200 (application/vnd.mason+json)
+    
+    + Body
+
+            {
+                "@namespaces": {
+                    "annometa": {
+                        "name": "/link-relations#"
+                    }
+                },
+                "@controls": {
+                    "self": {
+                        "href": "/api/images/"
+                    },
+                    "annometa:images-all": {
+                        "href": "/api/images/",
+                        "title": "GET All images"                                                
+                    },
+                    "annometa:add-imagefolder": {
+                        "href": "/api/images/",
+                        "title": "Add images from folder",
                         "encoding": "json",
                         "method": "POST",
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "data": {
-                                    "description": "ImageAnnotation binary file",
-                                    "type": "binary"
-                                },
-                                "ascii_data": {
-                                    "description": "ImageAnnotation ascii file",
-                                    "type": "string"
-                                },
-                                "name": {
-                                    "description": "ImageAnnotation name",
-                                    "type": "string"
-                                },
-                                "publish_date": {
-                                    "description": "ImageAnnotation publish date",
-                                    "type": "date"
-                                },
-                                "location": {
-                                    "description": "Location of image",
-                                    "type": "string"
+                                "id": {
+                                    "description": "Images unique id",
+                                    "type": "integer"
                                 },
                                 "is_private": {
-                                    "description": "ImageAnnotation privacy",
+                                    "description": "Image is not private",
+                                    "type": "boolean"
+                                },
+                                "folder_name": {
+                                    "description": "Folder name which is added",
                                     "type": "string"
                                 },
-                                "date": {
-                                    "description": "ImageAnnotation date of loading to API",
+                                "folder_path": {
+                                    "description": "Folder path which is added",
                                     "type": "string"
                                 }
+                            },
+                            "required": ["id","is_private","folder_name","folder_path"]
+                        }
+                    }
+                },
+                "items": [
+                    {
+                        "id": 1,
+                        "is_private": False,
+                        "folder_name": "Summer_2020_hate",
+                        "folder_path": "C:\user\images",
+                        "@controls": {
+                            "self": {
+                                "href": "/api/images/1/"
+                            }, 
+                            "profile": {
+                                "href": "/profiles/image/"
+                            }
+                        }
+                    }
+                ]
+            }
+
+
+
+### Add folder of images to Image Annotator API [POST]
+
+Adds a new image folder to the system.
+
++ Relation: add-imagefolder
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/vnd.mason+json
+        
+    + Body
+    
+            {
+                "is_private": False,
+                "folder_name": "Summer_2020_hate",
+                "folder_path": "C:\user\images"
+            }
+
++ Response 201
+
+    + Headers
+    
+            Location: /api/--/folder-path/
+            
+    + Body
+    
+            {}
+            
+
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to add a folder that is empty or does not contain any jpeg images.
+
+    + Body
+    
+            {
+                "resource_url": "/api/--/folder-path/",
+                "@error": {
+                    "@message": "Folder was empty or did not have jpeg images",
+                    "@messages": [null]
+                },
+                "@controls": {
+                    "profile": {
+                        "href": "/profiles/error/"
+                    }
+                }
+            }
+
+            
+            
+
+
+## Photo Collection [/api/photos/]
+
+A list of all photos known to the API. 
+
+This collection can be sorted using the sortby query parameter. 
+For each photos only  ---  id is included, 
+more information can be found by following the `self` relation of each user. 
+
+### List all Photos [GET]
+
+Get a list of all photos known to the API.
+
++ Relation: photos-all
++ Request
+
+    + Headers
+    
+            Accept: application/vnd.mason+json
+
++ Response 200 (application/vnd.mason+json)
+    
+    + Body
+
+            {
+                "@namespaces": {
+                    "annometa": {
+                        "name": "/link-relations#"
+                    }
+                },
+                "@controls": {
+                    "self": {
+                        "href": "/api/photos/"
+                    },
+                    "annometa:photos-all": {
+                        "href": "/api/photos/",
+                        "title": "GET All photos"                                                
+                    },
+                    "annometa:add-photofolder": {
+                        "href": "/api/photos/",
+                        "title": "Add photos from folder",
+                        "encoding": "json",
+                        "method": "POST",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "description": "Photos unique id",
+                                    "type": "integer"
+                                },
+                                "is_private": {
+                                    "description": "Photo is private",
+                                    "type": "boolean"
+                                },
+                                "folder_name": {
+                                    "description": "Folder name which is added",
+                                    "type": "string"
+                                },
+                                "folder_path": {
+                                    "description": "Folder path which is added",
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["id","is_private","folder_name","folder_path"]
+                        }
+                    }
+                },
+                "items": [
+                    {
+                        "id": 1,
+                        "is_private": False,
+                        "folder_name": "Summer_2020_holiday",
+                        "folder_path": "C:\user\photos",
+                        "@controls": {
+                            "self": {
+                                "href": "/api/photos/1/"
+                            }, 
+                            "profile": {
+                                "href": "/profiles/photo/"
+                            }
+                        }
+                    }
+                ]
+            }
+
+
+
+### Add folder of Photos to Image Annotator API [POST]
+
+Adds a new photo folder to the system.
+
++ Relation: add-photofolder
++ Request (application/json)
+
+    + Headers
+    
+            Accept: application/vnd.mason+json
+        
+    + Body
+    
+            {
+                "is_private": True,
+                "folder_name": "Summer_2020_holiday",
+                "folder_path": "C:\user\photos"
+            }
+
++ Response 201
+
+    + Headers
+    
+            Location: /api/--/folder-path/
+            
+    + Body
+    
+            {}
+            
+
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to add a folder that is empty or does not contain any jpeg images.
+
+    + Body
+    
+            {
+                "resource_url": "/api/--/folder-path/",
+                "@error": {
+                    "@message": "Folder was empty or did not have jpeg images",
+                    "@messages": [null]
+                },
+                "@controls": {
+                    "profile": {
+                        "href": "/profiles/error/"
+                    }
+                }
+            }
