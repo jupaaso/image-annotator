@@ -55,6 +55,14 @@ Leads to list of photoannotations collected by registered user. The control incl
 
 Leads to list of imageannotations collected by registered user. The control includes a JSON schema and must be accessed with GET.
 
+## photoannotations-by-photo
+
+Leads to list of photoannotations collected by photo. The control includes a JSON schema and must be accessed with GET.
+
+## imageannotations-by-image
+
+Leads to list of imageannotations collected by photo. The control includes a JSON schema and must be accessed with GET.
+
 ## users-all
 
 Leads to list of users that are registered to the API. The control includes a JSON schema and must be accessed with GET.
@@ -317,13 +325,19 @@ Get the API entry point
                 },
                 "@controls": {
                     "annometa:photoannotations-all": {
-                        "href": "/api/photoannotations-all/"
+                        "href": "/api/photoannotations/"
                     },
                     "annometa:imageannotations-all": {
-                        "href": "/api/imageannotations-all/"
+                        "href": "/api/imageannotations/"
                     },
                     "annometa:users-all": {
-                        "href": "/api/users-all/"
+                        "href": "/api/users/"
+                    },
+                    "annometa:photos-all": {
+                        "href": "/api/photos/"
+                    },
+                    "annometa:images-all": {
+                        "href": "/api/images/"
                     }
                 }
             }
@@ -496,16 +510,28 @@ Get the user representation.
                         "href": "/api/users/merja/"
                     },
                     "annometa:photoannotations-by": {
-                        "href": "/api/users/merja/photoannotations/"
+                        "href": "/api/users/merja/photos/1/photoannotations/"
+                        "title:" "All photoannotations of given photo of given user
                     },
                     "annometa:imageannotations-by": {
-                        "href": "/api/users/merja/imageannotations/"
+                        "href": "/api/users/merja/images/1/imageannotations/"
+                        "title:" "All imageannotations of given image of given user
                     },
                     "annometa:photos-by": {
                         "href": "/api/users/merja/photos/"
+                        "title": "All photos by given user
                     },
                     "annometa:images-by": {
                         "href": "/api/users/merja/images/"
+                        "title": "All images by given user
+                    },
+                    "annometa:photoannotations-by-photo-all-users": {
+                        "href": "/api/users/photos/1/photoannotations/"
+                        "title": "All photoannotations of given photo
+                    },
+                    "annometa:imageannotations-by-image-all-users": {
+                        "href": "/api/users/images/1/imageannotations/"
+                        "title": "All imageannotations of given image
                     },
                     "collection": {
                         "href": "/api/users/",
@@ -697,6 +723,14 @@ Get a list of all imageannotationss known to the API.
                         "href": "/api/imageannotations/",
                         "title": "GET All imageannotations"                                                
                     },
+                     "annometa:imageannotations-by": {
+                        "href": "/api/users/merja/images/1/imageannotations/"
+                        "title:" "All imageannotations of given image of given user
+                    },
+                    "annometa:imageannotations-by-image-all-users": {
+                        "href": "/api/users/images/1/imageannotations/"
+                        "title": "All imageannotations of given image
+                    },
                     "annometa:add-imageannotation": {
                         "href": "/api/imageannotations/",
                         "title": "Add a new imageannotation",
@@ -872,7 +906,7 @@ Get the imageannotation representation.
                 "text_language": "english, finnish",
                 "@controls": {
                     "self": {
-                        "href": "/api/imageannotations/1/"
+                        "href": "/api/user/{merja}/images/1/imageannotations/1/"
                     },
                     "collection": {
                         "href": "/api/imageannotations/",
@@ -1113,6 +1147,14 @@ Get a list of all photoannotations known to the API.
                     "annometa:photoannotations-all": {
                         "href": "/api/photoannotations/",
                         "title": "GET All photoannotations"                                                
+                    },
+                      "annometa:photoannotations-by": {
+                        "href": "/api/users/merja/photos/1/photoannotations/"
+                        "title:" "All photoannotations of given photo of given user
+                    },
+                    "annometa:photoannotations-by-photo-all-users": {
+                        "href": "/api/users/photos/1/photoannotations/"
+                        "title": "All photoannotations of given image
                     },
                     "annometa:add-photoannotation": {
                         "href": "/api/photoannotations/",
@@ -1494,7 +1536,7 @@ Get a list of all images known to the API.
                     },
                     "annometa:add-imagefolder": {
                         "href": "/api/images/",
-                        "title": "Add images from folder",
+                        "title": "Add image",
                         "encoding": "json",
                         "method": "POST",
                         "schema": {
