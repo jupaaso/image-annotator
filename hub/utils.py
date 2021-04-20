@@ -127,7 +127,7 @@ class HubBuilder(MasonBuilder):
         """
         self.add_control(
             "annometa:delete",
-            url_for("api.user", user_name=user_name),
+            url_for("api.useritem", user_name=user_name),
             method="DELETE",
             title="Delete user"
         )
@@ -137,8 +137,9 @@ class HubBuilder(MasonBuilder):
         Control to edit user
         """
         self.add_control(
-            "annometa:edit",
-            url_for("api.user", user_name=user_name),
+            #"annometa:edit",
+            "edit",
+            url_for("api.useritem", user_name=user_name),
             method="PUT",
             encoding="json",
             title="Edit user",
@@ -172,7 +173,7 @@ class HubBuilder(MasonBuilder):
             "pattern": "^[0-9]{4}-[01][0-9]-[0-3][0-9]T[0-9]{2}:[0-5][0-9]:[0-5][0-9]Z$"
         }
         props ["location"] = {
-            "description": "Original location of loaded photograph file",
+            "description": "Location of loaded photograph file in server",
             "type": "string"
         }
         props ["is_private"] = {
@@ -199,7 +200,8 @@ class HubBuilder(MasonBuilder):
     def add_control_delete_photo(self, photo):
         self.add_control(
             "annometa:delete",
-            url_for("api.photoitem", id=id),
+            #url_for("api.photoitem", id=id),
+            url_for("api.photoitem", id=photo),
             method="DELETE",
             title="Delete this photo"
         )
@@ -207,7 +209,8 @@ class HubBuilder(MasonBuilder):
     def add_control_edit_photo(self, photo):
         self.add_control(
             "annometa:edit",
-            url_for("api.photoitem", id=id),
+            #url_for("api.photoitem", id=id),
+            url_for("api.photoitem", id=photo),
             method="PUT",
             encoding="json",
             title="Edit this photo",
@@ -218,7 +221,8 @@ class HubBuilder(MasonBuilder):
         self.add_control(
             "annometa:photo",
             "/api/photos/photo/",
-            url_for("api.photoitem", id=id),
+            #url_for("api.photoitem", id=id),
+            url_for("api.photoitem", id=photo),
             method="GET",
             encoding="json",
             title="Add control to get photo",

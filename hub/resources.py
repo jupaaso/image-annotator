@@ -30,7 +30,6 @@ from hub.utils import *
 
 
 ### User and User Collection Resources ---------------------------------------
-
 # check database and db table names !!!!!!!!!!!!!!
 
 def myconverter(o):
@@ -59,7 +58,8 @@ class UserCollection(Resource):
                 user_name=db_user.user_name,
                 user_password=db_user.user_password
             )
-            item.add_control("self", url_for("api.usercollection"))
+            # item.add_control("self", url_for("api.usercollection")) # merja
+            item.add_control("self", url_for("api.useritem", user_name=db_user.user_name)) # JUHA
             item.add_control("profile", USER_PROFILE)
             body["items"].append(item)
         return Response(json.dumps(body), status=200, mimetype=MASON)
@@ -72,6 +72,7 @@ class UserCollection(Resource):
         if not request.json:
             return create_error_response(415, "Unsupported media type", "Requests must be JSON")
         try:
+            # validate(request.json, User.user_schema()) # JUHA
             validate(request.json, HubBuilder.user_schema())
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
@@ -88,7 +89,7 @@ class UserCollection(Resource):
             return create_error_response(409, "Username already exists", "User with name '{}' already exists in database. Choose new username.".format(request.json["user_name"]))
 
         # tarkista alla oleva rivi !!!
-        return Response(status=201, headers={"Location": url_for("api.useritem", name=request.json["user_name"])})
+        return Response(status=201, headers={"Location": url_for("api.useritem", user_name=request.json["user_name"])})
 
 
 class UserItem(Resource):
@@ -106,7 +107,7 @@ class UserItem(Resource):
 
         body = HubBuilder(
             user_name=db_user.user_name,
-            user_team=db_user.user_team
+            user_password=db_user.user_password
         )
 
         body.add_namespace("annometa", LINK_RELATIONS_URL)
@@ -229,6 +230,9 @@ class PhotoCollection(Resource):
             print('exp : ' + str(e), file=sys.stderr)    
             return create_error_response(400, "Invalid JSON document", str(e))                
         
+        # muutoksia alla olevissa riveissä
+        if req_content["user_name"] == "" or req_content["user_name"] == None:
+            return create_error_response(400, "Invalid JSON document", "No user provided")                
         # query current user from database
         # request content = req_content - includes user and private flag
         currentUser = User.query.filter_by(user_name=req_content["user_name"]).first()
@@ -276,6 +280,7 @@ class PhotoCollection(Resource):
                 create_error_response(500, "Failed to save the file", str(e) + " Failed to save file '{}'".format(request.json["id"]))
             
             # url checked from utils file
+            # alla olevaan lauseeseen tulee lisätä photon id
             return Response(status=201, headers={"Location": url_for("api.photocollection")})
 
 
@@ -289,15 +294,15 @@ class PhotoItem(Resource):
         """
         GET method gets one single photo
         """
-        db_photoid = Photo.query.filter_by(id=id).first()
+        db_photoid = ImageContent.query.filter_by(id=id).first()
         if db_photoid is None:
             return create_error_response(404, "Not found", "No throw was found with id {}".format(id))
 
         body = HubBuilder(
                 id = db_photoid.id,
                 user_id = db_photoid.user_id,
-                data = db_photoid.data,
-                ascii_data = db_photoid.ascii_data,
+                #data = db_photoid.data,
+                #ascii_data = db_photoid.ascii_data,
                 name = db_photoid.name,
                 publish_date = db_photoid.publish_date,
                 location = db_photoid.location,
@@ -319,7 +324,7 @@ class PhotoItem(Resource):
         """
         PUT method edits a single photo 
         """
-        db_photoid = Photo.query.filter_by(id=id).first()
+        db_photoid = ImageContent.query.filter_by(id=id).first()
 
         if db_photoid is None:
             return create_error_response(404, "Not found", "No throw was found with id {}".format(id))
@@ -351,7 +356,7 @@ class PhotoItem(Resource):
         """
         DELETE method deletes a single photo
         """
-        db_photoid = Photo.query.filter_by(id=id).first()
+        db_photoid = ImageContent.query.filter_by(id=id).first()
         if db_photoid is None:
             return create_error_response(404, "Not found", "No throw was found with id {}".format(id))
 
