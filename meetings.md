@@ -67,19 +67,46 @@ List here the actions points discussed with assistants
 ### Comments from staff
 *ONLY USED BY COURSE STAFF: Additional comments from the course staff*
 
+
+
 ## Meeting 3.
-* **DATE:**
-* **ASSISTANTS:**
+* DATE: 24.3.2021 12:00-12:30 with Mika, and later some additional discussion with Iván
+* ASSISTANTS: Mika Oja, Iván Sánchez Milara
 
 ### Minutes
-*Summary of what was discussed during the meeting*
+Summary of what was discussed during the meeting
+
+The meeting covered resource and request tables, state diagrams and apiary documentation compiled during API design.
+
+The state diagram and resource tables are missing resources of one photo and one image. The ImageContent resource should be removed from the state diagram, and replaced with Photo and Image resources. In state diagram photos-all and images-all arrows should be corrected so that they point to the right direction.
+
+Resources of designed API are not in correct order. The tables are missing single image and photo resources, which means that you must add both 'photo' resource and 'photos\photo' resource, as well as suitable links to the tables. In addition, you should add single photoannotation and imageannotation resources to the table. The annotation must be located at the end of a path where the image has been recognized. The image is related with the user, and the annotation is related both to the image and the user.
+
+The resource request table contains too many POST requests. Unnecessary POST requests should be deleted, and requests should be reviewed once again after the resources have been defined correctly.
+
+During Apiary review, it was found that the mason script style is quite well under control.
+
+We discussed the API's general policy. The API takes the pictures individually to process from a folder on your computer, that is, the pictures are added one at a time to the API. The folder must be defined by a client, and the client goes through the folder, uploading one image at a time. A folder is always explicitly downloaded over the Web one file at a time — an entire folder cannot be downloaded at once for web security reasons.
+
+During an annotation, the photo is identified by the photo URL, meaning that the photo URL will contain an ID, and after the annotation is generated, the photo URL contains both the image ID and the annotation ID.
+
+Logging in is a state, so the user key always goes along with the URL address, and this should be shown also in the defined resource table.
+
+During final discussion, it was agreed that in coursework , API testing can be done only on one side of the API, i.e. only for photoannotation part in order to to reduce the workload of coursework.
 
 ### Action points
-*List here the actions points discussed with assistants*
+List here the actions points discussed with assistants*
 
+-	make corrections to errors on resources and resource urls
+-	make corrections to errors on state diagram
+-	make corrections to errors on resource request table
+-	make corrections to errors on apiary documentation
 
 ### Comments from staff
 *ONLY USED BY COURSE STAFF: Additional comments from the course staff*
+
+
+
 
 ## Meeting 4.
 * **DATE:**
