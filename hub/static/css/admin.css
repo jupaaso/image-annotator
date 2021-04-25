@@ -5,3 +5,5 @@ form label {
 form label:first-letter{
     text-transform: uppercase;
 }
+
+.linkbar { font-size: 20px; }

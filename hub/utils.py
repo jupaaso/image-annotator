@@ -2,6 +2,12 @@
 
 import json
 import base64
+import glob
+from io import BytesIO
+from datetime import datetime
+from shutil import copy
+from PIL import Image, ExifTags
+
 from flask import Response, request, url_for
 
 #import hub.api_routes
@@ -220,7 +226,7 @@ class HubBuilder(MasonBuilder):
     def add_control_get_photo(self, photo):
         self.add_control(
             "annometa:photo",
-            "/api/photos/photo/",
+            #"/api/photos/photo/",
             #url_for("api.photoitem", id=id),
             url_for("api.photoitem", id=photo),
             method="GET",
@@ -330,22 +336,22 @@ class HubBuilder(MasonBuilder):
             )
 
     ##### photoannotation -----------------------------------------------------
+    # not required - "text_free_comment", "text_persons", "text_persons_comment"
 
     @staticmethod
     def photoannotation_schema():
         schema = {
             "type": "object",
-            "required": ["persons_class", "slideshow_class", "positivity_class", 
-            "text_free_comment", "text_persons", "text_persons_comment"]
+            "required": ["persons_class", "slideshow_class", "positivity_class"] 
         }
         props = schema["properties"] = {}
         props ["persons_class"] = {
             "description": "Classifier to define if photo includes persons",
-            "type": "number"
+            "type": "boolean"
         }
         props ["slideshow_class"] = {
             "description": "Classifier to define if photo is used in slideshow",
-            "type": "number"
+            "type": "boolean"
         }
         props ["positivity_class"] = {
             "description": "Classifier to define how good photo is",
@@ -371,7 +377,7 @@ class HubBuilder(MasonBuilder):
             url_for("api.photoannotationcollection"),
             method="POST",
             encoding="json",
-            title="Add a new annotation to photoannotation collection",
+            title="Add new photoannotation",
             schema=self.photoannotation_schema()
         )
 
@@ -380,7 +386,7 @@ class HubBuilder(MasonBuilder):
             "annometa:delete",
             url_for("api.photoannotationitem", id=id),
             method="DELETE",
-            title="Delete this photoannotation"
+            title="Delete photoannotation"
         )
 
     def add_control_edit_photoannotation(self, photoannotation):
@@ -389,7 +395,7 @@ class HubBuilder(MasonBuilder):
             url_for("api.photoannotationitem", id=id),
             method="PUT",
             encoding="json",
-            title="Edit this photoannotation",
+            title="Edit photoannotation",
             schema=self.photoannotation_schema()
         )
 
@@ -400,7 +406,7 @@ class HubBuilder(MasonBuilder):
             url_for("api.photoannotationitem", id=id),
             method="GET",
             encoding="json",
-            title="Add control to get photoannotation",
+            title="Add control to get defined photoannotation",
             schema=self.photoannotation_schema()
             )
 
@@ -553,18 +559,48 @@ def create_error_response(status_code, title, message=None):
 
 # file handling -----------------------------------------------------
 
-def convert_image_to_db_object(file, location, name, is_private):    
-    with open(file, "rb") as f:
-        image_binary = f.read()
-        image_ascii = base64.b64encode(image_binary).decode('ascii')
-        return ImageContent(
-            name = name,
-            location = location,
-            data = image_binary,
-            ascii_data = image_ascii,
-            date = datetime.now(),
-            is_private=is_private            
-        )        
+#lisätään funktio jota voi käyttää sekä testidatan populoinnissa että resurssissa
+def set_photo_meta_data_to_dict(filename, is_private):
+    # default publish_date is None
+    publish_date = None
+
+    # get exifdata only from private photo items
+    if is_private:
+        im = Image.open(filename)
+        exifdata = im.getexif()
+        if exifdata:
+            # Make a map with exifdata tag names
+            exif = { ExifTags.TAGS[k]: v for k, v in exifdata.items() if k in ExifTags.TAGS and type(v) is not bytes }                
+            # Grab the date
+            try:
+                publish_date = datetime.strptime(exif['DateTimeOriginal'], '%Y:%m:%d %H:%M:%S')
+            except Exception as e:
+                print('Unable to get DateTimeOriginal from exif for %s' % filename)
+                timestamp = os.path.getctime(filename)
+                publish_date = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            print('Unable to get date from exif for %s' % filename)        
+        del im
+    else:
+        timestamp = os.path.getctime(filename)
+        publish_date = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
+    thisdict = {
+        "name": os.path.basename(filename),
+        "publish_date": datetime.fromisoformat(publish_date),            
+        "is_private": is_private,
+        "date": datetime.fromisoformat(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+        "location" : "" # set this as empty, it should be define by calling function
+    }
+    return thisdict
+
+def convert_image_to_db_object(location, name, is_private):    
+    return ImageContent(
+        name = name,
+        location = location,
+        date = datetime.now(),
+        is_private=is_private            
+    )        
 
 # from https://flask.palletsprojects.com/en/1.1.x/patterns/fileuploads/
 def allowed_file(filename):

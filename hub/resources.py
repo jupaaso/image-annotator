@@ -36,6 +36,49 @@ def myconverter(o):
     if isinstance(o, datetime.datetime):
         return o.__str__()
 
+def create_image_item_from_request(req_content, image_object, upload_folder):
+    
+    # collect directory path
+    basedir = os.path.abspath(os.path.dirname(__file__))             
+    # does NOT return error response if the filename exists already
+    # --- but return as rename the file by adding a datetime to its name ---
+    db_photo_name_test = ImageContent.query.filter_by(name=image_object.filename).first()
+    if db_photo_name_test is not None:
+
+        # datetime according to milliseconds
+        time_now  = datetime.now().strftime('%m_%d_%Y_%H_%M_%S_%f') 
+        print("test time now  ", time_now)
+        filename_parts = os.path.splitext(image_object.filename)
+        new_file_name = filename_parts[0] + str(time_now) + filename_parts[1]
+        image_object.filename = new_file_name
+        ### return new filename
+    
+        
+        # defined in constants file ------
+        # UPLOAD_FOLDER = "\\static\\images\\"
+        # ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'gif', 'bmp', 'tiff'])
+
+    # define image path
+    upload = basedir + upload_folder + image_object.filename
+    
+    # save method saves an image to path
+    
+    image_object.save(upload)
+    
+    # NOTE paikka kuvien talletukseen, joka talletetaan tietokantaan ja palautetana clientille
+    item_location = upload_folder + image_object.filename
+    # NOTE luodaan photon metadata ilman lokaatiotietoa dictionaryyn
+    
+    item_dict = hub.utils.set_photo_meta_data_to_dict(upload, req_content["is_private"])
+    # NOTE luodaan ImageContent olio, jossa käytetään photolocation tietoa, joka on clientille käytettävissä
+    item = ImageContent(name=item_dict["name"], 
+                                publish_date=item_dict["publish_date"], 
+                                location=item_location, 
+                                is_private=item_dict["is_private"], 
+                                date=item_dict["date"])
+    
+    return item
+
 class UserCollection(Resource):
     """
     Resource for UserCollection. 
@@ -230,9 +273,11 @@ class PhotoCollection(Resource):
             print('exp : ' + str(e), file=sys.stderr)    
             return create_error_response(400, "Invalid JSON document", str(e))                
         
-        # muutoksia alla olevissa riveissä
+        # added rows
+        # user must be provided for photos / images
         if req_content["user_name"] == "" or req_content["user_name"] == None:
-            return create_error_response(400, "Invalid JSON document", "No user provided")                
+            return create_error_response(400, "Invalid JSON document", "No user provided") 
+        
         # query current user from database
         # request content = req_content - includes user and private flag
         currentUser = User.query.filter_by(user_name=req_content["user_name"]).first()
@@ -250,38 +295,33 @@ class PhotoCollection(Resource):
         
         # check if the file exists already
         if image and allowed_file(image.filename):
-
-            # collect the filename
-            filename = secure_filename(image.filename)
-            # collect directory path
-            basedir = os.path.abspath(os.path.dirname(__file__))
+            try:
+                photo_item = create_image_item_from_request(req_content, image, UPLOAD_FOLDER_PHOTOS)
+            except Exception as e:            
+                create_error_response(500, "Failed to save the file", str(e) + " Failed to save file '{}'".format(request.json["id"]))
             
-            # defined in constants file ------
-            # UPLOAD_FOLDER = "\\static\\images\\"
-            # ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'gif', 'bmp', 'tiff'])
-
-            # define image path
-            upload = basedir + UPLOAD_FOLDER + filename
-            
-            # save method saves an image to path
-            image.save(upload)
-            photo_item = hub.utils.convert_image_to_db_object(upload, upload, filename, req_content["is_private"])            
+            db_photo = None
 
             # user defined as photo_user
             try:
                 currentUser.photo_user.append(photo_item)
                 db.session.commit()
             
-            # return error response if the file exists already
-            # --------- or return as rename the file by adding a datetime to its name ---------------
+                # query photo item
+                db_photo = ImageContent.query.filter_by(name=photo_item.name).first()
+                print('db_photo : ' + str(db_photo.id), file=sys.stderr)
             except IntegrityError:
                 return create_error_response(409, "Already exists", "Photo with id '{}' already exists".format(request.json["id"]))
+            
             except Exception as e:
                 create_error_response(500, "Failed to save the file", str(e) + " Failed to save file '{}'".format(request.json["id"]))
+            # ------------------------------------- ##################### 
+
+            # following two rows below return the same answer (on Postman)
+            # return Response(status=201, headers={"Location": url_for("api.photocollection", id=db_photo.id)})
+            # the correct row below - returns api/photos/<id>/
+            return Response(status=201, headers={"Location": url_for("api.photocollection", id=db_photo.id)})
             
-            # url checked from utils file
-            # alla olevaan lauseeseen tulee lisätä photon id
-            return Response(status=201, headers={"Location": url_for("api.photocollection")})
 
 
 class PhotoItem(Resource):
@@ -387,7 +427,9 @@ class PhotoannotationCollection(Resource):
         body.add_control_add_photoannotation()
         body["items"] = []
 
+        # query db for all photoannotations
         for db_photoanno_id in PhotoAnnotation.query.all():
+
             item = HubBuilder(
                 id = db_photoanno_id.id,
                 photo_id = db_photoanno_id.photo_id,
@@ -417,8 +459,16 @@ class PhotoannotationCollection(Resource):
             validate(request.json, HubBuilder.photoannotation_schema())
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
-        new_photoannotation = Photoannotation(
-            id = request.json["id"],
+        
+        # query photoannotation item if it exists already
+        # only one annotation for photo is possible
+        db_photoannotation_test = PhotoAnnotation.query.filter_by(photo_id=request.json["photo_id"]).first()
+        
+        # if annotation already exists return error and use edit
+        if db_photoanno_id is not None:
+            return create_error_response(409, "Already exists", "Annotation for this photo already exists, use edit to change.")
+
+        new_photoannotation = PhotoAnnotation(
             photo_id = request.json["photo_id"],
             user_id=request.json["user_id"],
             persons_class = request.json["persons_class"],
@@ -428,14 +478,23 @@ class PhotoannotationCollection(Resource):
             text_persons = request.json["text_persons"],
             text_persons_comment = request.json["text_persons_comment"]
         )
+        
+        db_photoannotation = ""
+
         try:
             db.session.add(new_photoannotation)
             db.session.commit()
+
+            # query photo annotation item - with print-out check annotation id
+            db_photoannotation = PhotoAnnotation.query.filter_by(photo_id=new_photoannotation.photo_id).first()
+            print('db_photoannotation id : ' + str(db_photoannotation.id), file=sys.stderr)
+
         except IntegrityError:
             return create_error_response(409, "Already exists", "Photoannotation with id '{}' already exists".format(request.json["id"]))
 
-        # return Response(status=201, headers={"Location": url_for("api.photoannotationitem", id=request.json["id"])})
-        return Response(status=201, headers={"Location": url_for("api.photoannotationcollection")})
+        #return Response(status=201, headers={"Location": url_for("api.photoannotationitem", id=request.json["id"])})
+        #return Response(status=201, headers={"Location": url_for("api.photoannotationcollection")})
+        return Response(status=201, headers={"Location": url_for("api.photoitem", id=db_photoannotation.id)})
 
 
 class PhotoannotationItem(Resource):
@@ -549,8 +608,6 @@ class ImageCollection(Resource):
             item = HubBuilder(
                 id = image.id,
                 user_id = image.user_id,
-                #data = image.data,
-                #ascii_data = image.ascii_data,
                 name = image.name,
                 publish_date = image.publish_date,
                 location = image.location,
@@ -587,11 +644,16 @@ class ImageCollection(Resource):
             print('exp : ' + str(e), file=sys.stderr)    
             return create_error_response(400, "Invalid JSON document", str(e))  
 
+        # added rows
+        # user must be provided for photos / images
+        if req_content["user_name"] == "" or req_content["user_name"] == None:
+            return create_error_response(400, "Invalid JSON document", "No user provided") 
+        print('currentUser RECEIVED : ' + str(req_content["user_name"]), file=sys.stderr)
         # query current user from database -------------
         # request content = req_content - includes user and private flag
-        currentUser = User.query.filter_by(user_name=req_content["user_name"]).first()
+        currentUser = User.query.filter_by(user_name=req_content["user_name"]).first()        
         # print out current user
-        print('currentUser : ' + str(currentUser), file=sys.stderr)
+        print('currentUser : ' + str(currentUser.user_name), file=sys.stderr)
         
         # ----------------------------------------------
         # check if the post request has the file part
@@ -605,38 +667,34 @@ class ImageCollection(Resource):
         
         # ---------------------------------------------
         # check if the file exists already
-        if image and allowed_file(image.filename):
-
-            # collect the filename
-            filename = secure_filename(image.filename)
-            # collect directory path
-            basedir = os.path.abspath(os.path.dirname(__file__))
-
-            # defined in constants file ---------------
-            # UPLOAD_FOLDER = "\\static\\images\\"
-            # ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'gif', 'bmp', 'tiff'])
-
-            # define image path
-            upload = basedir + UPLOAD_FOLDER + filename
+        if image and allowed_file(image.filename):            
+            try:
+                image_item = create_image_item_from_request(req_content, image, UPLOAD_FOLDER_IMAGES)
+            except Exception as e:
+                create_error_response(500, "Failed to save the file", str(e) + " Failed to save file '{}'".format(image.filename))
             
-            # save method saves an image to path
-            image.save(upload)
-            image_item = hub.utils.convert_image_to_db_object(upload, upload, filename, req_content["is_private"])   
+            db_image = None
 
             # user defined as image_user
             try:
                 currentUser.image_user.append(image_item)
                 db.session.commit()
-            
+
+                # query photo item
+                db_image = ImageContent.query.filter_by(name=image_item.name).first()
+                print('db_image : ' + str(db_image.id), file=sys.stderr)
+
             # return error response if the file exists already
             # --------- or return as rename the file by adding a datetime to its name - not done yet ---------------
             except IntegrityError:
                 return create_error_response(409, "Already exists", "Image with id '{}' already exists".format(request.json["id"]))
             except Exception as e:
-                create_error_response(500, "Failed to save the file", str(e) + " Failed to save file '{}'".format(request.json["id"]))
+                create_error_response(500, "Failed to save the file", str(e) + " Failed to save file '{}'".format(image.filename))
             
-            # url checked from utils file
-            return Response(status=201, headers={"Location": url_for("api.imagecollection")})
+            # following two rows below return the same answer (on Postman)
+            # return Response(status=201, headers={"Location": url_for("api.imagecollection", id=db_image.id)})
+            # the correct row below - returns api/images/<id>/
+            return Response(status=201, headers={"Location": url_for("api.imageitem", id=db_image.id)})            
 
 
 class ImageItem(Resource):

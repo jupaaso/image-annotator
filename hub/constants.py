@@ -10,7 +10,8 @@ IMAGE_PROFILE = "/profiles/image/"
 PHOTOANNOTATION_PROFILE = "/profiles/photoannotation/"
 IMAGEANNOTATION_PROFILE = "/profiles/imageannotation/"
 
-UPLOAD_FOLDER = "\\static\\images\\"
+UPLOAD_FOLDER_IMAGES = "\\static\\images\\"
+UPLOAD_FOLDER_PHOTOS = "\\static\\photos\\"
 ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'gif', 'bmp', 'tiff'])
 
 # ---------------------------------------------------------
