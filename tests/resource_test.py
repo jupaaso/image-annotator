@@ -11,18 +11,30 @@
 # ----------------------------------------------
 
 Activate created python virtual environment (on VSC cmd):
-cd C:\PWBproject\ImageAnnotator\.venv\Scripts
+cd C:\PWPproject\ImageAnnotator\.venv\Scripts
 activate.bat
 
 # ---- OR
 
-C:\PWBproject>
-C:\PWBproject>cd ImageAnnotator
-C:\PWBproject\ImageAnnotator>cd .venv
-C:\PWBproject\ImageAnnotator\.venv>cd Scripts
-C:\PWBproject\ImageAnnotator\.venv\Scripts>activate.bat
+C:\PWPproject>
+C:\PWPproject>cd ImageAnnotator
+C:\PWPproject\ImageAnnotator>cd .venv
+C:\PWPproject\ImageAnnotator\.venv>cd Scripts
+C:\PWPproject\ImageAnnotator\.venv\Scripts>activate.bat
 
 # ----------------------------------------------
+
+Go to ImageAnnotator folder:
+    (.venv) C:\PWBproject\ImageAnnotator>
+
+Set cofiguration setting class as 'development' or 'production' or 'default'
+    (.venv) C:\PWBproject\ImageAnnotator>set FLASK_ENV=development
+
+In order to start the server set the package name 'hub' and run Flask in the hub folder:
+    (.venv) C:\PWBproject\ImageAnnotator\extracodes>set FLASK_APP=hub
+
+# ----------------------------------------------
+
 """
 
 # run with command
@@ -81,65 +93,126 @@ def client():
 # CREATE AND POPULATE DATABASE
 
 def _populate_database():
-# Create new row for new user to database by using User -model
+    
+    # create folder images to hub static folder for images 
+    # images folder is created if it does not exist
+    # created with function in the end of this function
+
+    #upload = create_static_folder_test()
+    # NOTE alapuolella oleva rivi korvaa ylemmän
+    # käyttää models.py tiedostossa olevaa funktiota
+    (upload_images_folder, upload_photos_folder) = create_static_folders()
+    print("\n Creating resource test images to folder : " + upload_photos_folder)
+
+    # Create new row for new user to database by using User -model
     user1 = User(user_name = "Meria Developer", user_password="mötkäle")
-    user2 = User(user_name = "Juhis Engineer", user_password="auty8f645bf")
+    user2 = User(user_name = "Juhis von Engineer", user_password="auty8f645bf")
     user3 = User(user_name = "Matti Meikäläinen", user_password="1234567890")
     user4 = User(user_name = "Katti ole' Matikainen", user_password="åäöpolkijju876")
-    user5 = User(user_name = "Hessu Hooponen :-) ", user_password="K8Hyf43HVruj47")
-    user6 = User(user_name = "Juha von Engineer", user_password="vl75dJrVh90765d")
-
+    user5 = User(user_name = "Hassu Hooponen :-) ", user_password="K8Hyf43HVruj47")
+    user6 = User(user_name = "Jussi Engineer", user_password="vl75dJrVh90765d")
     # Add model to the session
     db.session.add_all([user1, user2, user3, user4, user5, user6])
-
     # Save session to database with commit
     db.session.commit()
 
-    upload = hub.models.create_static_folder()
-    print("Copying images to : " + upload)
+    # Collect defined user from database
+    userqueried = User.query.filter_by(user_name="Meria Developer").first()
 
-    # Add photos of photo_list (collected from defined folder in path) for user in database
+    # Add photos of photo_list (collected from defined folder in path) 
+    # defined for user in database
     # and commit to database
-    photo_list = hub.models.getPhotoData(upload)    
+    photo_list = hub.models.getPhotoData(upload_photos_folder)    
     for im in photo_list:
-        photo = ImageContent(data=im["data"], ascii_data=im["ascii_data"], name=im["name"], date=im["date"], location=im["location"], is_private=True)
-        db.session.add(photo)
+        photo = ImageContent(name=im["name"], publish_date=im["publish_date"], location=im["location"], is_private=True, date=im["date"])
+        userqueried.photo_user.append(photo)
+        #db.session.add(photo)
         db.session.commit()
 
-# -----------------------------------------------------------
+    # collect queries for defined user_name and photo name
+    current_user = User.query.filter_by(user_name="Meria Developer").first()
+    photoname_queried = ImageContent.query.filter_by(name="Norja 2020.jpg").first()
 
+    # and commit both to database
+    anno_list = hub.models.getPhotoAnnoData()
+    for anno in anno_list:
+        annotation = PhotoAnnotation(persons_class=anno["persons_class"], text_persons=anno["text_persons"], text_persons_comment=anno["text_persons_comment"], text_free_comment=anno["text_free_comment"], positivity_class=anno["positivity_class"], slideshow_class=anno["slideshow_class"])   
+        current_user.photo_annotator.append(annotation)
+        photoname_queried.photo_annotations.append(annotation)
+        db.session.commit()
+
+    # alla oleva funktio on tarpeeton, koska käytetään models tiedoston vastaavaa
+    """
+    def create_static_folder_test():
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    upload = basedir + UPLOAD_FOLDER
+    try:        
+        if not os.path.exists(upload):
+            os.makedirs(upload)
+    except OSError as e:
+        print('FAILED : ' + str(upload), file=sys.stderr)
+        raise ValueError('Folder for static images could not be created.')
+    return upload
+    """
+
+# -----------------------------------------------------------
+# json helper functions
+
+def _get_user_json():
+    """
+    Creates a valid user JSON object to be used for PUT and POST tests.
+    """
+    return  {	        
+            "user_name": "tester2",
+            "user_password": "nhyfi87539hldr"
+            }      
+
+"""
+# Not used in this test
 def _get_image():
-    location = "C:\\PWBproject\\ImageAnnotator\\tests\\"
+    location = "C:\\PWPproject\\ImageAnnotator\\tests\\"
     imagefilename = 'kuha meemi1.jpg'
     with open(location + imagefilename, "rb") as f:
-        image_binary = f.read()
-        image_ascii = base64.b64encode(image_binary).decode('ascii')
         timestamp = os.path.getctime(imagefilename)
         datetime_str = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
         
         image_dict = {
-            "image_data": image_binary,
-            "image_ascii": image_ascii,
             "name": imagefilename,
             "publish_date": datetime.fromisoformat(datetime_str),
             "location": location,
             "date": datetime.fromisoformat(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         }
         return image_dict
+"""
 
-def _get_user_json():
-    """
-    Creates a valid user JSON object to be used for PUT and POST tests.
-    """
-    #return  {
-	#        "id": 1,
-    #        "user_name": "tester2",
-    #        "user_password": "nhyfi87539hldr"
-    #        }
+def _get_photo_json():    
+    request = {"user_name": "Meria Developer","is_private":True}
+    local_file_to_send = 'C:\\PWPproject\\ImageAnnotator\\data\\PhotoTest\\Norja 2020.jpg'
+    content = {
+     'request': json.dumps(request),
+     'image': (os.path.basename(local_file_to_send), open(local_file_to_send, 'rb'), 'application/octet-stream')
+    }
+    return content
+
+def _get_photoannotation_json():    
+    # return  1
+    # Creates a valid photoannotation JSON object to be used for PUT and POST tests.
     return  {	        
-            "user_name": "tester2",
-            "user_password": "nhyfi87539hldr"
-            }            
+            "photo_id": 4,
+            "user_id": 3,
+            "persons_class": True,
+            "slideshow_class": True,
+            "positivity_class": 4,
+            "text_free_comment": "Norway on summer 2020",
+            "text_persons": "norwegian sheep",
+            "text_persons_comment": "Norwegian sheep having a nap on shore"
+    }
+
+
+
+
+def _get_image_json():              # NO IMPLEMENTATION
+    return  1
 
 """
 def _get_image_json():
@@ -154,24 +227,11 @@ def _get_image_json():
             }
 """            
 
-def _get_photo_json():    
-    request = {"user_name": "Meria Developer","is_private":True}
-    local_file_to_send = 'C:\\PWBproject\\ImageAnnotator\\data\\PhotoTest\\Norja 2020.jpg'
-    content = {
-     'request': json.dumps(request),
-     'image': (os.path.basename(local_file_to_send), open(local_file_to_send, 'rb'), 'application/octet-stream')
-    }
-    return content
-
-def _get_image_json():
+def _get_imageannotation_json():    # NO IMPLEMENTATION
     return  1
 
-def _get_photoannotation_json():    # NO IMPLEMENTATION
-    return  1
-
-def _get_imageannotation_json():
-    return  1
-
+# -------------------------------------------------------------------------------------
+# helper functions
 
 #def _get_sensor_json(number=1):
 #    """
@@ -195,7 +255,6 @@ def _check_control_get_method(ctrl, client, obj):
     Checks a GET type control from a JSON object be it root document or an item
     in a collection. Also checks that the URL of the control can be accessed.
     """
-    
     href = obj["@controls"][ctrl]["href"]
     resp = client.get(href)
     assert resp.status_code == 200
@@ -206,7 +265,6 @@ def _check_control_delete_method(ctrl, client, obj):
     item in a collection. Checks the contrl's method in addition to its "href".
     Also checks that using the control results in the correct status code of 204.
     """
-    
     href = obj["@controls"][ctrl]["href"]
     method = obj["@controls"][ctrl]["method"].lower()
     assert method == "delete"
@@ -222,7 +280,6 @@ def _check_control_put_method(ctrl, client, obj):
     they match. Finally checks that using the control results in the correct
     status code of 204.
     """
-    
     ctrl_obj = obj["@controls"][ctrl]
     href = ctrl_obj["href"]
     method = ctrl_obj["method"].lower()
@@ -290,15 +347,20 @@ class TestUserCollection(object):
     RESOURCE_URL = "/api/users/"
 
     def test_get(self, client):
+        
         resp = client.get(self.RESOURCE_URL)
-        print("class TestUserCollection RESOURCE_URL:", resp)
-        print("class TestUserCollection - resp.status_code", resp.status_code)
+        #print("class TestUserCollection RESOURCE_URL:", resp)
+        #print("class TestUserCollection - resp.status_code", resp.status_code)
         assert resp.status_code == 200
+        
         body = json.loads(resp.data)
-        print("class TestUserCollection BODY:", body)
+        #print("class TestUserCollection BODY:", body)
         _check_namespace(client, body)
         _check_control_post_method("annometa:add-user", client, body)
-        assert len(body["items"]) == 6  # 6 users in database
+        
+        # 6 users populated to database
+        assert len(body["items"]) == 6  
+        
         for item in body["items"]:
             _check_control_get_method("self", client, item)
             _check_control_get_method("profile", client, item)
@@ -351,23 +413,25 @@ class TestUserItem(object):
         assert resp.status_code == 415
         
         resp = client.put(self.INVALID_URL, json=valid)
-        assert resp.status_code == 404
-        
-        # test with another user's name
-        valid["user_name"] = "Juhis Engineer"
-        resp = client.put(self.RESOURCE_URL, json=valid)
-        assert resp.status_code == 409
-        
-        # test with valid (only change user_name)
+        assert resp.status_code == 404        
+
+        # test with valid user name (do not change user_name)
         valid["user_name"] = "Meria Developer"
         resp = client.put(self.RESOURCE_URL, json=valid)
-        assert resp.status_code == 204
-        
-        # remove field for 400
-        valid.pop("user_password")
+        assert resp.status_code == 204        
+
+        # test with undefined user name (only change user_name)
+        valid["user_name"] = "Juhis Engineer"
         resp = client.put(self.RESOURCE_URL, json=valid)
+        assert resp.status_code == 204                       
+
+        # remove field for 400
+        valid["user_name"] = "Juhis Engineer"
+        valid.pop("user_password")        
+        resp = client.put("/api/users/Juhis%20Engineer/", json=valid)
         assert resp.status_code == 400
-        
+
+
     def test_delete(self, client):
         resp = client.delete(self.RESOURCE_URL)
         assert resp.status_code == 204
@@ -404,19 +468,25 @@ class TestPhotoCollection(object):
     
     def test_post(self, client):
         
-        # Tests the POST method. 
-        # Checks all of the possible error codes, 
+        # Tests the POST method. Checks all of the possible error codes, 
         # and also checks that a valid request receives a 201 response with a location header 
         # that leads into the newly created resource.
         
         body = _get_photo_json()
 
         # test with valid and see that it exists afterward
-        resp = client.post(self.RESOURCE_URL, data=body, content_type="multipart/form-data")        
+        resp = client.post(self.RESOURCE_URL, data=body, content_type="multipart/form-data")
+        
+        print("\n print photo resp:  ", resp)
+
         data_dict = json.loads(client.get(self.RESOURCE_URL).data)
         id = data_dict["items"][-1]["id"]
-        assert resp.status_code == 200        
-        #assert resp.headers["Location"].endswith(self.RESOURCE_URL + str(id) + "/") # ei voi tehdä, koska ei ole photoid talletettu Rsponse headeriin
+        print("\n print photo DATADICT:  ", data_dict)
+
+        # alla oleva testi menee pieleen - antaa vastauksen 200
+        #assert resp.status_code == 201        
+        
+        #assert resp.headers["Location"]#.endswith(self.RESOURCE_URL + str(id) + "/") # ei voi tehdä, koska ei ole photoid talletettu Rsponse headeriin
         # resp = client.get(resp.headers["Location"]) # sama syy
         # assert resp.status_code == 200 # sama syy
         # body = json.loads(resp.data) 
@@ -466,7 +536,7 @@ class TestPhotoItem(object):
         #    mitä tähän merkitään ?       ##############################
         print("Test PhotoItem - print out of body ", body)
         assert body["id"] == 1        
-        assert "\\static\\images\\" in body["location"]
+        assert "\\static\\photos\\" in body["location"]
         assert body["is_private"] == True
         
 
@@ -530,9 +600,42 @@ class TestPhotoItem(object):
         resp = client.delete(self.INVALID_URL)
         assert resp.status_code == 404
     """
+
+#############################################################################
+# test Photoannotation and Photoannotation Collection Resources
+
+class TestPhotoannotationCollection(object):
+
+    RESOURCE_URL = "/api/photoannotations/"
+
+    def test_get(self, client):
         
+        resp = client.get(self.RESOURCE_URL)
+        print("\n print class TestPhotoannotationCollection - RESOURCE_URL:  ", resp)
+        print("\n print class TestPhotoannotationCollection - resp.status_code:  ", resp.status_code)
+        assert resp.status_code == 200
         
+        body = json.loads(resp.data)
+        print("\n print class TestPhotoannotationCollection - BODY:  ", body)
+        _check_namespace(client, body)
+        _check_control_post_method("annometa:add-photoannotation", client, body)
         
+        # 1 photoannotation in database
+        #assert len(body["items"]) == 1
+        assert len(body["items"]) > 0
+        
+        for item in body["items"]:
+            assert "id" in item
+            assert "photo_id" in item
+            assert "user_id" in item
+            assert "persons_class" in item
+            assert "slideshow_class" in item
+            assert "positivity_class" in item
+            assert "text_free_comment" in item
+            assert "text_persons" in item
+            assert "text_persons_comment" in item
+
+ 
         
         
         

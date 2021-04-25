@@ -93,7 +93,7 @@ def app():
 # -----------------------------------------------------------
 
 def _get_image():
-    location = "C:\\PWBproject\\ImageAnnotator\\tests\\"
+    location = "C:\\PWPproject\\ImageAnnotator\\tests\\"
     imagefilename = 'kuha meemi1.jpg'
     with open(location + imagefilename, "rb") as f:
         image_binary = f.read()
@@ -212,21 +212,21 @@ def test_create_model_instances(app):
         # photo
         db_imagecontent2 = ImageContent.query.filter_by(id=2).first()
 
-        print(db_imagecontent1.img_user)
+        print(db_imagecontent1.image_users)
         print(db_user)
-        assert db_imagecontent1.img_user[0] == db_user
+        assert db_imagecontent1.image_users[0] == db_user
 
-        print(db_imageannotation.image)
+        print(db_imageannotation.images)
         print(db_imagecontent1)
-        assert db_imageannotation.image[0] == db_imagecontent1
+        assert db_imageannotation.images[0] == db_imagecontent1
 
-        print(db_imagecontent2.pho_user)
+        print(db_imagecontent2.photo_users)
         print(db_user)
-        assert db_imagecontent2.pho_user[0] == db_user
+        assert db_imagecontent2.photo_users[0] == db_user
 
-        print(db_photoannotation.photo)
+        print(db_photoannotation.photos)
         print(db_imagecontent2)
-        assert db_photoannotation.photo[0] == db_imagecontent2
+        assert db_photoannotation.photos[0] == db_imagecontent2
         
         assert db_user.image_user[0] == db_imagecontent1
         assert db_user.photo_user[1] == db_imagecontent2
@@ -383,7 +383,7 @@ def test_photoannotation_ondelete_photo(app):
 
         # HUOM! Kun kuva poistetaan, niin annotaatio säilyy
         assert ImageContent.query.count() == 0
-        assert testphotoannotation.photo == []
+        assert testphotoannotation.photos == []
         assert ImageAnnotation.query.count() == 0
         assert PhotoAnnotation.query.count() == 1
 
@@ -403,7 +403,7 @@ def test_imageannotation_ondelete_image(app):
 
         # HUOM! Kun kuva poistetaan, niin annotaatio säilyy
         assert ImageContent.query.count() == 0
-        assert testimageannotation.image == []
+        assert testimageannotation.images == []
         assert ImageAnnotation.query.count() == 1
         assert PhotoAnnotation.query.count() == 0
 
@@ -431,16 +431,17 @@ def test_photo_and_photoannotation_ondelete_user(app):
 
         # HUOM! Kun user poistetaan, niin kuva ja annotaatio säilyy
         assert User.query.count() == 0
-        assert testphoto.pho_user == []
-        assert testphotoannotation.pho_annotator == []
+        assert testphoto.photo_users == []
+        assert testphotoannotation.photo_annotators == []
         assert ImageContent.query.count() == 1
         assert PhotoAnnotation.query.count() == 1
         assert ImageAnnotation.query.count() == 0
 
 
+
 """
 
-# THIS CANNOT BE TESTED ------------------------------------------------------------
+# THIS CANNOT BE TESTED ??? ------------------------------------------------------------
 
 # should test relationship between three tables: user - image - annotation
 

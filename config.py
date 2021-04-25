@@ -9,7 +9,7 @@ import os
 # get file location, print file location if needed
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-print("\nconfig basedir:  ", basedir)
+# print("\nconfig basedir:  ", basedir)
 
 # -----------------------------------------------------------------------------------
 # class Config implements an empty init_app() method
@@ -28,10 +28,10 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
-    DEBUG = False
-    SECRET_KEY="dev"    
+    #DEBUG = False
+    #SECRET_KEY="dev"    
     SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(basedir, "testingAnno.db")
-    SQLALCHEMY_TRACK_MODIFICATIONS=False
+    #SQLALCHEMY_TRACK_MODIFICATIONS=False
 
 class ProductionConfig(Config):    
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'MyPhotosAnno.db')
