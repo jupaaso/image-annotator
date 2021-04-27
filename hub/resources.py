@@ -244,9 +244,11 @@ class PhotoCollection(Resource):
                 is_private = photo.is_private,
                 date = photo.date
             )
-
-            item.add_control("self", url_for("api.photocollection"))
+            
+            item.add_control("self", url_for("api.photoitem", id=photo.id))
             item.add_control("profile", PHOTO_PROFILE)
+            if photo.photo_annotations != []:
+                item.add_control("photoannotation", url_for("api.photoannotationitem", id=photo.photo_annotations[0].id))
             body["items"].append(item)
         
         return Response(json.dumps(body, default=str), status=200, mimetype=MASON)
@@ -341,19 +343,19 @@ class PhotoItem(Resource):
         body = HubBuilder(
                 id = db_photoid.id,
                 user_id = db_photoid.user_id,
-                #data = db_photoid.data,
-                #ascii_data = db_photoid.ascii_data,
                 name = db_photoid.name,
                 publish_date = db_photoid.publish_date,
                 location = db_photoid.location,
                 is_private = db_photoid.is_private,
                 date = db_photoid.date
-        )
+        )        
 
         body.add_namespace("annometa", LINK_RELATIONS_URL)
         body.add_control("self", url_for("api.photoitem", id=id))
         body.add_control("profile", PHOTO_PROFILE)
         body.add_control("collection", url_for("api.photocollection"))
+        if db_photoid.photo_annotations != []:            
+            body.add_control("photoannotation", url_for("api.photoannotationitem", id=db_photoid.photo_annotations[0].id))
         body.add_control_delete_photo(id)
         body.add_control_edit_photo(id)
 
@@ -527,6 +529,7 @@ class PhotoannotationItem(Resource):
         body.add_control("self", url_for("api.photoannotationitem", id=id))
         body.add_control("profile", PHOTOANNOTATION_PROFILE)
         body.add_control("collection", url_for("api.photoannotationcollection"))
+        body.add_control("photoitem", url_for("api.photoitem", id=db_photoanno_id.photo_id))
         body.add_control_delete_photoannotation(id)
         body.add_control_edit_photoannotation(id)
 
@@ -615,8 +618,10 @@ class ImageCollection(Resource):
                 date = image.date
             )
 
-            item.add_control("self", url_for("api.imagecollection"))
+            item.add_control("self", url_for("api.imageitem", id=image.id))
             item.add_control("profile", IMAGE_PROFILE)
+            if image.image_annotations != []:
+                item.add_control("imageannotation", url_for("api.imageannotationitem", id=image.image_annotations[0].id))
             body["items"].append(item)
         
         # definition default=str below because of datetime objects
@@ -707,15 +712,13 @@ class ImageItem(Resource):
         """
         GET method gets one single image
         """
-        db_imageid = Image.query.filter_by(id=id).first()
+        db_imageid = ImageContent.query.filter_by(id=id).first()
         if db_imageid is None:
             return create_error_response(404, "Not found", "No throw was found with id {}".format(id))
 
         body = HubBuilder(
                 id = db_imageid.id,
                 user_id = db_imageid.user_id,
-                data = db_imageid.data,
-                ascii_data = db_imageid.ascii_data,
                 name = db_imageid.name,
                 publish_date = db_imageid.publish_date,
                 location = db_imageid.location,
@@ -727,6 +730,8 @@ class ImageItem(Resource):
         body.add_control("self", url_for("api.imageitem", id=id))
         body.add_control("profile", IMAGE_PROFILE)
         body.add_control("collection", url_for("api.imagecollection"))
+        if db_imageid.image_annotations != []:            
+            body.add_control("imageannotation", url_for("api.imageannotationitem", id=db_imageid.image_annotations[0].id))
         body.add_control_delete_image(id)
         body.add_control_edit_image(id)
 

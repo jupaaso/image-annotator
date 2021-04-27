@@ -33,33 +33,8 @@ function sendData(href, method, item, postProcessor) {
     });
 }
 
-// define item print outs for ImageContent metadata 
-function ImageContentRow(item) {
-    let link = "<img src='" +
-                item.location + "'" + 
-                "style='width:82px; height:86px'" + 
-                "alt='" + item.name + "'>";                                
 
-    return "<tr><td>" + item.name +
-            "</td><td>" + item.publish_date +            
-            "</td><td>" + item.is_private +            
-            "</td><td>" + link + "</td></tr>";
-}
-
-// define item print outs for ImageContent metadata 
-function PhotoContentRow(item) {
-    let link = "<img src='" +
-                item.location + "'" + 
-                "style='width:82px; height:86px'" + 
-                "alt='" + item.name + "'>";                                
-
-    return "<tr><td>" + item.name +
-            "</td><td>" + item.publish_date +            
-            "</td><td>" + item.is_private +            
-            "</td><td>" + link + "</td></tr>";
-}
-
-// define item print outs for ImageContent metadata 
+// define item print outs for User data 
 function UserItemRow(item) {
     let link = "<a href='" +
                 item["@controls"].self.href +
@@ -70,27 +45,65 @@ function UserItemRow(item) {
 }
 
 
-// edited function - including some added objects
-function renderSelection(body) {
-    // add empty navigation object
-    //$("div.navigation").empty();
-    // link to sensor resource, click handlers
-    $("div.navigation").html(
-        "<a href='" +         
-        "' onClick='getImageCollection(event)'>Images</a>" +         
-        "<span class='linkbar'> | </span>" + 
-        "<a href='" +
-        "' onClick='getPhotoCollection(event)'>Photos</a>"         
-    );
+// define item print outs for ImageContent metadata 
+function ImageContentRow(item) {    
+    let imageLink  = "<a href='" +
+    item["@controls"].self.href +    
+    "' onClick='followLink(event, this, renderImageAnnotation)'>Edit</a>";
     
-    $(".resulttable thead").empty();
-    $(".resulttable tbody").empty();    
+    return createItemTable(item, imageLink);
 }
 
+// define item print outs for ImageContent metadata 
+function PhotoContentRow(item) {    
+    let imageLink  = "<a href='" +
+    item["@controls"].self.href +    
+    "' onClick='followLink(event, this, renderPhotoAnnotation)'>Edit</a>";
+    
+    return createItemTable(item, imageLink);
+}
+
+// create table item for image or photo
+function createItemTable(item, imageLink) {
+    let link = "<img src='" +
+                item.location + "'" + 
+                "style='width:82px; height:86px'" + 
+                "alt='" + item.name + "'>";
+
+    return "<tr><td>" + item.name +
+            "</td><td>" + item.publish_date +            
+            "</td><td>" + item.is_private +            
+            "</td><td>" + link + 
+            "</td><td>" + imageLink + "</td></tr>";
+}
+
+// render device selection 
+// and back to start / user selection
+function renderSelection(body) {
+    // add empty navigation object
+    // $("div.navigation").empty();
+    // link to imagecollection / photocollection resource
+    // click handlers
+    $("div.navigation").html(
+        "<a href='" +
+        "' onClick='getImageCollection(event)'> Images </a>" +
+        "<span class='linkbar'> | </span>" +
+        "<a href='" +
+        "' onClick='getPhotoCollection(event)'> Photos </a>" +
+        "<span class='linkbar'> | </span>" +
+        "<a href='" +
+        "' onClick='getResource(event)'> Back to User Selection </a>"
+    );
+    $(".resulttable thead").empty();
+    $(".resulttable tbody").empty();
+}
+
+// REQUIRED for image/photo list update, when a new is added
 function appendImageContentRow(body) {
     $(".resulttable tbody").append(ImageContentRow(body));
 }
 
+// REQUIRED for image/photo list update, when a new is added
 function getSubmittedImageContent(data, status, jqxhr) {
     renderMsg("Successful");
     let href = jqxhr.getResponseHeader("Location");
@@ -113,8 +126,11 @@ function getPhotoCollection(event) {
     event.preventDefault();
     getResource("http://localhost:5000/api/photos/", renderPhotos);
 }
+
+
+////////////////////////////////
 // define submit for ImageContent
-// NOT changed yet
+// NOT created yet
 function submitImageContent(event) {
     event.preventDefault();
     let data = {};
@@ -127,6 +143,7 @@ function submitImageContent(event) {
     sendData(form.attr("action"), form.attr("method"), data, getSubmittedSensor);
 }
 
+// REQUIRED, not used yet
 // define delete function
 function deleteResource(event, a) {
     event.preventDefault();
@@ -141,6 +158,7 @@ function deleteResource(event, a) {
     });
 }
 
+// REQUIRED, not used yet
 // define update function
 function updateResource(event, a) {
     event.preventDefault();
@@ -155,7 +173,9 @@ function updateResource(event, a) {
     });
 }
 
+// REQUIRED, maybe for adding a new image and photo
 // define render for ImageContent
+// NOT created yet
 function renderImageForm(ctrl) {
     let form = $("<form>");
     let name = ctrl.schema.properties.name;
@@ -174,6 +194,8 @@ function renderImageForm(ctrl) {
     $("div.form").html(form);
 }
 
+// define render for User Login page
+// NOT created yet
 function renderUserLogin(ctrl) {
     let form = $("<form>");
     let name = ctrl.schema.properties.name;
@@ -192,8 +214,11 @@ function renderUserLogin(ctrl) {
     $("div.form").html(form);
 }
 
+
+// define render for start page
+// database populated and users are already in database
 function renderStartup(body) {
-     $("div.navigation").empty();
+    $("div.navigation").empty();
     $(".resulttable thead").html(
         "<tr><th>User name</th></tr>"
     );
@@ -204,24 +229,90 @@ function renderStartup(body) {
     });    
 }
 
-/* function to render uploaded image data and metadata */
-function renderPhotos(body) {
-    $("div.navigation").empty();
+/////////////////////////////////////
+// REQUIRED, same funcitonality as with renderImageAnnotation, but with photos
+function renderPhotoAnnotation(body) {            
+    $("div.navigation").empty();  
+}
+
+
+/* function to render uploaded photo data and metadata */
+function renderPhotos(body) {    
+    $("div.navigation").html(
+        "<a href='" +
+        "' onClick='followLink(event, this, renderSelection)'>Back</a>"         
+    );
     $(".resulttable thead").html(
-        "<tr><th>Filename</th><th>Publish date</th><th>Privacy class</th><th>Image</th></tr>"
+        "<tr><th>Filename</th><th>Publish date</th><th>Privacy class</th><th>Photo</th></tr>"
     );
     let tbody = $(".resulttable tbody");
     tbody.empty();
     body.items.forEach(function (item) {
         tbody.append(ImageContentRow(item));
+        console.log(item);
     });
-    renderImageForm(body["@controls"]["annometa:add-image"]);    
+    $('img').each(function() {
+        var currentImage = $(this);
+        currentImage.wrap("<a target='_blank' href='" + currentImage.attr("src") + "'</a>");
+    });
+    renderImageForm(body["@controls"]["annometa:add-photo"]);
+}
+
+
+function renderImageAnnotation(item) {
+    
+    // clear the view before rendering
+    $(".imagecontent").empty();
+    $(".imagemetatable tbody").empty();
+    $(".imagemetatable thead").empty();
+    $(".resulttable thead").empty();
+    $(".resulttable tbody").empty();
+    $(".form").empty();
+
+
+    $("div.navigation").html(
+        "<a href='" +
+        "' onClick='getImageCollection(event)'> Back to Images </a>"
+    );
+    let link = "<img src='" +
+    item.location + "'" +     
+    "alt='" + item.name + "'>";
+    
+    let imagemeta = "<tr><td>" + item.name +
+    "</td><td>" + item.publish_date + "</td></tr>";
+
+    let imagecontent = $(".imagecontent");
+    imagecontent.append(link);        
+    $(".imagemetatable thead").html(
+        "<tr><th>Filename</th><th>Publish date</th></tr>"
+    );
+    let ibody = $(".imagemetatable tbody");           
+    ibody.append(imagemeta);
+    
+    if (item["@controls"].hasOwnProperty("imageannotation"))
+    {
+        getResource(item["@controls"].imageannotation.href, function(annotationItem) {
+            $(".annotationtable thead").html(
+                "<tr><th>Meme class</th><th>HS_class</th></tr>"
+            );
+            let annotations = "<tr><td>" + annotationItem.meme_class +
+            "</td><td>" + annotationItem.HS_class + "</td></tr>";
+
+            let abody = $(".annotationtable tbody");           
+            abody.append(annotations);
+        });
+    }
+    else {
+        console.log("No annotations - implement add ")
+    }    
 }
 
 /* function to render uploaded image data and metadata */
-function renderImages(body) {
-    console.log("In renderImages----");
-    $("div.navigation").empty();
+function renderImages(body) {    
+    $("div.navigation").html(
+        "<a href='" +
+        "' onClick='followLink(event, this, renderSelection)'>Back</a>"         
+    );
     $(".resulttable thead").html(
         "<tr><th>Filename</th><th>Publish date</th><th>Privacy class</th><th>Image</th></tr>"
     );
@@ -230,8 +321,13 @@ function renderImages(body) {
     body.items.forEach(function (item) {
         tbody.append(ImageContentRow(item));
     });
-    renderImageForm(body["@controls"]["annometa:add-image"]);    
+    $('img').each(function() {
+        var currentImage = $(this);
+        currentImage.wrap("<a target='_blank' href='" + currentImage.attr("src") + "'</a>");
+    });
+    renderImageForm(body["@controls"]["annometa:add-image"]);
 }
+
 
 /* local host for render uploaded */
 $(document).ready(function () {

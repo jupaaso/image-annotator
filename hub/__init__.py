@@ -10,13 +10,14 @@
 # in order to start development server on windows
 #(.venv) C:\PWBproject\ImageAnnotator\hub>set FLASK_APP=hub
 #(.venv) C:\PWBproject\ImageAnnotator\hub>set FLASK_ENV=development
+# flask run
 
 import os
 from flask import Flask, url_for
 from flask_sqlalchemy import SQLAlchemy
 # start
 from hub.constants import *
-#from config import config
+# from config import config
 # end
 
 
@@ -33,7 +34,7 @@ print("\ninit basedir:  ", basedir)
 # initialize configuration with init_app()
 # initialize app with init_app()
 
-#def create_app(config_name):
+# def create_app(config_name):
 def create_app(test_config=None):
 
     app = Flask(__name__, instance_relative_config=True)
@@ -56,51 +57,57 @@ def create_app(test_config=None):
         SQLALCHEMY_TRACK_MODIFICATIONS=False
     )
     # filen tallennukseen tarvitaan nämä
-    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    app.config['UPLOAD_FOLDER_PHOTOS'] = UPLOAD_FOLDER_PHOTOS
+    app.config['UPLOAD_FOLDER_IMAGES'] = UPLOAD_FOLDER_IMAGES
     # disable cache
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
     # end file
 
     if test_config is None:
         app.config.from_pyfile("config.py", silent=True)
+    
+    # do not use rows below if not necessary --------------------------
     else:
         app.config.from_mapping(test_config)
-        app.config['DEBUG'] = True
-
+        #app.config['DEBUG'] = True
+    # ------------------------------------------------------------------
+    
     try:
         os.makedirs(app.instance_path)        
     except OSError:        
         pass
 
-    try:
-        upload = basedir + UPLOAD_FOLDER        
-        if not os.path.exists(upload):
-            os.makedirs(upload)
-    except OSError as e:
-        print('FAILED : ' + str(upload), file=sys.stderr)
+    
+
     db.init_app(app)
     
     from . import models
     from . import api_routes
 
+    models.create_static_folders()
+    
     app.cli.add_command(models.init_db_command)
+    app.cli.add_command(models.generate_test_data)
     app.register_blueprint(api_routes.api_bp)
 
-    return app
-
-"""
     @app.route(LINK_RELATIONS_URL)
     def send_link_relations():
         return "link relations"
+
+    @app.route("/admin/")
+    def admin_site():
+        return app.send_static_file("html/admin.html")
 
     @app.route("/profiles/<profile>/")
     def send_profile(profile):
         return "you requests {} profile".format(profile)
 
-    @app.route("/admin/")
-    def admin_site():
-        return app.send_static_file("html/admin.html")
-"""
+    return app
+
+
+
+
+
     # attach routes and custom error pages here
     #print("instance path : ", app.instance_path)
 
