@@ -158,17 +158,18 @@ class HubBuilder(MasonBuilder):
     def photo_schema():
         schema = {
             "type": "object",
-            "required": ["data", "ascii_data", "name", "publish_date", "location", "is_private", "date"]
+            "required": ["name", "publish_date", "location", "is_private", "date"]
+            #"required": ["data", "ascii_data", "name", "publish_date", "location", "is_private", "date"]
         }
         props = schema["properties"] = {}
-        props ["data"] = {
-            "description": "Raw data of photo",
-            "type": "LargeBinary"
-        }
-        props ["ascii_data"] = {
-            "description": "Ascii data of photo",
-            "type": "text"
-        }
+        #props ["data"] = {
+        #    "description": "Raw data of photo",
+        #    "type": "LargeBinary"
+        #}
+        #props ["ascii_data"] = {
+        #    "description": "Ascii data of photo",
+        #    "type": "text"
+        #}
         props ["name"] = {
             "description": "Name of photograph",
             "type": "string"
@@ -251,17 +252,18 @@ class HubBuilder(MasonBuilder):
     def image_schema():
         schema = {
             "type": "object",
-            "required": ["data", "ascii_data", "name", "publish_date", "location", "is_private", "date"]
+            "required": ["name", "publish_date", "location", "is_private", "date"]
+            #"required": ["data", "ascii_data", "name", "publish_date", "location", "is_private", "date"]
         }
         props = schema["properties"] = {}
-        props ["data"] = {
-            "description": "Raw data of image",
-            "type": "LargeBinary"
-        }
-        props ["ascii_data"] = {
-            "description": "Ascii data of image",
-            "type": "text"
-        }
+        #props ["data"] = {
+        #    "description": "Raw data of image",
+        #    "type": "LargeBinary"
+        #}
+        #props ["ascii_data"] = {
+        #    "description": "Ascii data of image",
+        #    "type": "text"
+        #}
         props ["name"] = {
             "description": "Name of image",
             "type": "string"
@@ -433,15 +435,15 @@ class HubBuilder(MasonBuilder):
         props = schema["properties"] = {}
         props ["meme_class"] = {
             "description": "Classifier to define if image is meme",
-            "type": "number"
+            "type": "boolean"
         }
         props ["HS_class"] = {
             "description": "Classifier to define if image is hate speech",
-            "type": "number"
+            "type": "boolean"
         }
         props ["text_class"] = {
             "description": "Classifier to define if image includes text",
-            "type": "number"
+            "type": "boolean"
         }
         props ["polarity_classA"] = {
             "description": "Classifier to define polarity value for image",
@@ -479,7 +481,7 @@ class HubBuilder(MasonBuilder):
             schema=self.imageannotation_schema()
         )
 
-    def add_control_delete_imageannotation(self, imageannotation):
+    def add_control_delete_imageannotation(self, id):
         self.add_control(
             "annometa:delete",
             url_for("api.imageannotationitem", id=id),
@@ -487,7 +489,7 @@ class HubBuilder(MasonBuilder):
             title="Delete this imageannotation"
         )
 
-    def add_control_edit_imageannotation(self, imageannotation):
+    def add_control_edit_imageannotation(self, id):
         self.add_control(
             "edit",
             url_for("api.imageannotationitem", id=id),
@@ -497,7 +499,7 @@ class HubBuilder(MasonBuilder):
             schema=self.imageannotation_schema()
         )
 
-    def add_control_get_imageannotation(self, imageannotation):
+    def add_control_get_imageannotation(self, id):
         self.add_control(
             "annometa:imageannotation",
             "/api/imageannotations/imageannotation/",

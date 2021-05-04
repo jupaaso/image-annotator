@@ -356,6 +356,8 @@ class PhotoItem(Resource):
         body.add_control("collection", url_for("api.photocollection"))
         if db_photoid.photo_annotations != []:            
             body.add_control("photoannotation", url_for("api.photoannotationitem", id=db_photoid.photo_annotations[0].id))
+        else:
+            body.add_control("photoannotations", url_for("api.photoannotationcollection"))            
         body.add_control_delete_photo(id)
         body.add_control_edit_photo(id)
 
@@ -514,6 +516,10 @@ class PhotoannotationItem(Resource):
         if db_photoanno_id is None:
             return create_error_response(404, "Not found", "No photoannotation was found with id {}".format(id))
 
+        # MUUTOS
+        # get the annotator for annotator control
+        annotator = User.query.filter_by(id=db_photoanno_id.user_id).first()
+
         body = HubBuilder(
                 id = db_photoanno_id.id,
                 photo_id = db_photoanno_id.photo_id,
@@ -530,6 +536,8 @@ class PhotoannotationItem(Resource):
         body.add_control("profile", PHOTOANNOTATION_PROFILE)
         body.add_control("collection", url_for("api.photoannotationcollection"))
         body.add_control("photoitem", url_for("api.photoitem", id=db_photoanno_id.photo_id))
+        # MUUTOS
+        body.add_control("annotator", url_for("api.useritem", user_name=annotator.user_name))
         body.add_control_delete_photoannotation(id)
         body.add_control_edit_photoannotation(id)
 
@@ -714,7 +722,7 @@ class ImageItem(Resource):
         """
         db_imageid = ImageContent.query.filter_by(id=id).first()
         if db_imageid is None:
-            return create_error_response(404, "Not found", "No throw was found with id {}".format(id))
+            return create_error_response(404, "Not found", "No throw was found with id {}".format(id))        
 
         body = HubBuilder(
                 id = db_imageid.id,
@@ -732,6 +740,8 @@ class ImageItem(Resource):
         body.add_control("collection", url_for("api.imagecollection"))
         if db_imageid.image_annotations != []:            
             body.add_control("imageannotation", url_for("api.imageannotationitem", id=db_imageid.image_annotations[0].id))
+        else:
+            body.add_control("imageannotations", url_for("api.imageannotationcollection"))
         body.add_control_delete_image(id)
         body.add_control_edit_image(id)
 
@@ -836,8 +846,7 @@ class ImageannotationCollection(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        new_imageannotation = Imageannotation(
-            id = request.json["id"],
+        new_imageannotation = ImageAnnotation(
             image_id = request.json["image_id"],
             user_id=request.json["user_id"],
             meme_class = request.json["meme_class"],
@@ -854,10 +863,14 @@ class ImageannotationCollection(Resource):
         try:
             db.session.add(new_imageannotation)
             db.session.commit()
+
+             # query the newly added annotation             
+            db_annotation = ImageAnnotation.query.filter_by(image_id=new_imageannotation.image_id).first()
+            
         except IntegrityError:
             return create_error_response(409, "Already exists", "Imageannotation with id '{}' already exists".format(request.json["id"]))
 
-        return Response(status=201, headers={"Location": url_for("api.imageannotationcollection")})
+        return Response(status=201, headers={"Location": url_for("api.imageannotationitem", id=db_annotation.id)})
 
 
 class ImageannotationItem(Resource):
@@ -874,6 +887,10 @@ class ImageannotationItem(Resource):
         db_imageanno_id = ImageAnnotation.query.filter_by(id=id).first()
         if db_imageanno_id is None:
             return create_error_response(404, "Not found", "No imageannotation was found with id {}".format(id))
+
+        # MUUTOS
+        # get the annotator for annotator control
+        annotator = User.query.filter_by(id=db_imageanno_id.user_id).first()
 
         body = HubBuilder(
             id = db_imageanno_id.id,
@@ -894,6 +911,8 @@ class ImageannotationItem(Resource):
         body.add_control("self", url_for("api.imageannotationitem", id=id))
         body.add_control("profile", IMAGEANNOTATION_PROFILE)
         body.add_control("collection", url_for("api.imageannotationcollection"))
+        # MUUTOS
+        body.add_control("annotator", url_for("api.useritem", user_name=annotator.user_name))
         body.add_control_delete_imageannotation(id)
         body.add_control_edit_imageannotation(id)
         return Response(json.dumps(body), status=200, mimetype=MASON)
