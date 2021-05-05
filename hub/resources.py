@@ -43,39 +43,41 @@ def create_image_item_from_request(req_content, image_object, upload_folder):
     # does NOT return error response if the filename exists already
     # --- but return as rename the file by adding a datetime to its name ---
     db_photo_name_test = ImageContent.query.filter_by(name=image_object.filename).first()
+    
     if db_photo_name_test is not None:
 
-        # datetime according to milliseconds
-        time_now  = datetime.now().strftime('%m_%d_%Y_%H_%M_%S_%f') 
+        # datetime according to milliseconds - no
+        time_now  = datetime.now().strftime('%m_%d_%Y_%H_%M_%S_%f')
+
         print("test time now  ", time_now)
+
         filename_parts = os.path.splitext(image_object.filename)
         new_file_name = filename_parts[0] + str(time_now) + filename_parts[1]
+        
         image_object.filename = new_file_name
         ### return new filename
     
-        
         # defined in constants file ------
         # UPLOAD_FOLDER = "\\static\\images\\"
         # ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'gif', 'bmp', 'tiff'])
 
     # define image path
     upload = basedir + upload_folder + image_object.filename
-    
     # save method saves an image to path
-    
     image_object.save(upload)
     
     # NOTE paikka kuvien talletukseen, joka talletetaan tietokantaan ja palautetana clientille
     item_location = upload_folder + image_object.filename
+
     # NOTE luodaan photon metadata ilman lokaatiotietoa dictionaryyn
-    
     item_dict = hub.utils.set_photo_meta_data_to_dict(upload, req_content["is_private"])
+
     # NOTE luodaan ImageContent olio, jossa käytetään photolocation tietoa, joka on clientille käytettävissä
     item = ImageContent(name=item_dict["name"], 
-                                publish_date=item_dict["publish_date"], 
-                                location=item_location, 
-                                is_private=item_dict["is_private"], 
-                                date=item_dict["date"])
+                        publish_date=item_dict["publish_date"], 
+                        location=item_location, 
+                        is_private=item_dict["is_private"], 
+                        date=item_dict["date"])
     
     return item
 
@@ -657,16 +659,17 @@ class ImageCollection(Resource):
             print('exp : ' + str(e), file=sys.stderr)    
             return create_error_response(400, "Invalid JSON document", str(e))  
 
-        # added rows
+        # request content = req_content - includes user and private flag
         # user must be provided for photos / images
         if req_content["user_name"] == "" or req_content["user_name"] == None:
-            return create_error_response(400, "Invalid JSON document", "No user provided") 
+            return create_error_response(400, "Invalid JSON document", "No user provided")
+
         print('currentUser RECEIVED : ' + str(req_content["user_name"]), file=sys.stderr)
-        # query current user from database -------------
-        # request content = req_content - includes user and private flag
+        
+        # query current user from database
         currentUser = User.query.filter_by(user_name=req_content["user_name"]).first()        
         # print out current user
-        print('currentUser : ' + str(currentUser.user_name), file=sys.stderr)
+        print('PRINT currentUser : ' + str(currentUser.user_name), file=sys.stderr)
         
         # ----------------------------------------------
         # check if the post request has the file part
@@ -680,34 +683,44 @@ class ImageCollection(Resource):
         
         # ---------------------------------------------
         # check if the file exists already
-        if image and allowed_file(image.filename):            
-            try:
-                image_item = create_image_item_from_request(req_content, image, UPLOAD_FOLDER_IMAGES)
-            except Exception as e:
-                create_error_response(500, "Failed to save the file", str(e) + " Failed to save file '{}'".format(image.filename))
-            
-            db_image = None
+        # if image and allowed_file(image.filename):            
+        try:
+            image_item = create_image_item_from_request(req_content, image, UPLOAD_FOLDER_IMAGES)
 
-            # user defined as image_user
-            try:
-                currentUser.image_user.append(image_item)
-                db.session.commit()
+            print('PRINT image-item name and ID :  '  + str(image_item.name), file=sys.stderr)
 
-                # query photo item
-                db_image = ImageContent.query.filter_by(name=image_item.name).first()
-                print('db_image : ' + str(db_image.id), file=sys.stderr)
+        except Exception as e:
+            create_error_response(500, "Failed to save the file", str(e) + " Failed to save file '{}'".format(image.filename))
+        
+        # db_image = None
+        # user defined as image_user
+        # kuvan lisäys ei EI TOIMI current userille
 
-            # return error response if the file exists already
-            # --------- or return as rename the file by adding a datetime to its name - not done yet ---------------
-            except IntegrityError:
-                return create_error_response(409, "Already exists", "Image with id '{}' already exists".format(request.json["id"]))
-            except Exception as e:
-                create_error_response(500, "Failed to save the file", str(e) + " Failed to save file '{}'".format(image.filename))
-            
-            # following two rows below return the same answer (on Postman)
+        # ------------------------------------
+        try:
+            currentUser.image_user.append(image_item)
+            db.session.commit()
+        # ----------------------------------
+            # query photo item by name
+            db_image = ImageContent.query.filter_by(name=image_item.name).first()
+
+            # query photo item by id - similarly as in annotation post
+            # change the rest of the code
+
+            print('PRINT db_image name and ID :  ' + str(db_image.id), file=sys.stderr)
+             # following two rows below return the same answer (on Postman)
             # return Response(status=201, headers={"Location": url_for("api.imagecollection", id=db_image.id)})
             # the correct row below - returns api/images/<id>/
-            return Response(status=201, headers={"Location": url_for("api.imageitem", id=db_image.id)})            
+            return Response(status=201, headers={"Location": url_for("api.imageitem", id=db_image.id)}) 
+
+        # return error response if the file exists already or failed to save the file
+        except IntegrityError:
+            return create_error_response(409, "Already exists", "Image with id '{}' already exists".format(request.json["id"]))
+        # return error response if failed to save the file
+        except Exception as e:
+            create_error_response(500, "Failed to save the file", str(e) + " Failed to save file '{}'".format(image.filename))
+    
+                  
 
 
 class ImageItem(Resource):
@@ -923,6 +936,7 @@ class ImageannotationItem(Resource):
         PUT method edits one single imageannotation
         """
         db_imageanno_id = ImageAnnotation.query.filter_by(id=id).first()
+
         if db_imageanno_id is None:
             return create_error_response(404, "Not found", "No imageannotation was found with id {}".format(id))
         if not request.json:
@@ -932,24 +946,24 @@ class ImageannotationItem(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        db_imageanno_id.id = request.json["id"],
-        db_imageanno_id.photo_id = request.json["image_id"],
-        db_imageanno_id.user_id=request.json["user_id"],
-        db_imageanno_id.meme_class = request.json["meme_class"],
-        db_imageanno_id.HS_class = request.json["HS_class"],
-        db_imageanno_id.text_class = request.json["text_class"],
-        db_imageanno_id.polarity_classA = request.json["polarity_classA"],
-        db_imageanno_id.polarity_classB = request.json["polarity_classB"],
-        db_imageanno_id.HS_strength = request.json["HS_strength"],
-        db_imageanno_id.HS_category = request.json["HS_category"],
-        db_imageanno_id.text_text = request.json["text_text"],
+        db_imageanno_id.id = request.json["id"]
+        db_imageanno_id.image_id = request.json["image_id"]
+        db_imageanno_id.user_id=request.json["user_id"]
+        db_imageanno_id.meme_class = request.json["meme_class"]
+        db_imageanno_id.HS_class = request.json["HS_class"]
+        db_imageanno_id.text_class = request.json["text_class"]
+        db_imageanno_id.polarity_classA = request.json["polarity_classA"]
+        db_imageanno_id.polarity_classB = request.json["polarity_classB"]
+        db_imageanno_id.HS_strength = request.json["HS_strength"]
+        db_imageanno_id.HS_category = request.json["HS_category"]
+        db_imageanno_id.text_text = request.json["text_text"]
         db_imageanno_id.text_language = request.json["text_language"]
 
         try:
             db.session.commit()
         except IntegrityError:
             return create_error_response(409, "Already exists", "Imageannotation with id '{}' already exists".format(request.json["id"]))
-        return Response(status=204)
+        return Response(status=204, headers={"Location": url_for("api.imageannotationitem", id=db_imageanno_id.id)})
 
 
     def delete(self, id):

@@ -62,7 +62,7 @@
                 </div>        
                 <label class="Polarity_classA_header">Polarity_classA</label>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="Polarity_classA_Positive" value="1" disabled>
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="Polarity_classA_Positive" value="1" checked disabled>
                     <label class="form-check-label" for="Polarity_classA_Positive">Positive</label>
                   </div>
                   <div class="form-check form-check-inline">
@@ -136,5 +136,16 @@
         <div class="tablecontrols"></div>
     </div>
     <div class="form">
+        <form class="imageUploadForm" id="imageUploadFormId">
+            <button class="btn btn-primary me-md-2" type="button" id="uploadFileBtnId" style="display:none">Add image...</button>
+            <input type="file" id="fileElem" accept="image/*" style="display:none">
+            <div class="fileList" id="fileList" style="margin-top: 10px;">
+                <p id="fileInfoId" style="display: none;">No files selected!</p>
+            </div>
+            <div class="d-grid gap-2 d-md-block">
+                <button class="btn btn-secondary" id="cancelUploadBtn" type="button" style="display:none">Cancel</button>
+                <button class="btn btn-primary" id="uploadBtn" type="submit" style="display:none">Upload</button>
+              </div>
+        </form>
     </div>
 </body>

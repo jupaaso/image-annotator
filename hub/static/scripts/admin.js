@@ -37,6 +37,20 @@ function sendData(href, method, item, postProcessor) {
     });
 }
 
+function sendImageData(href, method, formData, postProcessor) {
+    console.log(href);
+    console.log(method);  
+    console.log(formData);
+    $.ajax({
+        url: href,
+        type: method,
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: postProcessor,
+        error: renderError
+    });
+}
 
 // define item print outs for User data 
 function UserItemRow(item) {
@@ -116,10 +130,10 @@ function appendImageContentRow(body) {
 
 // REQUIRED for image/photo list update, when a new is added
 function getSubmittedImageContent(data, status, jqxhr) {
-    renderMsg("Successful");
+    renderMsg("Image/Photo update was successful");
     let href = jqxhr.getResponseHeader("Location");
     if (href) {
-        getResource(href, appendImageContentRow);
+        getResource(href, getImageCollection);
     }
 }
 
@@ -129,7 +143,10 @@ function followLink(event, a, renderer) {
 }
 
 function backToImageCollection() {
-    renderMsg("Delete Successful");
+    renderMsg("Delete/Update was successful");    
+    $('#testform').each(function(){
+        this.reset();
+    });    
     $('#testform').hide(); 
     hideButtons();
     getResource("http://localhost:5000/api/images/", renderImages);
@@ -146,7 +163,7 @@ function getPhotoCollection(event) {
 }
 
 
-////////////////////////////////
+/*
 // define submit for ImageContent
 // NOT created yet
 function submitImageContent(event) {
@@ -159,7 +176,7 @@ function submitImageContent(event) {
     data.team1_points = parseInt($("input[name='team1_points']").val());
     data.team2_points = parseInt($("input[name='team2_points']").val());
     sendData(form.attr("action"), form.attr("method"), data, getSubmittedSensor);
-}
+} */
 
 // REQUIRED, not used yet
 // define delete function
@@ -174,8 +191,22 @@ function deleteResource(href, callback) {
     });
 }
 
+function updateResource(href, callback) {
+    //event.preventDefault();
+    //let resource = $(a);
+    $.ajax({
+        //url:resource.attr("href"),
+        url:href,
+        type:"PUT",
+        success: callback,
+        // success: function(){ renderMsg("Update Succesful"); },
+        error:renderError
+    });
+}
+
 // REQUIRED, not used yet
 // define update function
+/*
 function updateResource(event, a) {
     event.preventDefault();
     let resource = $(a);
@@ -187,28 +218,83 @@ function updateResource(event, a) {
         },
         error:renderError
     });
+} */
+
+function handleFileSelect (e) {
+    var files = e.target.files;
+    if (files.length < 1) {
+        alert('Select a file...');
+        return;
+    }
+    $("#uploadFileBtnId").attr('disabled', true);
+
+    var file = files[0];
+    fileList.innerHTML = "";
+    const list = document.createElement("ul");
+    fileList.appendChild(list);
+
+    const li = document.createElement("li");
+    list.appendChild(li);
+
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(file);
+    img.height = 60;
+    img.onload = function() {
+    URL.revokeObjectURL(this.src);
+    }
+    li.appendChild(img);
+    const info = document.createElement("span");
+    info.innerHTML = file.name + ": " + file.size + " bytes";
+    li.appendChild(info);
+
+    $("#cancelUploadBtn").show();
+    $("#uploadBtn").show();
+
+    $("#cancelUploadBtn").on("click", function(event) {        
+        event.preventDefault();
+        $("div.fileList").empty();
+        $("#uploadFileBtnId").attr('disabled', false);
+        $("#cancelUploadBtn").hide();
+        $("#uploadBtn").hide();
+    });
+
+    $("#uploadBtn").on("click", function(event) {        
+        event.preventDefault();
+        $("div.fileList").empty();
+        $("#uploadFileBtnId").attr('disabled', false);
+        $("#cancelUploadBtn").hide();
+        $("#uploadBtn").hide();
+
+        const fd = new FormData();
+        fd.append('image', file);
+
+       // {"user_name": "Meria Developer","is_private":true}
+        let data = {};
+        data.user_name = sessionStorage.getItem("CurrentUser");
+        data.is_private = true;
+        fd.append('request', JSON.stringify(data));
+        sendImageData($("#imageUploadFormId").attr("action"), $("#imageUploadFormId").attr("method"), fd, getSubmittedImageContent);
+    }); 
 }
 
-// REQUIRED, maybe for adding a new image and photo
+// for adding a new image and photo
 // define render for ImageContent
-// NOT created yet
 function renderImageForm(ctrl) {
-    let form = $("<form>");
-    let name = ctrl.schema.properties.name;
-    let model = ctrl.schema.properties.location;
-    form.attr("action", ctrl.href);
-    form.attr("method", ctrl.method);
-    form.submit(submitImageContent);
-    form.append("<label>" + name.description + "</label>");
-    form.append("<input type='text' name='name'>");
-    form.append("<label>" + location.description + "</label>");
-    form.append("<input type='text' name='model'>");
-    ctrl.schema.required.forEach(function (property) {
-        $("input[name='" + property + "']").attr("required", true);
+
+    $("imageUploadFormId").toggle();
+    $("#uploadFileBtnId").show();
+    
+    $("#imageUploadFormId").attr("action", ctrl.href);
+    $("#imageUploadFormId").attr("method", ctrl.method);
+
+    $(function () {
+        $('#uploadFileBtnId').click(function(e) {
+            $('#fileElem').click();
+        });
+        $('#fileElem').change(handleFileSelect);
     });
-    form.append("<input type='submit' name='submit' value='Submit'>");
-    $("div.form").html(form);
 }
+
 
 // define render for User Login page
 // NOT created yet
@@ -279,6 +365,8 @@ function renderPhotos(body) {
     renderImageForm(body["@controls"]["annometa:add-photo"]);
 }
 
+// helper functions -----------------------------------------------------
+
 function createheaderForFormRow(valueString) {
     return "<div class='col-md-2 col-form-label'><label>'" +
                 valueString + "</label></div>"
@@ -289,8 +377,6 @@ function createSpanForFormRow(valueString) {
                 valueString + "</span></div>"
 }
 
- 
-
 function appendToForm(form, rowHeader, rowValue) {
     //let annotationForm =  $(".annotationform");
     let rowElement = "<div class='row'>" + rowHeader + rowValue + "</div>";
@@ -298,7 +384,16 @@ function appendToForm(form, rowHeader, rowValue) {
 }
 
 function getSubmittedAnnotation(data, status, xhr) {
-    renderMsg("Submit of annotation was successful");
+    renderMsg("Submit of new annotation was successful");
+    let href = xhr.getResponseHeader("Location");
+    console.log(href);
+    if (href) {
+        getResource(href, populateImageAnnotationForm);
+    }
+}
+
+function getEditedAnnotation(data, status, xhr) {
+    renderMsg("EDIT of annotation was successful");
     let href = xhr.getResponseHeader("Location");
     console.log(href);
     if (href) {
@@ -317,11 +412,47 @@ function isChecked(checkbox) {
     }
 }
 
+// EDIT - PUT --------------------------------------------------------------
+
+function putImageAnnotationContent(event) {
+    event.preventDefault();
+    let data = {};
+    let form = $(".annotationMetaForm");
+    
+    data.id = parseInt(($('input[id="annotationId"]', '#testform').val()));
+    data.image_id = parseInt(($('input[id="imageId"]', '#testform').val()));
+    data.user_id = parseInt(($('input[id="userId"]', '#testform').val()));
+    data.meme_class = isChecked($("#meme_class"));
+    data.HS_class = isChecked($("#HS_class"));
+    data.text_class = isChecked($("#text_class"));    
+    data.polarity_classA = parseInt(($('input[name=inlineRadioOptions]:checked', '#testform').val()));
+    data.polarity_classB = parseInt(($('input[name=rangeInputclassB]', '#testform').val()));
+    data.HS_strength = parseInt(($('input[name=rangeInputclassHS]', '#testform').val()));
+    data.HS_category = $("#HS_category").val();
+    data.text_text = $("#text_text").val();
+    data.text_language = $("#text_language").val();
+    
+    sendData(form.attr("action"), form.attr("method"), data, getEditedAnnotation);
+}
+
+function editImageAnnotationContent(event) {
+    event.preventDefault();
+    $("#testform").find('*').attr('disabled', false);
+    hideButtons();
+    $("#editAnnotationBtnId").show();
+    $("#editAnnotationBtnId").on( "click", function(event) {        
+        putImageAnnotationContent(event);
+    }); 
+}
+
+// ADD - POST --------------------------------------------------------------
+
 function submitImageAnnotationContent(event) {
     event.preventDefault();
     let data = {};
     let form = $(".annotationMetaForm");
     
+    // post tarvitsee image_id ja user_id
     data.image_id = parseInt(($('input[id="imageId"]', '#testform').val()));
     data.user_id = parseInt(($('input[id="userId"]', '#testform').val()));
     data.meme_class = isChecked($("#meme_class"));
@@ -341,20 +472,22 @@ function submitImageAnnotationContent(event) {
 
 
 function populateEmptyImageAnnotationForm(imageItem) {
-    //$('.annotationMetaForm').show(); // Show annotation form
-    $("#testform").show();
-
-    // enable fields
-    //$("#annotationMetaFormId").find('*').attr('disabled', false);
-    $("#testform").find('*').attr('disabled', false);
-    
-    $("#text_class").prop("checked", false);
-    enableTextFields();
-
+    $("div.notification").empty();
     // set current user and image id's
     $("#annotatorName").attr("value", sessionStorage.getItem("CurrentUser"));
     $("#imageId").attr("value", imageItem.id);
     $("#userId").attr("value", imageItem.user_id);
+    $("#annotationId").attr("value", $("#annotationId").attr("placeholder"));
+
+    // clear text fields if not already empty
+    $("#HS_category").val('');
+    $("#text_language").val('');
+    $("#text_text").val('');
+
+    // enable fields
+    $("#testform").find('*').attr('disabled', false);
+    $("#text_class").prop("checked", false);
+    enableTextFields();
 
     // get imageannotation collection to get the control, method and encoding
     getResource(imageItem["@controls"].imageannotations.href, function(annotationCollection) {
@@ -365,6 +498,7 @@ function populateEmptyImageAnnotationForm(imageItem) {
         console.log($("#annotationMetaFormId").attr("method"));
         console.log($("#annotationMetaFormId").attr("action"));
     });
+    $("#testform").show();
     $("#addAnnotationBtnId").show();
     $("#addAnnotationBtnId").on( "click", function(event) {        
         submitImageAnnotationContent(event);
@@ -395,8 +529,7 @@ function enableTextFields() {
 
 
 function populateImageAnnotationForm(annotationItem, annotationExists) {
-    // clear the view before rendering
-    //$("div.navigation").empty();
+    // clear the view before rendering    
     // api/imageannotations/<id>/
     getResource(annotationItem["@controls"].annotator.href, function(annotatorItem) {
         $("#annotatorName").attr("value", annotatorItem.user_name);
@@ -491,7 +624,12 @@ function populateImageAnnotationForm(annotationItem, annotationExists) {
     // edit - put not implemented yet - coming here soon
     $("#editAnnotationBtnId").on( "click", function(event) {
         event.preventDefault();
-        console.log("Annotation edit not implemented yet")
+        //console.log("Annotation edit not implemented yet")
+        let editCtrl = annotationItem["@controls"]["edit"];
+        $("#annotationMetaFormId").attr("action", editCtrl.href);
+        $("#annotationMetaFormId").attr("method", editCtrl.method);
+        console.log("EDIT of imageannotation was succesful " + editCtrl.href);
+        editImageAnnotationContent(event);
       });     
     
     $("#deleteAnnotationBtnId").on( "click", function(event) {
@@ -529,7 +667,7 @@ function renderImageAnnotation(item) {
     $(".resulttable tbody").empty();
     $(".imagemetaform").empty();
     $(".form").empty();
-    
+    $("#uploadFileBtnId").hide();
     // MUUTOS
     $("div.navigation").html(
         "<a href='" +
@@ -588,6 +726,7 @@ function renderImages(body) {
     $(".annotationform").empty();
     $(".imagemetaform").empty();
     
+
     // define navigation
     $("div.navigation").html(
         "<a href='" +
@@ -605,6 +744,9 @@ function renderImages(body) {
         var currentImage = $(this);
         currentImage.wrap("<a target='_blank' href='" + currentImage.attr("src") + "'</a>");
     });
+
+    
+    // add image files from folder here
     renderImageForm(body["@controls"]["annometa:add-image"]);
 }
 
