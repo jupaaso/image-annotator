@@ -263,7 +263,10 @@ def save_to_upload(target_folder, source_folder, source_filename):
 
 def getImageData(upload):
     image_list = []
-    source_images_folder = "C:\\PWPproject\\ImageAnnotator\\data\\ImageTest\\"
+    cwd = os.getcwd()
+    folder = '\\data\\ImageTest\\'
+    source_images_folder = cwd + folder
+    #print("source_images_folder:", source_images_folder)
     
     for filename in glob.glob(source_images_folder + '*.jpg'):
         print("\n Print image data filename:  ", filename)
@@ -308,8 +311,11 @@ def getImageAnnoData():
 
 def getPhotoData(upload):
     photo_list = []
-    source_photos_folder = 'C:\\PWPproject\\ImageAnnotator\\data\\PhotoTest//'
-    
+    cwd = os.getcwd()
+    folder = '\\data\\PhotoTest\\'
+    source_photos_folder = cwd + folder
+    #print("source_photos_folder:", source_photos_folder)
+
     for filename in glob.glob(source_photos_folder + '*.jpg'):        
         meta_data_dict = set_photo_meta_data_to_dict(filename, True)
         # NOTE!!!
