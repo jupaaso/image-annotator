@@ -93,17 +93,24 @@ def app():
 # -----------------------------------------------------------
 
 def _get_image():
-    location = "C:\\PWPproject\\ImageAnnotator\\tests\\"
+    cwd = os.getcwd()   # get current working directory
+    folder = '\\tests\\'
+    location = cwd + folder
     imagefilename = 'kuha meemi1.jpg'
+    path_to_file = location + imagefilename
+    #print("Current working directory: {0}".format(cwd))
+    print("get_image path: ", path_to_file)
     with open(location + imagefilename, "rb") as f:
-        image_binary = f.read()
-        image_ascii = base64.b64encode(image_binary).decode('ascii')
-        timestamp = os.path.getctime(imagefilename)
+        #image_binary = f.read()
+        #image_ascii = base64.b64encode(image_binary).decode('ascii')
+        timestamp = os.path.getctime(path_to_file)  # get created time
         datetime_str = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+        print("datetime:", datetime_str)
         
+        # Note! publish_date = creation date ; date = datetime now
         image_dict = {
-            "image_data": image_binary,
-            "image_ascii": image_ascii,
+            #"image_data": image_binary,
+            #"image_ascii": image_ascii,
             "name": imagefilename,
             "publish_date": datetime.fromisoformat(datetime_str),
             "location": location,
@@ -118,8 +125,8 @@ def _get_user():
 def _get_image_content(received_is_private):
     test_image = _get_image()
     return ImageContent(
-        data=test_image["image_data"],
-        ascii_data=test_image["image_ascii"],
+        #data=test_image["image_data"],
+        #ascii_data=test_image["image_ascii"],
         name=test_image["name"],
         publish_date=test_image["publish_date"],
         location=test_image["location"],
@@ -212,20 +219,20 @@ def test_create_model_instances(app):
         # photo
         db_imagecontent2 = ImageContent.query.filter_by(id=2).first()
 
-        print(db_imagecontent1.image_users)
-        print(db_user)
+        print("imagecontent1_user:", db_imagecontent1.image_users)
+        print("imagecontent1_user:", db_user)
         assert db_imagecontent1.image_users[0] == db_user
 
-        print(db_imageannotation.images)
-        print(db_imagecontent1)
+        print("imagecontent1", db_imageannotation.images)
+        print("imagecontent1", db_imagecontent1)
         assert db_imageannotation.images[0] == db_imagecontent1
 
-        print(db_imagecontent2.photo_users)
-        print(db_user)
+        print("imagecontent2_user:", db_imagecontent2.photo_users)
+        print("imagecontent2_user:", db_user)
         assert db_imagecontent2.photo_users[0] == db_user
 
-        print(db_photoannotation.photos)
-        print(db_imagecontent2)
+        print("imagecontent2", db_photoannotation.photos)
+        print("imagecontent2", db_imagecontent2)
         assert db_photoannotation.photos[0] == db_imagecontent2
         
         assert db_user.image_user[0] == db_imagecontent1
@@ -270,21 +277,22 @@ def test_image_content_columns(app):
 
     with app.app_context():
         # add image to image content
-        
+        """
         image = _get_image_content(False)
         image.data = None
         db.session.add(image)
         with pytest.raises(IntegrityError):
             db.session.commit()
         db.session.rollback()
-
+        """
+        """
         image = _get_image_content(False)
         image.ascii_data = None
         db.session.add(image)
         with pytest.raises(IntegrityError):
             db.session.commit()
         db.session.rollback()
-
+        """
         image = _get_image_content(False)
         image.name = None
         db.session.add(image)
@@ -299,13 +307,16 @@ def test_image_content_columns(app):
             db.session.commit()
         db.session.rollback()
 
-        #image = _get_image_content(False)
-        #image.date = None
-        #db.session.add(image)
-        #with pytest.raises(IntegrityError):
-        #    db.session.commit()
+        # NOT! "image.date" does not give IntegrityError, if "default" is set in database
+        image = _get_image_content(False)
+        image.date = None
+        print("image.date:", image.date)
+        db.session.add(image)
+        print("image", image.date)
+        with pytest.raises(IntegrityError):
+            db.session.commit()
         
-        #db.session.rollback()
+        db.session.rollback()
 
 
 def test_image_annotation_columns(app):
@@ -336,6 +347,13 @@ def test_image_annotation_columns(app):
             db.session.commit()
         db.session.rollback()
 
+        # TAMAN VOI POISTAA SILLA ON NOLLATTAVA MUUTTUJA
+        #imageAnno = _get_image_annotation()
+        #imageAnno.polarity_classA = None
+        #db.session.add(imageAnno)
+        #with pytest.raises(IntegrityError):
+        #    db.session.commit()
+        #db.session.rollback()
 
 def test_photo_annotation_columns(app):
     # Tests photo annotation columns' restrictions. 
@@ -381,7 +399,7 @@ def test_photoannotation_ondelete_photo(app):
         db.session.delete(testphoto)
         db.session.commit()
 
-        # HUOM! Kun kuva poistetaan, niin annotaatio säilyy
+        # NOTE! When image is removed, the annotation remains
         assert ImageContent.query.count() == 0
         assert testphotoannotation.photos == []
         assert ImageAnnotation.query.count() == 0
@@ -401,7 +419,7 @@ def test_imageannotation_ondelete_image(app):
         db.session.delete(testimage)
         db.session.commit()
 
-        # HUOM! Kun kuva poistetaan, niin annotaatio säilyy
+        # NOTE! When image is removed, the annotation remains
         assert ImageContent.query.count() == 0
         assert testimageannotation.images == []
         assert ImageAnnotation.query.count() == 1
@@ -429,7 +447,7 @@ def test_photo_and_photoannotation_ondelete_user(app):
         db.session.delete(testuser)
         db.session.commit()
 
-        # HUOM! Kun user poistetaan, niin kuva ja annotaatio säilyy
+        # NOTE! When user is removed, the image and annotation remains
         assert User.query.count() == 0
         assert testphoto.photo_users == []
         assert testphotoannotation.photo_annotators == []
@@ -439,8 +457,8 @@ def test_photo_and_photoannotation_ondelete_user(app):
 
 
 
-"""
 
+"""
 # THIS CANNOT BE TESTED ??? ------------------------------------------------------------
 
 # should test relationship between three tables: user - image - annotation
@@ -458,28 +476,34 @@ def test_imagecontent_imageannotation_one_to_one(app):
         # add user
         user = _get_user()
         db.session.add(user)
-        #db.session.commit()
+        db.session.commit() # JUHA POISTI KOMMENTIN
         # query user from database
         newUser = User.query.filter_by(id=1).first()
+        print("newUser", newUser.user_name)
         
         # add image for user
         image = _get_image_content(False)
         newUser.image_user.append(image)
-        #db.session.commit()
-        # add annotation for user and image
+        db.session.commit()    # JUHA POISTI KOMMENTIN
+        # query image from database # JUHA MUUTTI KOMENTIB ## add annotation for user and image
         newImage = ImageContent.query.filter_by(id=1).first()
+        print("newImage", newImage.name)
 
         # create annotation 1
         image_annotation1 = _get_image_annotation()
         newUser.image_annotator.append(image_annotation1)
         newImage.image_annotations.append(image_annotation1)
-        #db.session.commit()
+        db.session.commit() # JUHA
+        print("image_annotation1", image_annotation1.text_text)
 
         # create annotation 2
         image_annotation2 = _get_image_annotation()
         newUser.image_annotator.append(image_annotation2)
+        print("image_annotation2", image_annotation2.text_text)
+        #print("user.image.image_annotation2", newUser.image_user.image_annotator.text_text)
         newImage.image_annotations.append(image_annotation2)
-        #db.session.commit()
+        print("newImage", newImage.image_annotations )
+        #db.session.commit()  # JUHA
 
         # testing
         #image_1 = _get_image_content(1)
@@ -487,9 +511,9 @@ def test_imagecontent_imageannotation_one_to_one(app):
         #image_1.annotation = annotation
         #image_2.annotation = locatioannotation
         
-        db.session.add(image)
-        db.session.add(image_annotation1)
-        db.session.add(image_annotation2)    
+        #db.session.add(image)
+        #db.session.add(image_annotation1)
+        #db.session.add(image_annotation2)    
         with pytest.raises(IntegrityError):
             db.session.commit()
 """
