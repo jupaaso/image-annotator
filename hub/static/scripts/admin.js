@@ -58,30 +58,51 @@ function UserItemRow(item) {
                 item["@controls"].self.href +
                 "' onClick='followLink(event, this, renderSelection)'>Login</a>";
 
-    return "<tr><td>" + item.user_name +            
-            "</td><td>" + link + "</td></tr>";
+    return "<tr><td>" + item.user_name + "</td><td>" + link + "</td></tr>";
 }
-
 
 // define item print outs for ImageContent metadata 
 function ImageContentRow(item) {    
     let imageLink  = "<a href='" +
     item["@controls"].self.href +    
-    "' onClick='followLink(event, this, renderImageAnnotation)'>Edit</a>";
+    "' onClick='followLink(event, this, renderImageAnnotation)'> Modify Annotation </a>" +
+    "<a href='" +
+    item["@controls"].self.href + 
+    "' onClick='followLink(event, this, deleteImageContent)'> Delete Image </a>";
     
     return createItemTable(item, imageLink);
 }
+
+
+// define delete for image on list/table
+function deleteImageContent(event) {
+    // renderMsg("Image/Photo DELETE was successful");
+    event.preventDefault();
+
+    const delImage = new FormData();
+    delImage.append('image', file);
+
+    let deleteCtrl = imageitem["@controls"]["annometa:delete"];
+    
+    $("#imageItemId").attr("action", deleteCtrl.href);
+    $("#imageItemId").attr("method", deleteCtrl.method);
+    
+    console.log("Delete of image/photo was successful " + deleteCtrl.href);
+    deleteResource(deleteCtrl.href);
+    getResource("http://localhost:5000/api/images/", renderImages);
+}
+
 
 // define item print outs for ImageContent metadata 
 function PhotoContentRow(item) {    
     let imageLink  = "<a href='" +
     item["@controls"].self.href +    
-    "' onClick='followLink(event, this, renderPhotoAnnotation)'>Edit</a>";
+    "' onClick='followLink(event, this, renderPhotoAnnotation)'>Modify Annotation</a>";
     
     return createItemTable(item, imageLink);
 }
 
-// create table item for image or photo
+// define table items for image or photo
 function createItemTable(item, imageLink) {
     let link = "<img src='" +
                 item.location + "'" + 
@@ -95,20 +116,18 @@ function createItemTable(item, imageLink) {
             "</td><td>" + imageLink + "</td></tr>";
 }
 
-// render device selection 
-// and back to start / user selection
+
+// render device selection and back to start / user selection
 function renderSelection(body) {
-    
     console.log(body);
-    // MUUTOS
+    // define logged in cureent user
     sessionStorage.setItem("CurrentUser", body.user_name);
     // clear the view before rendering
     $("div.navigation").empty();
     $(".resulttable thead").empty();
     $(".resulttable tbody").empty();
-
-    // link to imagecollection / photocollection resource
-    // click handlers
+    $("#uploadFileBtnId").hide();
+    // click handlers and link to imagecollection / photocollection resource
     $("div.navigation").html(
         "<a href='" +
         "' onClick='getImageCollection(event)'> Images </a>" +
@@ -119,9 +138,8 @@ function renderSelection(body) {
         "<a href='" +
         "' onClick='getResource(event)'> Back to User Selection </a>"
     );
-    //$(".resulttable thead").empty();
-    //$(".resulttable tbody").empty();
 }
+
 
 // REQUIRED for image/photo list update, when a new is added
 function appendImageContentRow(body) {
@@ -131,10 +149,11 @@ function appendImageContentRow(body) {
 // REQUIRED for image/photo list update, when a new is added
 function getSubmittedImageContent(data, status, jqxhr) {
     renderMsg("Image/Photo update was successful");
-    let href = jqxhr.getResponseHeader("Location");
-    if (href) {
-        getResource(href, getImageCollection);
-    }
+    //let href = jqxhr.getResponseHeader("Location");
+    //if (href) {
+    //    getResource(href, getImageCollection);
+   // }
+   getResource("http://localhost:5000/api/images/", renderImages);
 }
 
 function followLink(event, a, renderer) {
@@ -162,6 +181,31 @@ function getPhotoCollection(event) {
     getResource("http://localhost:5000/api/photos/", renderPhotos);
 }
 
+// define delete of resource
+function deleteResource(href, callback) {    
+    //let resource = $(a);
+    $.ajax({
+        //url:resource.attr("href"),
+        url:href,
+        type:"DELETE",
+        success: callback,        
+        error: renderError
+    });
+}
+
+// define update-edit-put of resource
+function updateResource(href, callback) {
+    //event.preventDefault();
+    //let resource = $(a);
+    $.ajax({
+        //url:resource.attr("href"),
+        url:href,
+        type:"PUT",
+        success: callback,
+        // success: function(){ renderMsg("Update Succesful"); },
+        error:renderError
+    });
+}
 
 /*
 // define submit for ImageContent
@@ -178,49 +222,9 @@ function submitImageContent(event) {
     sendData(form.attr("action"), form.attr("method"), data, getSubmittedSensor);
 } */
 
-// REQUIRED, not used yet
-// define delete function
-function deleteResource(href, callback) {    
-    //let resource = $(a);
-    $.ajax({
-        //url:resource.attr("href"),
-        url:href,
-        type:"DELETE",
-        success: callback,        
-        error: renderError
-    });
-}
 
-function updateResource(href, callback) {
-    //event.preventDefault();
-    //let resource = $(a);
-    $.ajax({
-        //url:resource.attr("href"),
-        url:href,
-        type:"PUT",
-        success: callback,
-        // success: function(){ renderMsg("Update Succesful"); },
-        error:renderError
-    });
-}
-
-// REQUIRED, not used yet
-// define update function
-/*
-function updateResource(event, a) {
-    event.preventDefault();
-    let resource = $(a);
-    $.ajax({
-        url:resource.attr("href"),
-        type:"PUT",
-        success: function(){
-            renderMsg("Update Succesful");
-        },
-        error:renderError
-    });
-} */
-
-function handleFileSelect (e) {
+// file select for image files
+function handleFileSelectImages (e) {
     var files = e.target.files;
     if (files.length < 1) {
         alert('Select a file...');
@@ -267,15 +271,15 @@ function handleFileSelect (e) {
 
         const fd = new FormData();
         fd.append('image', file);
-
-       // {"user_name": "Meria Developer","is_private":true}
         let data = {};
         data.user_name = sessionStorage.getItem("CurrentUser");
-        data.is_private = true;
+        // file select for images "is_private" = false
+        data.is_private = false;
         fd.append('request', JSON.stringify(data));
         sendImageData($("#imageUploadFormId").attr("action"), $("#imageUploadFormId").attr("method"), fd, getSubmittedImageContent);
     }); 
 }
+
 
 // for adding a new image and photo
 // define render for ImageContent
@@ -283,7 +287,6 @@ function renderImageForm(ctrl) {
 
     $("imageUploadFormId").toggle();
     $("#uploadFileBtnId").show();
-    
     $("#imageUploadFormId").attr("action", ctrl.href);
     $("#imageUploadFormId").attr("method", ctrl.method);
 
@@ -291,7 +294,7 @@ function renderImageForm(ctrl) {
         $('#uploadFileBtnId').click(function(e) {
             $('#fileElem').click();
         });
-        $('#fileElem').change(handleFileSelect);
+        $('#fileElem').change(handleFileSelectImages);
     });
 }
 
@@ -529,7 +532,6 @@ function enableTextFields() {
 
 
 function populateImageAnnotationForm(annotationItem, annotationExists) {
-    // clear the view before rendering    
     // api/imageannotations/<id>/
     getResource(annotationItem["@controls"].annotator.href, function(annotatorItem) {
         $("#annotatorName").attr("value", annotatorItem.user_name);
@@ -537,8 +539,7 @@ function populateImageAnnotationForm(annotationItem, annotationExists) {
         $("#userId").attr("value", annotationItem.user_id);
         $("#annotationId").attr("value", annotationItem.id);    
     });
-
-    // tässä on lista itemeistä, joiden nimillä annotaatio taulu kootaan
+    // list of items to define annotation table
     let requiredItems = annotationItem["@controls"]["edit"]["schema"]["required"];    
     console.log(requiredItems);
 
@@ -610,18 +611,16 @@ function populateImageAnnotationForm(annotationItem, annotationExists) {
                 default:
                     break;
             }
-            //$('.annotationMetaForm').show(); // Show annotation form
+            // Show annotation form - $('.imageAnnoMetaForm').show();
+            // define add-post button for new annotation
             $("#testform").show();
             $("#testform").find('*').attr('disabled', true);
             showButtons();
             $("#addAnnotationBtnId").prop("disabled", true);            
-        }
-        
-        //    renderImageAnnotation(body["@controls"]["annometa:add-imageannotation"]);        
+        }      
     });
 
-    // create PUT - edit here for annotation that already exists
-    // edit - put not implemented yet - coming here soon
+    // define put-edit for annotation that already exists
     $("#editAnnotationBtnId").on( "click", function(event) {
         event.preventDefault();
         //console.log("Annotation edit not implemented yet")
@@ -630,8 +629,9 @@ function populateImageAnnotationForm(annotationItem, annotationExists) {
         $("#annotationMetaFormId").attr("method", editCtrl.method);
         console.log("EDIT of imageannotation was succesful " + editCtrl.href);
         editImageAnnotationContent(event);
-      });     
-    
+      });
+
+    // define delete for annotation that already exists
     $("#deleteAnnotationBtnId").on( "click", function(event) {
         event.preventDefault();
         let deleteCtrl = annotationItem["@controls"]["annometa:delete"];
@@ -698,7 +698,7 @@ function renderImageAnnotation(item) {
     let link = "<img src='" + item.location + "'" + "alt='" + item.name + "'>";
     imagecontent.append(link);            
     
-    // annotaatio vastauksena jos sellainen on
+    // provides annotation as response if there is one
     if (item["@controls"].hasOwnProperty("imageannotation"))
     {
         // api/imageannotations/<id>/
@@ -707,7 +707,7 @@ function renderImageAnnotation(item) {
         });
     }
     else {
-        // create and define POST - add here for new annotation
+        // create and define POST-add for new annotation
         populateEmptyImageAnnotationForm(item);
     }    
 }
@@ -726,7 +726,6 @@ function renderImages(body) {
     $(".annotationform").empty();
     $(".imagemetaform").empty();
     
-
     // define navigation
     $("div.navigation").html(
         "<a href='" +
@@ -740,12 +739,11 @@ function renderImages(body) {
     body.items.forEach(function (item) {
         tbody.append(ImageContentRow(item));
     });
+    // create 'image-in-new-window-tab'
     $('img').each(function() {
         var currentImage = $(this);
         currentImage.wrap("<a target='_blank' href='" + currentImage.attr("src") + "'</a>");
     });
-
-    
     // add image files from folder here
     renderImageForm(body["@controls"]["annometa:add-image"]);
 }

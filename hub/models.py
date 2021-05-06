@@ -124,7 +124,7 @@ class User(db.Model):
 # activate.bat
 # C:\PWPproject\ImageAnnotator>
 # set FLASK_ENV=development (or testing)
-# set FLASk_APP=hub
+# set FLASK_APP=hub
 # flask init-db
 # flask populate-db
 # flask run
