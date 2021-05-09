@@ -44,6 +44,7 @@ In order to start the server set the package name 'hub' and run Flask in the hub
 
 # import python packages -----------------------------------
 
+import glob
 import json
 import os
 import pytest
@@ -80,8 +81,10 @@ def client():
     
     app = create_app(resourcetest_config)
 
+    i = 0
     with app.app_context():
         db.create_all()
+        print("Numero: ", i+1)
         _populate_database()
 
     yield app.test_client()
@@ -90,6 +93,60 @@ def client():
     os.unlink(db_fname)
 
 # ------------------------------------------------------
+# Collect images and image meta data from defined ImageTest -folder to image_list
+
+def _getImageDatas(upload):
+    image_list = []
+    cwd = os.getcwd()
+    parent_folder = os.path.dirname(cwd)    # get parent directory from tests = "..\\ImageAnnotator"
+    folder = '\\Data\\ImageTest\\'
+    source_images_folder = parent_folder + folder
+    print("  _get: source_images_folder:", source_images_folder)
+    
+    for filename in glob.glob(source_images_folder + '*.jpg'):
+        print("\n Print image data filename:  ", filename)
+        #filedate = os.path.getctime(filename)
+
+        with open(filename, "rb") as f:
+            timestamp = os.path.getctime(filename)
+            datetime_str = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
+            thisdict = {
+                "name": os.path.basename(filename),
+                "publish_date": datetime.fromisoformat(datetime_str),
+                "location": save_to_upload(upload, source_images_folder, os.path.basename(filename)),
+                "is_private": False,
+                "date": datetime.fromisoformat(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            }
+        image_list.append(thisdict)
+    #print("_get: image_list:", image_list)
+    return image_list
+
+# -------------------------------------------------------------------------------
+# Collect photos and photo meta data from defined PhotoTest -folder to photo_list
+
+# from PIL import Image, ExifTags
+
+def _getPhotoDatas(upload):
+    photo_list = []
+    cwd = os.getcwd()
+    parent_folder = os.path.dirname(cwd)    # get parent directory from tests = "..\\ImageAnnotator"
+    folder = '\\Data\\PhotoTest\\'
+    source_photos_folder = parent_folder + folder
+    print("_get..: source_photos_folder:", source_photos_folder)
+
+    print("for looppiin")
+    for filename in glob.glob(source_photos_folder + '*.jpg'):
+        meta_data_dict = set_photo_meta_data_to_dict(filename, True)
+        # NOTE!!!
+        # remember to set photo location, this is done differently in tests (test image folder -> static/photos)
+        # in development state image is saved from request (request.image -> static/photos)
+        meta_data_dict["location"] = hub.models.save_to_upload(upload, source_photos_folder, os.path.basename(filename))
+        photo_list.append(meta_data_dict)
+    #print("_get: photo_list:", photo_list)
+    return photo_list
+
+# -----------------------------------------------------------
 # CREATE AND POPULATE DATABASE
 
 def _populate_database():
@@ -98,11 +155,16 @@ def _populate_database():
     # images folder is created if it does not exist
     # created with function in the end of this function
 
-    #upload = create_static_folder_test()
-    # NOTE alapuolella oleva rivi korvaa ylemmän
+    # upload = create_static_folder_test()
+    # #### NOTE alapuolella oleva rivi korvaa ylemmän
     # käyttää models.py tiedostossa olevaa funktiota
+    # \ImageAnnotator\hub\static\images is the created_static_folder
+    # \ImageAnnotator\hub\static\photos is the created_static_folder
     (upload_images_folder, upload_photos_folder) = create_static_folders()
-    print("\n Creating resource test images to folder : " + upload_photos_folder)
+    print("\n Creating resource test images to folder : " + upload_images_folder)
+    print("\n Creating resource test photos to folder : " + upload_photos_folder)
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    print("\n basedir for resource_test.py:", basedir)
 
     # Create new row for new user to database by using User -model
     user1 = User(user_name = "Meria Developer", user_password="mötkäle")
@@ -118,21 +180,70 @@ def _populate_database():
 
     # Collect defined user from database
     userqueried = User.query.filter_by(user_name="Meria Developer").first()
-
-    # Add photos of photo_list (collected from defined folder in path) 
+    #print("userqueried:", userqueried.user_name)
+    
+    # Add IMAGES to image list (collected from defined folder in path)
     # defined for user in database
     # and commit to database
-    photo_list = hub.models.getPhotoData(upload_photos_folder)    
+    cwd = os.getcwd()   # get current working directory = ""..\\ImageAnnotator\\tests"
+    print(" current working directory:   ", cwd)
+    parent_folder = os.path.dirname(cwd)    # get parent directory from tests = "..\\ImageAnnotator"
+    image_folder = "\\Data\ImageTest\\" 
+    image_list = _getImageDatas(upload_images_folder) 
+    print("IMAGE LIST:", image_list)  
+
+    for im in image_list:
+        image = ImageContent(name=im["name"], publish_date=im["publish_date"], location=im["location"], is_private=False, date=im["date"])
+        userqueried.image_user.append(image)
+        db.session.commit()
+
+    # collect queries for defined user_name and image name
+    current_user = User.query.filter_by(user_name="Meria Developer").first()
+    imagename_queried = ImageContent.query.filter_by(name="kuha meemi1.jpg").first()
+    print(" X X X X X X X imagename_queried:", imagename_queried)
+    # and commit both to database
+    anno_list = hub.models.getImageAnnoData()
+    for anno in anno_list:
+        #annotation = ImageAnnotation(persons_class=anno["persons_class"], text_persons=anno["text_persons"], text_persons_comment=anno["text_persons_comment"], text_free_comment=anno["text_free_comment"], positivity_class=anno["positivity_class"], slideshow_class=anno["slideshow_class"])   
+        annotation = ImageAnnotation(meme_class=anno["meme_class"], 
+                                    HS_class=anno["HS_class"], 
+                                    text_class=anno["text_class"], 
+                                    polarity_classA=anno["polarity_classA"], 
+                                    polarity_classB=anno["polarity_classB"], 
+                                    HS_strength=anno["HS_strength"],
+                                    HS_category=anno["HS_category"],
+                                    text_text=anno["text_text"],
+                                    text_language=anno["text_language"]) 
+        current_user.image_annotator.append(annotation)
+        imagename_queried.image_annotations.append(annotation)
+        db.session.commit()
+    
+
+    # Add PHOTOS of photo_list (collected from defined folder in path) 
+    # defined for user in database
+    # and commit to database
+    cwd = os.getcwd()   # get current working directory = ""..\\ImageAnnotator\\tests"
+    print("    current working directory: ", cwd)
+    parent_folder = os.path.dirname(cwd)    # get parent directory from tests = "..\\ImageAnnotator"
+    #os.chdir('../') # current workin dirextory is one up
+    photo_folder = "\\data\PhotoTest\\"
+    #upload_photos_folder = parent_folder + photo_folder
+    print("    upload_photos_folder: ", upload_photos_folder)
+    #photo_list = _getPhotoData(upload_photos_folder) 
+    photo_list = _getPhotoDatas(upload_photos_folder) 
+    print("    PHOTO LIST:", photo_list)  
+
     for im in photo_list:
         photo = ImageContent(name=im["name"], publish_date=im["publish_date"], location=im["location"], is_private=True, date=im["date"])
         userqueried.photo_user.append(photo)
+        #print("photo_user: ", photo_user.user_name)
         #db.session.add(photo)
         db.session.commit()
 
     # collect queries for defined user_name and photo name
     current_user = User.query.filter_by(user_name="Meria Developer").first()
     photoname_queried = ImageContent.query.filter_by(name="Norja 2020.jpg").first()
-
+    print("   X X X X X X X photoname_queried:", photoname_queried)
     # and commit both to database
     anno_list = hub.models.getPhotoAnnoData()
     for anno in anno_list:
@@ -154,7 +265,60 @@ def _populate_database():
         raise ValueError('Folder for static images could not be created.')
     return upload
     """
+"""
+# -------------------------------------------------------------------------------
+# Collect images and image meta data from defined ImageTest -folder to image_list
 
+def _getImageData(upload):
+    image_list = []
+    cwd = os.getcwd()
+    folder = '\\data\\ImageTest\\'
+    source_images_folder = cwd + folder
+    print("  models.py: source_images_folder:", source_images_folder)
+    
+    for filename in glob.glob(source_images_folder + '*.jpg'):
+        print("\n Print image data filename:  ", filename)
+        #filedate = os.path.getctime(filename)
+
+        with open(filename, "rb") as f:
+            timestamp = os.path.getctime(filename)
+            datetime_str = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
+            thisdict = {
+                "name": os.path.basename(filename),
+                "publish_date": datetime.fromisoformat(datetime_str),
+                "location": save_to_upload(upload, source_images_folder, os.path.basename(filename)),
+                "is_private": False,
+                "date": datetime.fromisoformat(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            }
+        image_list.append(thisdict)
+        print("  models.py: image_list:", image_list)
+    return image_list
+
+# -------------------------------------------------------------------------------
+# Collect photos and photo meta data from defined PhotoTest -folder to photo_list
+
+# from PIL import Image, ExifTags
+
+def _getPhotoData(upload):
+    photo_list = []
+    cwd = os.getcwd()
+    parent_folder = os.path.dirname(cwd)    # get parent directory from tests = "..\\ImageAnnotator"
+    folder = '\\Data\\PhotoTest\\'
+    source_photos_folder = parent_folder + folder
+    print("_get..: source_photos_folder:", source_photos_folder)
+
+    for filename in glob.glob(source_photos_folder + '*.jpg'):        
+        print("for loopissa")
+        meta_data_dict = set_photo_meta_data_to_dict(filename, True)
+        # NOTE!!!
+        # remember to set photo location, this is done differently in tests (test image folder -> static/photos)
+        # in development state image is saved from request (request.image -> static/photos)
+        meta_data_dict["location"] = hub.models.save_to_upload(upload, source_photos_folder, os.path.basename(filename))
+        photo_list.append(meta_data_dict)
+    print("_get: photo_list:", photo_list)
+    return photo_list
+"""
 # -----------------------------------------------------------
 # json helper functions
 
@@ -187,7 +351,15 @@ def _get_image():
 
 def _get_photo_json():    
     request = {"user_name": "Meria Developer","is_private":True}
-    local_file_to_send = 'C:\\PWPproject\\ImageAnnotator\\data\\PhotoTest\\Norja 2020.jpg'
+    #local_file_to_send = 'C:\\PWPproject\\ImageAnnotator\\data\\PhotoTest\\Norja 2020.jpg'
+    cwd = os.getcwd()   # get current working directory = ""..\\ImageAnnotator\\tests"
+    #print("current working directory: ", cwd)
+    parent_folder = os.path.dirname(cwd)    # get parent directory from tests = "..\\ImageAnnotator"
+    photo_folder = "\\data\PhotoTest\\"
+    imagefilename = 'Norja 2020.jpg'
+    local_file_to_send = parent_folder + photo_folder + imagefilename
+    print("local_file_to_send:", local_file_to_send)
+    #local_file_to_send = 'C:\\PWPproject\\ImageAnnotator\\data\\PhotoTest\\Norja 2020.jpg'
     content = {
      'request': json.dumps(request),
      'image': (os.path.basename(local_file_to_send), open(local_file_to_send, 'rb'), 'application/octet-stream')
@@ -245,9 +417,9 @@ def _check_namespace(client, response):
     that its "name" attribute is a URL that can be accessed.
     """
     ns_href = response["@namespaces"]["annometa"]["name"]
-    print("check namespaces:", ns_href)
+    print("_check_namespace:", ns_href)
     resp = client.get(ns_href)
-    print("check namespaces:", resp)
+    print("_check_namespace:", resp)
     assert resp.status_code == 200
     
 def _check_control_get_method(ctrl, client, obj):
@@ -256,7 +428,9 @@ def _check_control_get_method(ctrl, client, obj):
     in a collection. Also checks that the URL of the control can be accessed.
     """
     href = obj["@controls"][ctrl]["href"]
+    print("_check_control_get_method:", href)
     resp = client.get(href)
+    print("_check_control_get_method:", resp)
     assert resp.status_code == 200
     
 def _check_control_delete_method(ctrl, client, obj):
@@ -269,6 +443,7 @@ def _check_control_delete_method(ctrl, client, obj):
     method = obj["@controls"][ctrl]["method"].lower()
     assert method == "delete"
     resp = client.delete(href)
+    print("_check_control_delete_method:", resp)
     assert resp.status_code == 204
     
 def _check_control_put_method(ctrl, client, obj):
@@ -530,13 +705,15 @@ class TestPhotoItem(object):
         # and checks that all their controls are present.
         
         resp = client.get(self.RESOURCE_URL)
+        print("photot test_get resp:", resp)
         assert resp.status_code == 200
         body = json.loads(resp.data)
+        print("photot test_get body:", body)
 
         #    mitä tähän merkitään ?       ##############################
         print("Test PhotoItem - print out of body ", body)
-        assert body["id"] == 1        
-        assert "\\static\\photos\\" in body["location"]
+        assert body["id"] == 1  # halla-aho32.jpg has id=1
+        assert "\\static\\images\\" in body["location"]
         assert body["is_private"] == True
         
 
