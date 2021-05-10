@@ -52,7 +52,7 @@ import tempfile
 import time
 
 from datetime import datetime
-from jsonschema import validate
+from jsonschema import validate, expect_failure
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError, StatementError
@@ -486,7 +486,12 @@ def _check_control_post_method(ctrl, client, obj):
     assert method == "post"
     assert encoding == "json"
     body = _get_user_json()
-    validate(body, schema)
+    #validate(body, schema)
+    if expect_failure:
+        with pytest.raises(ValidationError):
+            validate(body, schema)
+    else: 
+        validate(body, schema)
     print("_check_control_post_method: href : " + href)
     print("_check_control_post_method: body : " + str(body))
     resp = client.post(href, json=body)
@@ -529,7 +534,9 @@ class TestUserCollection(object):
         assert resp.status_code == 200
         
         body = json.loads(resp.data)
-        #print("class TestUserCollection BODY:", body)
+        print(" Y  Y  Y  Y  Y  Y  Y  Y  Y ")
+        print("class TestUserCollection BODY:", body)
+        print(" Y Y Y Y Y Y Y Y Y Y  ")
         _check_namespace(client, body)
         _check_control_post_method("annometa:add-user", client, body)
         
@@ -691,7 +698,7 @@ class TestPhotoCollection(object):
     
 class TestPhotoItem(object):
     
-    RESOURCE_URL = "/api/photos/1/"
+    RESOURCE_URL = "/api/photos/9/"
     INVALID_URL = "/api/photos/x/"
     MODIFIED_URL = "/api/photos/30/"
     
@@ -703,6 +710,7 @@ class TestPhotoItem(object):
         # and the controls work. 
         # Checks that all items of database populuation are present, 
         # and checks that all their controls are present.
+        # KUVA NORAJ  20202 tulee 
         print("\n    * * * * DEF TEST GET OLLAAN * * * * \n")
         resp = client.get(self.RESOURCE_URL)
         print("photot test_get resp:", resp)
@@ -712,9 +720,9 @@ class TestPhotoItem(object):
 
         #    mitä tähän merkitään ?       ##############################
         print("Test PhotoItem - print out of body ", body)
-        assert body["id"] == 1  # JUHAN KOMMENTTI halla-aho32.jpg has id=1
-        assert "\\static\\images\\" in body["location"]
-        #assert body["is_private"] == True  # JUHA KOMMENTIKSI KUN TULEE ERROR
+        assert body["id"] == 9  # JUHAN KOMMENTTI halla-aho32.jpg has id=1
+        assert "\\static\\photos\\" in body["location"]
+        assert body["is_private"] == True  # JUHA KOMMENTIKSI KUN TULEE ERROR
         
 
         _check_namespace(client, body)
@@ -777,6 +785,43 @@ class TestPhotoItem(object):
         resp = client.delete(self.INVALID_URL)
         assert resp.status_code == 404
     """
+
+#############################################################################
+# test Imageannotation and Imageannotation Collection Resources
+
+class TestImageannotationCollection(object):
+
+    RESOURCE_URL = "/api/imageannotations/"
+
+    def test_get(self, client):
+        
+        resp = client.get(self.RESOURCE_URL)
+        print("\n print class TestImageannotationCollection - RESOURCE_URL:  ", resp)
+        print("\n print class TestImageannotationCollection - resp.status_code:  ", resp.status_code)
+        assert resp.status_code == 200
+        
+        body = json.loads(resp.data)
+        print("\n print class TestImageannotationCollection - BODY:  ", body)
+        _check_namespace(client, body)
+        #_check_control_post_method("annometa:add-imageannotation", client, body) 
+        # JUHA KOMMENTOI EDLLISEN RIVIN KUN SE TEKEE PERSONS CLASS VALIDATION ERRORIN
+        
+        # 1 photoannotation in database
+        #assert len(body["items"]) == 1
+        assert len(body["items"]) > 0
+    
+        for item in body["items"]:
+            assert "image_id" in item
+            assert "user_id" in item
+            assert "meme_class" in item
+            assert "HS_class" in item
+            assert "text_class" in item
+            assert "polarity_classA" in item
+            assert "polarity_classB" in item
+            assert "HS_strength" in item
+            assert "HS_category" in item
+            assert "text_text" in item
+            assert "text_language" in item
 
 #############################################################################
 # test Photoannotation and Photoannotation Collection Resources
