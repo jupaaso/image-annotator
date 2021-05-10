@@ -94,8 +94,9 @@ def app():
 
 def _get_image():
     cwd = os.getcwd()   # get current working directory
+    parent_folder = os.path.dirname(cwd)    # get parent directory from tests = "..\\ImageAnnotator"
     folder = '\\tests\\'
-    location = cwd + folder
+    location = parent_folder + folder
     imagefilename = 'kuha meemi1.jpg'
     path_to_file = location + imagefilename
     #print("Current working directory: {0}".format(cwd))
@@ -308,15 +309,14 @@ def test_image_content_columns(app):
         db.session.rollback()
 
         # NOT! "image.date" does not give IntegrityError, if "default" is set in database
-        image = _get_image_content(False)
-        image.date = None
-        print("image.date:", image.date)
-        db.session.add(image)
-        print("image", image.date)
-        with pytest.raises(IntegrityError):
-            db.session.commit()
-        
-        db.session.rollback()
+        #image = _get_image_content(False)
+        #image.date = None
+        #print("image.date:", image.date)
+        #db.session.add(image)
+        #print("image", image.date)
+        #with pytest.raises(IntegrityError):
+        #    db.session.commit()
+        #db.session.rollback()
 
 
 def test_image_annotation_columns(app):
