@@ -52,7 +52,7 @@ import tempfile
 import time
 
 from datetime import datetime
-from jsonschema import validate, expect_failure
+from jsonschema import validate
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError, StatementError
@@ -486,12 +486,12 @@ def _check_control_post_method(ctrl, client, obj):
     assert method == "post"
     assert encoding == "json"
     body = _get_user_json()
-    #validate(body, schema)
-    if expect_failure:
-        with pytest.raises(ValidationError):
-            validate(body, schema)
-    else: 
-        validate(body, schema)
+    validate(body, schema)
+    #if expect_failure: # KOKEILU JUHAN KESKEN VIELA
+    #    with pytest.raises(ValidationError):
+    #        validate(body, schema)
+    #else: 
+    #    validate(body, schema)
     print("_check_control_post_method: href : " + href)
     print("_check_control_post_method: body : " + str(body))
     resp = client.post(href, json=body)
