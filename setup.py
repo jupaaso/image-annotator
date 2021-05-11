@@ -16,7 +16,7 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="hub",
+    name="imageannotator",
     version="0.1.0",
     author="Merja Kreivi-Kauppinen and Juha Paaso",
     url="https://github.com/jupaaso/image-annotator",
