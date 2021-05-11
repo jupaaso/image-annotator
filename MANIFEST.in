@@ -1,0 +1,8 @@
+graft hub/static
+graft data*
+global-include *.py
+include README.md
+include LICENCE.txt
+include requirements.txt
+exclude .git
+global-exclude *.pyc
