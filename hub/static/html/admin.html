@@ -93,9 +93,7 @@
                 </div>
                 <div class="row">
                     <div class="form-check">
-                        <label class="form-check-label" for="text_class">
-                            Image contains text
-                        </label>
+                        <label class="form-check-label" for="text_class">Image contains text</label>
                         <input class="form-check-input" type="checkbox" value="" id="text_class" onclick="enableTextFields()" disabled>
                     </div>
                 </div>
@@ -134,6 +132,45 @@
             </table>
         </div>
         <div class="tablecontrols"></div>
+
+        <!-- USER window and tables -->
+        <div class="usermetaform">       
+            <form class="row g-3 needs-validation" id = "userFormId" style="margin-top: 50px;" novalidate>
+                <!-- div class="row"> -->
+                    <!--<div class="col-md-2 col-form-label"> -->
+                    <div class="col-md-6">   
+                        <label for="user_name" class="form-label">USER NAME</label>
+                    </div>
+                    <div class="col-sm">
+                        <input class="form-control" id="user_name" type="text" required>
+                        <div class="valid-feedback">
+                            Ok!
+                        </div>
+                        <div class="invalid-feedback">
+                            Please enter username.
+                        </div>
+                    </div> 
+                <!-- </div> -->
+                <!-- <div class="row"> -->
+                    <!-- <div class="col-md-2 col-form-label"> -->
+                    <div class="col-md-6">                        
+                        <label for="user_password" class="form-label">USER PASSWORD</label>
+                    </div>
+                    <div class="col-sm">
+                        <input class="form-control" id="user_password" type="password" required>                            
+                    </div>
+                <!-- </div> -->
+                <div id="userLoginButtonContainerId" class="container" style="margin-top: 20px;">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end" id="formButtonGroupId">
+                        <button class="btn btn-danger" id="deleteUserBtnId" type="button" style="display:none">Delete user</button>
+                        <button class="btn btn-warning me-md-2" id="editUserBtnId" type="button" style="display:none">Edit password</button>
+                        <button class="btn btn-primary me-md-2" id="addUserBtnId" type="submit" style="display:none">Add new user</button>
+                        <button class="btn btn-success me-md-2" id="loginUserBtnId" type="submit" style="display:none">Login user</button>
+                    </div>
+                </div>
+            </form>
+        </div> 
+
     </div>
     <div class="form">
         <form class="imageUploadForm" id="imageUploadFormId">
