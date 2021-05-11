@@ -1,4 +1,9 @@
-# define constants --------------------------------------
+# PWP course 2021 University of Oulu
+# created by Merja Kreivi-Kauppinen and Juha Paaso
+
+# Image Annotator API - constants.py
+# ------------------------------------------------------------------------
+# define constants
 
 MASON = "application/vnd.mason+json"
 LINK_RELATIONS_URL = "/annometa/link-relations/"
@@ -14,4 +19,4 @@ UPLOAD_FOLDER_IMAGES = "\\static\\images\\"
 UPLOAD_FOLDER_PHOTOS = "\\static\\photos\\"
 ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'gif', 'bmp', 'tiff', 'png'])
 
-# ---------------------------------------------------------
+# ------------------------------------------------------------------------

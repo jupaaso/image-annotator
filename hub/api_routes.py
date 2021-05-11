@@ -1,15 +1,15 @@
+# PWP course 2021 University of Oulu
+# created by Merja Kreivi-Kauppinen and Juha Paaso
 
-# INSERT ROUTES HERE
+# Image Annotator API - api_routes.py
+# ------------------------------------------------------------------------
 
 from flask import Blueprint
 from flask_restful import Api
 
-# -----------------------------------------------------------
-# import resources
-
-from hub.resources import UserItem, UserCollection
+# import hub.resources
+from hub.resources import UserItem, UserCollection, UserLogin
 from hub.resources import PhotoItem, PhotoCollection, ImageItem, ImageCollection
-#from hub.resources import ImageContent
 from hub.resources import PhotoannotationItem, PhotoannotationCollection, ImageannotationItem, ImageannotationCollection
 
 # -----------------------------------------------------------
@@ -19,7 +19,9 @@ api_bp = Blueprint("api", __name__, url_prefix="/api")
 api = Api(api_bp)
 
 # -----------------------------------------------------------
-# add resources to api
+# define and add resources to api
+
+api.add_resource(UserLogin, "/userlogin/")
 
 api.add_resource(UserCollection, "/users/")
 api.add_resource(UserItem, "/users/<user_name>/")
@@ -35,7 +37,6 @@ api.add_resource(PhotoannotationItem, "/photoannotations/<id>/")
 
 api.add_resource(ImageannotationCollection, "/imageannotations/")
 api.add_resource(ImageannotationItem, "/imageannotations/<id>/")
-
 
 # ----------------------------------------------------------
 # define routes

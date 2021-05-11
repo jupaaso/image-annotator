@@ -1,5 +1,15 @@
-# define resources here
+# PWP course 2021 University of Oulu
+# created by Merja Kreivi-Kauppinen and Juha Paaso
+
+# Image Annotator API resources.py
+# This file includes resources of Image Annotator API.
+
+# -----------------------------------------------------------------------------
+
 import os
+import sys
+from io import BufferedReader
+
 import json
 from jsonschema import validate, ValidationError
 from datetime import datetime
@@ -11,27 +21,29 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.engine import Engine
-from io import BufferedReader
-# needed for image validation
+
+# werkzeug needed for image validation
 from werkzeug.utils import secure_filename
 
 #from hub import db or database
-import sys
 #import hub.api_routes
 #from hub.api_routes import *
 
 from hub.constants import *
-
 import hub.models
 from hub.models import *
-
 import hub.utils
 from hub.utils import *
 
+# -------------------------------------------------------------------------------------------
+# defined in constants file
+# UPLOAD_FOLDER = "\\static\\images\\"
+# ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'gif', 'bmp', 'tiff'])
 
-### User and User Collection Resources ---------------------------------------
-# check database and db table names !!!!!!!!!!!!!!
+# -------------------------------------------------------------------------------------------
+# helper functions
 
+# convert datetime to string
 def myconverter(o):
     if isinstance(o, datetime.datetime):
         return o.__str__()
@@ -50,18 +62,13 @@ def create_image_item_from_request(req_content, image_object, upload_folder):
         # datetime according to milliseconds - no
         time_now  = datetime.now().strftime('%m_%d_%Y_%H_%M_%S_%f')
 
-        print("test time now  ", time_now)
+        print("Print of resources file : test time now : ", time_now)
 
+        # return new filename if needed
         filename_parts = os.path.splitext(image_object.filename)
         new_file_name = filename_parts[0] + str(time_now) + filename_parts[1]
-        
         image_object.filename = new_file_name
-        ### return new filename
-    
-        # defined in constants file ------
-        # UPLOAD_FOLDER = "\\static\\images\\"
-        # ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'gif', 'bmp', 'tiff'])
-
+        
     # define image path
     upload = basedir + upload_folder + image_object.filename
     # save method saves an image to path
@@ -79,8 +86,10 @@ def create_image_item_from_request(req_content, image_object, upload_folder):
                         location=item_location, 
                         is_private=item_dict["is_private"], 
                         date=item_dict["date"])
-    
     return item
+
+# -----------------------------------------------------------------------------------------------------------
+# User and UserCollection Resources
 
 class UserCollection(Resource):
     """
@@ -95,19 +104,20 @@ class UserCollection(Resource):
         """
         body = HubBuilder()
         body.add_namespace("annometa", LINK_RELATIONS_URL)
-        #
         body.add_control("self", url_for("api.usercollection"))
         body.add_control_add_user()
         body["items"] = []
+
         for db_user in User.query.all():
             item = HubBuilder(
                 user_name=db_user.user_name,
                 user_password=db_user.user_password
             )
             # item.add_control("self", url_for("api.usercollection")) # merja
-            item.add_control("self", url_for("api.useritem", user_name=db_user.user_name)) # JUHA
+            item.add_control("self", url_for("api.useritem", user_name=db_user.user_name))
             item.add_control("profile", USER_PROFILE)
             body["items"].append(item)
+        body.add_control_login_user()
         return Response(json.dumps(body), status=200, mimetype=MASON)
 
 
@@ -127,7 +137,6 @@ class UserCollection(Resource):
             user_name=request.json["user_name"],
             user_password=request.json["user_password"]
         )
-
         try:
             db.session.add(new_user)
             db.session.commit()
@@ -139,11 +148,42 @@ class UserCollection(Resource):
         return Response(status=201, headers={"Location": url_for("api.useritem", user_name=request.json["user_name"])})
 
 
+class UserLogin(Resource):
+    """
+    New resource !!! POST for login purposes
+    """
+    def post(self):
+        """
+        POST method for user login
+        """
+        if not request.json:
+            return create_error_response(415, "Unsupported media type", "Requests must be JSON")
+        try:
+            # validate(request.json, User.user_schema())
+            validate(request.json, HubBuilder.user_schema())
+        except ValidationError as e:
+            return create_error_response(400, "Invalid JSON document", str(e))
+        
+        user_name=request.json["user_name"]
+        user_password=request.json["user_password"]
+
+        db_user = User.query.filter_by(user_name=user_name).first()
+        
+        if db_user is None:
+            return create_error_response(404, "Not found", "No user was found with name {}".format(user_name))
+
+        if (db_user.user_password == user_password):
+            return Response(status=200, headers={"Location": url_for("api.useritem", user_name=user_name)})
+        else:
+            return create_error_response(401, "Invalid password", "Invalid password for {}".format(user_name))
+
+
 class UserItem(Resource):
     """
     Resource for single UserItem. 
     Function GET gets a user, PUT edits a user and DELETE deletes a user.
-    """
+    """    
+        
     def get(self, user_name):
         """
         GET method gets a single user
@@ -179,8 +219,7 @@ class UserItem(Resource):
             validate(request.json, HubBuilder.user_schema())
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
-
-        db_user.user_name = request.json["user_name"]
+        
         db_user.user_password = request.json["user_password"]
 
         try:
@@ -203,9 +242,8 @@ class UserItem(Resource):
 
         return Response(status=204)
 
-
-### Photo and Photo Collection Resources ---------------------------------------
-# check database and db table names !!!!!!!!!!!!!!
+# --------------------------------------------------------------------------------------------------------------
+# Photo and PhotoCollection Resources
 
 class PhotoCollection(Resource):
     """
@@ -403,9 +441,8 @@ class PhotoItem(Resource):
         return Response(status=204)
 
 
-# -----------------------------------------------------------------------------------------------
-### Photoannotation and Photoannotation Collection Resources ------------------------------------
-# check database and db table names !!!!!!!!!!!!!!
+# ------------------------------------------------------------------------------------------------------------
+# Photoannotation and Photoannotation Collection Resources ---------------------------------------------------
 
 class PhotoannotationCollection(Resource):
     """
@@ -581,8 +618,8 @@ class PhotoannotationItem(Resource):
         return Response(status=204)
 
 
-### Image and Image Collection Resources ---------------------------------------
-# check database and db table names !!!!!!!!!!!!!!
+# ----------------------------------------------------------------------------------------------------------------
+# Image and Image Collection Resources
 
 class ImageCollection(Resource):
     """
@@ -783,7 +820,7 @@ class ImageItem(Resource):
         """
         DELETE method deletes one single image
         """
-        db_imageid = Image.query.filter_by(id=id).first()
+        db_imageid = ImageContent.query.filter_by(id=id).first()
         if db_imageid is None:
             return create_error_response(404, "Not found", "No image was found with id {}".format(id))
         
@@ -792,8 +829,8 @@ class ImageItem(Resource):
         return Response(status=204)
 
 
-### Imageannotation and Imageannotation Collection Resources --------------------------------------
-# check database and db table names !!!!!!!!!!!!!!
+# -----------------------------------------------------------------------------------------------------------------
+# Imageannotation and Imageannotation Collection Resources
 
 class ImageannotationCollection(Resource):
     """

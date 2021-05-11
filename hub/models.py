@@ -1,21 +1,66 @@
 # PWP course 2021 University of Oulu
 # created by Merja Kreivi-Kauppinen and Juha Paaso
+
 # Image Annotator API database models - models.py
 # This file includes database models of Image Annotator API.
 
-# ---------------------------------------------------------------------------
-# check / change launch.json -file parameters and location 
-# if debugging with VSC and Postman
-# ----------------------------------------------------------------------------
+# check / change launch.json -file parameters and location if debugging with VSC or Postman
+
+# --------------------------------------------------------------------------------------------
+
 # The first time the app runs it creates the table. 
 # BE CAREFULL - With this code you can override the default table name
-# ----------------------------------------------------------------------------
+
+# cd C:\PWPproject\ImageAnnotator\.venv\Scripts
+# activate.bat
+# C:\PWPproject\ImageAnnotator>
+# set FLASK_ENV=development (or testing)
+# set FLASK_APP=hub
+# flask init-db
+# flask populate-db
+# flask run
+
+# --------------------------------------------------------------------------------------------
+"""
+In order run ImageAnnotator flask API and this file 
+activate virtual environment, set flask, init database and populate database.
+
+Activate created python virtual environment (on cmd):
+    cd C:\PWPproject\ImageAnnotator\.venv\Scripts
+    activate.bat
+
+Go to ImageAnnotator folder: (provide 'cd ..' on cmd)
+    (.venv) C:\PWPproject\ImageAnnotator>
+
+Set cofiguration setting class as 'development' or 'production' or 'default' or 'testing'
+    (.venv) C:\PWPproject\ImageAnnotator>set FLASK_ENV=development
+
+In order to start the server set the package name 'hub' and run Flask in the hub folder:
+    (.venv) C:\PWPproject\ImageAnnotator\extracodes>set FLASK_APP=hub
+
+Init flask database basedir hub:
+    (.venv) C:\PWPproject\ImageAnnotator>flask init-db
+
+Populate flask database:
+    (.venv) C:\PWPproject\ImageAnnotator>flask populate-db
+
+Run flask local host at http://localhost:5000/admin/
+
+    (.venv) C:\PWPproject\ImageAnnotator>flask run
+
+This code creates database models, 
+and populates User, PhotoContent, PhotoAnnotation, ImageContent and ImageAnnotation models
+"""
+# --------------------------------------------------------------------------------------------
+
 import os
 import glob
 import base64
 from io import BytesIO
 
 from datetime import datetime
+#import random  
+
 import click
 from flask.cli import with_appcontext
 
@@ -26,8 +71,7 @@ from hub import db
 from hub.constants import *
 from hub.utils import set_photo_meta_data_to_dict
 
-
-# database model for image content and photo content ------------------------------------------
+# database model for image content and photo content -----------------------------------------
 
 class ImageContent(db.Model):
     __tablename__ = 'imagecontent'
@@ -35,8 +79,6 @@ class ImageContent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="SET NULL"))
 
-    #data = db.Column(db.LargeBinary)
-    #ascii_data = db.Column(db.Text)
     name = db.Column(db.String(128), nullable=False)
     publish_date = db.Column(db.DateTime, nullable = True)
     location = db.Column(db.String(64), nullable=False)
@@ -48,8 +90,7 @@ class ImageContent(db.Model):
     photo_annotations = db.relationship("PhotoAnnotation", back_populates="photos")
     photo_users = db.relationship("User", back_populates="photo_user", uselist=True)
 
-
-# database model for imageannotation ---------------------------------------------------
+# database model for imageannotation ---------------------------------------------------------
 
 class ImageAnnotation(db.Model):
     __tablename__ = 'imageannotation'
@@ -75,8 +116,7 @@ class ImageAnnotation(db.Model):
     images = db.relationship("ImageContent", back_populates="image_annotations", uselist=True)
     image_annotators = db.relationship("User", back_populates="image_annotator", uselist=True)
 
-
-# database model for photoannotation ---------------------------------------------------
+# database model for photoannotation --------------------------------------------------------
 
 class PhotoAnnotation(db.Model):
     __tablename__ = 'photoannotation'
@@ -94,16 +134,13 @@ class PhotoAnnotation(db.Model):
     text_free_comment = db.Column(db.String(128), nullable=True)
     text_persons = db.Column(db.String(128), nullable=True)
     text_persons_comment = db.Column(db.String(128), nullable=True)
-
-    # geografical location - not sure yet how to do
+    # geografical location - not created
 
     photos = db.relationship("ImageContent", back_populates="photo_annotations", uselist=True)
     photo_annotators = db.relationship("User", back_populates="photo_annotator", uselist=True)
 
-
-# database model for user -----------------------------------------------------------
-# user name is unique
-# password is not necessary
+# database model for user -------------------------------------------------------------------
+# user name is unique - password is not necessary - CHECK CLIENT !!!!!
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -119,15 +156,9 @@ class User(db.Model):
     photo_annotator = db.relationship("PhotoAnnotation", back_populates="photo_annotators")
 
 
-# start ----------------------------------------------------------------------------
-# cd C:\PWPproject\ImageAnnotator\.venv\Scripts
-# activate.bat
-# C:\PWPproject\ImageAnnotator>
-# set FLASK_ENV=development (or testing)
-# set FLASK_APP=hub
-# flask init-db
-# flask populate-db
-# flask run
+# --------------------------------------------------------------------------------------------
+# HELPER FUNCTIONS - CLICK COMMANDS
+# create database and popuate it for test and dvelopment purposes
 
 @click.command("init-db")
 @with_appcontext
@@ -135,14 +166,9 @@ class User(db.Model):
 def init_db_command():
     db.create_all()
 
-# after running init-db (above)
-# run this by 
-# flask populate-db
 @click.command("populate-db")
 @with_appcontext
 
-#import datetime
-#import random   
 
 def generate_test_data():
 
@@ -218,10 +244,9 @@ def generate_test_data():
         db.session.commit()
 
 # -------------------------------------------------------------------------------
-# create image folder to static folder in hub
+# Create images and photos folders to static folder in hub
 
 def create_static_folders():    
-
     try:
         basedir = os.path.abspath(os.path.dirname(__file__))
         upload_images = basedir + UPLOAD_FOLDER_IMAGES
@@ -230,7 +255,6 @@ def create_static_folders():
     except OSError as e:
         print('FAILED : ' + str(upload_images), file=sys.stderr)
         raise ValueError('Folder for static images could not be created.')
-
     try:
         upload_photos = basedir + UPLOAD_FOLDER_PHOTOS
         if not os.path.exists(upload_photos):
@@ -238,12 +262,10 @@ def create_static_folders():
     except OSError as e:
         print('FAILED : ' + str(upload_photos), file=sys.stderr)
         raise ValueError('Folder for static photos could not be created.')
-    
     return (upload_images, upload_photos)
 
-
 # -------------------------------------------------------------------------------
-# collect filename and location of image/photo files
+# Collect filename and location of image/photo files
 # from shutil import copy   
 
 def save_to_upload(target_folder, source_folder, source_filename):
@@ -261,15 +283,25 @@ def save_to_upload(target_folder, source_folder, source_filename):
 # -------------------------------------------------------------------------------
 # Collect images and image meta data from defined ImageTest -folder to image_list
 
+# NOTE!!!
+# remember to set image location, this is done differently in tests (test images folder -> static/images)
+# in development state image is saved from request (request.image -> static/images)
+
+# NOTE ! is_private = False
+
 def getImageData(upload):
     image_list = []
+
+    # DO NOT USE absolut path
+    #source_images_folder = "C:\\PWPproject\\ImageAnnotator\\data\\ImageTest\\"
+    # USE relative path
     cwd = os.getcwd()
     folder = '\\data\\ImageTest\\'
     source_images_folder = cwd + folder
-    #print("source_images_folder:", source_images_folder)
+    print("Print of models.py -file : source_images_folder:", source_images_folder)
     
     for filename in glob.glob(source_images_folder + '*.jpg'):
-        print("\n Print image data filename:  ", filename)
+        #print("\n Print image data filename:  ", filename)
         #filedate = os.path.getctime(filename)
 
         with open(filename, "rb") as f:
@@ -303,28 +335,33 @@ def getImageAnnoData():
     imageAnno_list.append(thisdict)
     return imageAnno_list
 
-
 # -------------------------------------------------------------------------------
 # Collect photos and photo meta data from defined PhotoTest -folder to photo_list
 
 # from PIL import Image, ExifTags
 
+# NOTE!!!
+# remember to set photo location, this is done differently in tests (test photo folder -> static/photos)
+# in development state photo is saved from request (request.image -> static/photos)
+
+# NOTE ! is_private = True
+
 def getPhotoData(upload):
     photo_list = []
+
+    # DO NOT USE absolut path
+    # source_photos_folder = 'C:\\PWPproject\\ImageAnnotator\\data\\PhotoTest//'
+    # USE relative path
     cwd = os.getcwd()
     folder = '\\data\\PhotoTest\\'
     source_photos_folder = cwd + folder
-    #print("source_photos_folder:", source_photos_folder)
-
+    print("Print of models.py -file : source_photos_folder:", source_photos_folder)
+    
     for filename in glob.glob(source_photos_folder + '*.jpg'):        
         meta_data_dict = set_photo_meta_data_to_dict(filename, True)
-        # NOTE!!!
-        # remember to set photo location, this is done differently in tests (test image folder -> static/photos)
-        # in development state image is saved from request (request.image -> static/photos)
         meta_data_dict["location"] = save_to_upload(upload, source_photos_folder, os.path.basename(filename))
         photo_list.append(meta_data_dict)
     return photo_list
-
 
 # Define photo annotation data for database PhotoAnnotation -model population
 def getPhotoAnnoData():
