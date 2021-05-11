@@ -109,15 +109,31 @@ List here the actions points discussed with assistants*
 
 
 ## Meeting 4.
-* **DATE:**
-* **ASSISTANTS:**
+* DATE: 5.5.2021 11:00 - 11:20 with Mika
+* ASSISTANTS: Mika Oja
 
 ### Minutes
-*Summary of what was discussed during the meeting*
+Summary of what was discussed during the meeting
+
+Minimum requirement: for 5 resources, each method 2 times all together to be used
+
+db_test was OK like it is now
+    o	pytest coverage cannot be used for database
+
+Resource_test must be further developed. Resource.py has still faults in it. Need to resolve the faults in resource.py, so that resource_test can be run without errors, and so that resource_test coverage will achieve accepted min level
+    o	Resource test coverage: minimum coverage  85 % (see min requirements)
+
+-	Asked and confirmed: All directory/file paths must be relative (db_test has two D-path to correct)
+
+-	Asked and confirmed: client no need to test
 
 ### Action points
-*List here the actions points discussed with assistants*
+List here the actions points discussed with assistants*
 
+Check minimum requirements and Constraints flom Lovelace:
+https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/pwp-project-work-assignment/#minimum-requirements-and-constraints
+
+Resource_test need further development to gain higher test coverage.
 
 ### Comments from staff
 *ONLY USED BY COURSE STAFF: Additional comments from the course staff*
