@@ -18,6 +18,9 @@ These are not resources. Custom link relations are CURIEs that use the annometa 
 Image Annotator API utilizes defined custom link relations, and [IANA link relations] 
 (http://www.iana.org/assignments/link-relations/link-relations.xhtml) where applicable. 
 
+## add-userlogin
+
+The control for adding new user for login purposes
 
 ## add-user
 
@@ -39,27 +42,27 @@ The control for adding new annotation for specified photograph. The control incl
 
 The control for adding new annotation for specified image. The control includes a JSON schema and must be accessed with POST.
 
-## images-by
+## images-by (NOT IMPLEMENTED)
 
 Leads to list of images collected by registered user. The control includes a JSON schema and must be accessed with GET.
 
-## photos-by
+## photos-by (NOT IMPLEMENTED)
 
 Leads to list of photographs collected by registered user. The control includes a JSON schema and must be accessed with GET.
 
-## photoannotations-by
+## photoannotations-by (NOT IMPLEMENTED)
 
 Leads to list of photoannotations collected by registered user. The control includes a JSON schema and must be accessed with GET.
 
-## imageannotations-by
+## imageannotations-by (NOT IMPLEMENTED)
 
 Leads to list of imageannotations collected by registered user. The control includes a JSON schema and must be accessed with GET.
 
-## photoannotations-by-photo
+## photoannotations-by-photo ( MITENKA )
 
 Leads to list of photoannotations collected by photo. The control includes a JSON schema and must be accessed with GET.
 
-## imageannotations-by-image
+## imageannotations-by-image ( MITENKA )
 
 Leads to list of imageannotations collected by photo. The control includes a JSON schema and must be accessed with GET.
 
@@ -122,15 +125,16 @@ This section lists all possible link relations associated with User.
 
 The following link relations from the annometa namespace are used for:
 
+ * [add-userlogin](reference/link-relations/add-userlogin)
  * [add-user](reference/link-relations/add-user)
  * [add-photo](reference/link-relations/add-photo)
  * [add-image](reference/link-relations/add-image)
  * [add-photoannotation](reference/link-relations/add-photoannotation)
  * [add-imageannotation](reference/link-relations/add-imageannotation)
- * [photos-by](reference/link-relations/photos-by)
- * [images-by](reference/link-relations/images-by)
- * [photoannotations-by](reference/link-relations/photoannotations-by)
- * [imageannotations-by](reference/link-relations/imageannotations-by)
+ * [photos-by] (NOT IMPLEMENTED) (reference/link-relations/photos-by)
+ * [images-by] (NOT IMPLEMENTED) (reference/link-relations/images-by)
+ * [photoannotations-by] (NOT IMPLEMENTED) (reference/link-relations/photoannotations-by)
+ * [imageannotations-by] (NOT IMPLEMENTED) (reference/link-relations/imageannotations-by)
  * [users-all](reference/link-relations/users-all)
  * [photos-all](reference/link-relations/photos-all)
  * [images-all](reference/link-relations/images-all)
@@ -187,8 +191,6 @@ The following [IANA RFC5988](http://www.iana.org/assignments/link-relations/link
  * self
 
 ### Semantic descriptors
- * **data**: BINARY. Binary file of loaded image or photograph.
- * **ascii_data**: STRING. ASCII file of loaded image or photograph.
  * **name**: STRING. Name of the loaded image or photograph file.
  * **publish_date**: DATE (ISO_8601)/NONE. If the device or user have updated or defined the date when image or photograph has been taken or published originally, the date is gathered as metadata. If it does not exist, it will contain None.
  * **location**: STRING. Location of file from where image or photograph file has been loaded to API.
@@ -388,6 +390,26 @@ Get a list of all users known to the API.
                         "href": "/api/users/",
                         "title": "GET All users"                                                
                     },
+                    "annometa:userlogin": {
+                        "href": "/api/userlogin/",
+                        "title": "Checks that user name and password are valid for login purposes",
+                        "encoding": "json",
+                        "method": "POST",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "user_name": {
+                                    "description": "User name",
+                                    "type": "string"
+                                },
+                                "user_password": {
+                                    "description": "User password",
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["user_name", "user_password"]
+                        }
+                    },
                     "annometa:add-user": {
                         "href": "/api/users/",
                         "title": "Add a new user",
@@ -440,11 +462,69 @@ Adds a new user. The user representation must be valid against the user schema.
     + Body
     
             {
-                "user_name": "Merja",
+                "user_name": "merja",
                 "user_password": "pass"
             }
 
 + Response 201
+
+    + Headers
+    
+            Location: /api/users/merja/
+
++ Response 400 (application/vnd.mason+json)
+
+    The client is trying to send a JSON document 
+    that doesn't validate against the schema, or has non-existent release date.
+
+    + Body
+    
+            ...
+            
++ Response 409 (application/vnd.mason+json)
+
+    The client is trying to add user that allready in the database.
+
+    + Body
+        
+            ...
+            
+            
++ Response 415 (application/vnd.mason+json)
+
+    The client did not use the proper content type, or the request body was not valid JSON.
+
+    + Body
+        
+            ...
+            
+
+
+## UserLogin [/api/userlogin/]
+
+
+POST for login purposes. Checks if user_name and user_password are valid in  request 
+
+
+### Add userlogin [POST]
+
+POST for login purposes. The userlogin representation must be valid against the user schema.
+
++ Relation: userlogin
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+        
+    + Body
+    
+            {
+                "user_name": "merja",
+                "user_password": "pass"
+            }
+
++ Response 200
 
     + Headers
     
@@ -468,9 +548,6 @@ Adds a new user. The user representation must be valid against the user schema.
             ...
             
 
-
-
-
 ## User [/api/users/{user}/]
 
 This is a single user item by given user using the user's unique name. 
@@ -480,6 +557,9 @@ more information can be found by following the `self` relation of each artist.
 + Parameters
 
     + user: merja (string) - user's unique user_name
+
+    
+
 
 
 ### User information [GET]
@@ -740,7 +820,15 @@ Get a list of all imageannotationss known to the API.
                             "type": "object",
                             "properties": {
                                 "id": {
-                                    "description": "ImageAnnotation unique name",
+                                    "description": "ImageAnnotation's unique id",
+                                    "type": "integer"
+                                },
+                                "image_id": {
+                                    "description": "Image's unique id",
+                                    "type": "integer"
+                                },
+                                "user_id": {
+                                    "description": "User's unique id",
                                     "type": "integer"
                                 },
                                 "meme_class": {
@@ -780,13 +868,15 @@ Get a list of all imageannotationss known to the API.
                                     "type": "string"
                                 }
                             },
-                            "required": ["id", "HS_class"]
+                            "required": ["id","image_id","user_id","meme_class","HS_class","text_class"]
                         }
                     }
                 },
                 "items": [
                     {
                         "id": 1,
+                        "image_id": 1,
+                        "user_id": 1,
                         "meme_class": True,
                         "HS_class": True,
                         "text_class": True,
@@ -821,9 +911,11 @@ Adds a new imageannotation. The imageannotation representation must be valid aga
             Accept: application/vnd.mason+json
         
     + Body
-    
+
             {
                 "id": 1,
+                "image_id": 1,
+                "user_id": 1,
                 "meme_class": True,
                 "HS_class": True,
                 "text_class": True,
@@ -850,6 +942,14 @@ Adds a new imageannotation. The imageannotation representation must be valid aga
     
             ...
 
++ Response 409 (application/vnd.mason+json)
+
+    The client is trying to add new annotation with existing id.
+
+    + Body
+        
+            ...
+            
 + Response 415 (application/vnd.mason+json)
 
     The client did not use the proper content type, or the request body was not valid JSON.
@@ -887,7 +987,7 @@ Get the imageannotation representation.
 + Response 200 (application/vnd.mason+json)
 
     + Body
-    
+
             {
                 "@namespaces": {
                     "annometa": {
@@ -895,6 +995,8 @@ Get the imageannotation representation.
                     }
                 },
                 "id": 1,
+                "image_id": 1,
+                "user_id": 1,
                 "meme_class": True,
                 "HS_class": True,
                 "text_class": True,
@@ -922,7 +1024,15 @@ Get the imageannotation representation.
                             "type": "object",
                             "properties": {
                                 "id": {
-                                    "description": "ImageAnnotation unique name",
+                                    "description": "ImageAnnotation's unique id",
+                                    "type": "integer"
+                                },
+                                "image_id": {
+                                    "description": "Image's unique id",
+                                    "type": "integer"
+                                },
+                                "user_id": {
+                                    "description": "User's unique id",
                                     "type": "integer"
                                 },
                                 "meme_class": {
@@ -962,7 +1072,7 @@ Get the imageannotation representation.
                                     "type": "string"
                                 }
                             },
-                            "required": ["id"]
+                            "required": ["id","image_id","user_id","meme_class","HS_class","text_class"]
                         }
                     },
                     "annometa:delete": {
@@ -1000,7 +1110,7 @@ Get the imageannotation representation.
     The client is trying to access an artist that doesn't exist.
 
     + Body
-    
+
             {
                 "resource_url": "/api/imageannotations/1/",
                 "@error": {
@@ -1030,7 +1140,7 @@ Must validate against the user schema.
             Accept: application/vnd.mason+json
         
     + Body
-    
+
             {
                 "id": 1,
                 "meme_class": True,
@@ -1165,7 +1275,15 @@ Get a list of all photoannotations known to the API.
                             "type": "object",
                             "properties": {
                                 "id": {
-                                    "description": "Photoannotation unique id",
+                                    "description": "Photoannotation's unique id",
+                                    "type": "integer"
+                                },
+                                "image_id": {
+                                    "description": "Image's unique id",
+                                    "type": "integer"
+                                },
+                                "user_id": {
+                                    "description": "User's unique id",
                                     "type": "integer"
                                 },
                                 "persons_class": {
@@ -1193,13 +1311,15 @@ Get a list of all photoannotations known to the API.
                                     "type": "string"
                                 }
                             },
-                            "required": ["id"]
+                            "required": ["id","image_id","user_id","persons_class","slideshow_class","positivity_class"]
                         }
                     }
                 },
                 "items": [
                     {
-                        "id": 1,
+                        "id": 2,
+                        "image_id": 9,
+                        "user_id": 1,
                         "persons_class": "True",
                         "slideshow_class": "False",
                         "positivity_class": 6,
@@ -1231,9 +1351,11 @@ Adds a new photoannotation. The photoannotation representation must be valid aga
             Accept: application/vnd.mason+json
         
     + Body
-    
+
             {
-                "id": 1,
+                "id": 2,
+                "image_id": 9,
+                "user_id": 1,
                 "persons_class": "True",
                 "slideshow_class": "False",
                 "positivity_class": 6,
@@ -1255,6 +1377,14 @@ Adds a new photoannotation. The photoannotation representation must be valid aga
 
     + Body
     
+            ...
+            
++ Response 409 (application/vnd.mason+json)
+
+    The client is trying to add new annotation with existing id.
+
+    + Body
+        
             ...
 
 + Response 415 (application/vnd.mason+json)
@@ -1294,14 +1424,16 @@ Get the photoannotation representation.
 + Response 200 (application/vnd.mason+json)
 
     + Body
-    
+
             {
                 "@namespaces": {
                     "annometa": {
                         "name": "/link-relations#"
                     }
                 },
-                "id": 1,
+                "id": 2,
+                "image_id": 9,
+                "user_id": 1,
                 "persons_class": "True",
                 "slideshow_class": "False",
                 "positivity_class": 6,
@@ -1326,7 +1458,15 @@ Get the photoannotation representation.
                             "type": "object",
                             "properties": {
                                "id": {
-                                    "description": "Photoannotation unique id",
+                                    "description": "Photoannotation's unique id",
+                                    "type": "integer"
+                                },
+                                 "image_id": {
+                                    "description": "Image's unique id",
+                                    "type": "integer"
+                                },
+                                "user_id": {
+                                    "description": "User's unique id",
                                     "type": "integer"
                                 },
                                 "persons_class": {
@@ -1354,7 +1494,7 @@ Get the photoannotation representation.
                                     "type": "string"
                                 }
                             },
-                            "required": ["id"]
+                            "required": ["id","image_id","user_id","persons_class","slideshow_class","positivity_class"]
                         }
                     },
                     "annometa:delete": {
@@ -1365,7 +1505,9 @@ Get the photoannotation representation.
                 },
                 "items": [
                     { 
-                        "id": 1,
+                        "id": 2,
+                        "image_id": 9,
+                        "user_id": 1,
                         "persons_class": "True",
                         "slideshow_class": "False",
                         "positivity_class": 6,
@@ -1389,7 +1531,7 @@ Get the photoannotation representation.
     The client is trying to access an artist that doesn't exist.
 
     + Body
-    
+
             {
                 "resource_url": "/api/photoannotations/1/",
                 "@error": {
@@ -1419,18 +1561,17 @@ Must validate against the user schema.
             Accept: application/vnd.mason+json
         
     + Body
-    
+
             {
-                "id": 1,
-                "meme_class": True,
-                "HS_class": True,
-                "text_class": True,
-                "polarity_classA": -2,
-                "polarity_classB": -4,
-                "HS_strength": -3,
-                "HS_category": "ethnic, sexual, bully, troll, coded, idiom",
-                "text_text": "PARENTS NAMED HIM MIKA PEOPLE CALL HIM BUBBA TUHNULA",
-                "text_language": "english, finnish"
+                "id": 2,
+                "image_id": 9,
+                "user_id": 1,
+                "persons_class": "True",
+                "slideshow_class": "False",
+                "positivity_class": 6,
+                "text_free_comment": "Lomalla Norjassa kesällä 2020",
+                "text_persons": "Hessu Hopo, Iines Ankka",
+                "text_persons_comment": "Hauskat ilmeet kavereilla",
             }
         
 + Response 204
@@ -1534,7 +1675,7 @@ Get a list of all images known to the API.
                         "href": "/api/images/",
                         "title": "GET All images"                                                
                     },
-                    "annometa:add-imagefolder": {
+                    "annometa:add-image": {
                         "href": "/api/images/",
                         "title": "Add image",
                         "encoding": "json",
@@ -1543,32 +1684,47 @@ Get a list of all images known to the API.
                             "type": "object",
                             "properties": {
                                 "id": {
-                                    "description": "Images unique id",
+                                    "description": "Image's unique id",
                                     "type": "integer"
                                 },
+                                "user_id": {
+                                    "description": "User's unique id",
+                                    "type": "integer"
+                                },
+                                "name": {
+                                    "description": "Image's name",
+                                    "type": "string"
+                                },
+                                "publish_date": {
+                                    "description": "Image's publish date",
+                                    "type": "string"
+                                },
+                                "location": {
+                                    "description": "Image's location (where to find it)",
+                                    "type": "string"
+                                },
                                 "is_private": {
-                                    "description": "Image is not private",
+                                    "description": "Image is not private, photo is private",
                                     "type": "boolean"
                                 },
-                                "folder_name": {
-                                    "description": "Folder name which is added",
-                                    "type": "string"
-                                },
-                                "folder_path": {
-                                    "description": "Folder path which is added",
-                                    "type": "string"
+                                "date": {
+                                    "description": "Date now",
+                                    "type": "datetime"
                                 }
                             },
-                            "required": ["id","is_private","folder_name","folder_path"]
+                            "required": ["id","user_id","name","location","is_private","date"]
                         }
                     }
                 },
                 "items": [
                     {
                         "id": 1,
+                        "user_id": 1,
+                        "name": "halla-aho meemi32.jpg",
+                        "publish_date": "2021-05-11 21:28:38",
+                        "location": "\\static\\images\\kuha meemi1.jpg",
                         "is_private": False,
-                        "folder_name": "Summer_2020_hate",
-                        "folder_path": "C:\user\images",
+                        "date": 2021-05-11 21:28:38,
                         "@controls": {
                             "self": {
                                 "href": "/api/images/1/"
@@ -1583,11 +1739,11 @@ Get a list of all images known to the API.
 
 
 
-### Add folder of images to Image Annotator API [POST]
+### Add an image[POST]
 
-Adds a new image folder to the system.
+Adds a new image.
 
-+ Relation: add-imagefolder
++ Relation: add-image
 + Request (application/json)
 
     + Headers
@@ -1597,9 +1753,21 @@ Adds a new image folder to the system.
     + Body
     
             {
-                "is_private": False,
-                "folder_name": "Summer_2020_hate",
-                "folder_path": "C:\user\images"
+               "id": 1,
+               "user_id": 1,
+               "name": "halla-aho meemi32.jpg",
+               "publish_date": "2021-05-11 21:28:38",
+               "location": "\\static\\images\\kuha meemi1.jpg",
+               "is_private": False,
+               "date": 2021-05-11 21:28:38,
+               "@controls": {
+                    "self": {
+                        "href": "/api/images/1/"
+                    }, 
+                    "profile": {
+                        "href": "/profiles/image/"
+                    }
+                }
             }
 
 + Response 201
@@ -1611,28 +1779,32 @@ Adds a new image folder to the system.
     + Body
     
             {}
-            
 
-+ Response 404 (application/vnd.mason+json)
++ Response 400 (application/vnd.mason+json)
 
-    The client is trying to add a folder that is empty or does not contain any jpeg images.
+    The client is trying to send a JSON document that doesn't validate against the schema, or has non-existent release date.
 
     + Body
     
-            {
-                "resource_url": "/api/--/folder-path/",
-                "@error": {
-                    "@message": "Folder was empty or did not have jpeg images",
-                    "@messages": [null]
-                },
-                "@controls": {
-                    "profile": {
-                        "href": "/profiles/error/"
-                    }
-                }
-            }
-
+            ...
             
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to access an image that doesn't exist.
+
+    + Body
+    
+            ...
+            
++ Response 500 (application/vnd.mason+json)
+
+    Saving image failed.
+
+    + Body
+    
+            ...
+            
+
             
 
 
@@ -1669,48 +1841,63 @@ Get a list of all photos known to the API.
                     "self": {
                         "href": "/api/photos/"
                     },
-                    "annometa:photos-all": {
+                    "annometa:images-all": {
                         "href": "/api/photos/",
                         "title": "GET All photos"                                                
                     },
-                    "annometa:add-photofolder": {
+                    "annometa:add-photo": {
                         "href": "/api/photos/",
-                        "title": "Add photos from folder",
+                        "title": "Add photos",
                         "encoding": "json",
                         "method": "POST",
                         "schema": {
                             "type": "object",
                             "properties": {
                                 "id": {
-                                    "description": "Photos unique id",
+                                    "description": "Photo's unique id",
                                     "type": "integer"
                                 },
+                                "user_id": {
+                                    "description": "User's unique id",
+                                    "type": "integer"
+                                },
+                                "name": {
+                                    "description": "Photo's name",
+                                    "type": "string"
+                                },
+                                "publish_date": {
+                                    "description": "Photo's publish date",
+                                    "type": "string"
+                                },
+                                "location": {
+                                    "description": "Photo's location (where to find it)",
+                                    "type": "string"
+                                },
                                 "is_private": {
-                                    "description": "Photo is private",
+                                    "description": "Image is not private, photo is private",
                                     "type": "boolean"
                                 },
-                                "folder_name": {
-                                    "description": "Folder name which is added",
-                                    "type": "string"
-                                },
-                                "folder_path": {
-                                    "description": "Folder path which is added",
-                                    "type": "string"
+                                "date": {
+                                    "description": "Date now",
+                                    "type": "datetime"
                                 }
                             },
-                            "required": ["id","is_private","folder_name","folder_path"]
+                            "required": ["id","user_id","name","location","is_private","date"]
                         }
                     }
                 },
                 "items": [
                     {
-                        "id": 1,
+                        "id": 9,
+                        "user_id": 3,
+                        "name": "Norja 2020",
+                        "publish_date": null,
+                        "location": "\\static\\photos\\Norja 2020.jpg",
                         "is_private": False,
-                        "folder_name": "Summer_2020_holiday",
-                        "folder_path": "C:\user\photos",
+                        "date": 2021-05-11 21:28:39,
                         "@controls": {
                             "self": {
-                                "href": "/api/photos/1/"
+                                "href": "/api/photos/9/"
                             }, 
                             "profile": {
                                 "href": "/profiles/photo/"
@@ -1722,11 +1909,11 @@ Get a list of all photos known to the API.
 
 
 
-### Add folder of Photos to Image Annotator API [POST]
+### Add a photo [POST]
 
-Adds a new photo folder to the system.
+Adds a new photo to the system.
 
-+ Relation: add-photofolder
++ Relation: add-photo
 + Request (application/json)
 
     + Headers
@@ -1736,10 +1923,23 @@ Adds a new photo folder to the system.
     + Body
     
             {
+                "id": 9,
+                "user_id": 3,
+                "name": "Norja 2020",
+                "publish_date": null,
+                "location": "\\static\\photos\\Norja 2020.jpg",
                 "is_private": True,
-                "folder_name": "Summer_2020_holiday",
-                "folder_path": "C:\user\photos"
+                "date": 2021-05-11 21:28:39,
+                "@controls": {
+                    "self": {
+                        "href": "/api/photos/9/"
+                    }, 
+                    "profile": {
+                        "href": "/profiles/photo/"
+                    }
+                }
             }
+
 
 + Response 201
 
@@ -1751,22 +1951,26 @@ Adds a new photo folder to the system.
     
             {}
             
++ Response 400 (application/vnd.mason+json)
 
-+ Response 404 (application/vnd.mason+json)
-
-    The client is trying to add a folder that is empty or does not contain any jpeg images.
+    The client is trying to send a JSON document that doesn't validate against the schema, or has non-existent release date.
 
     + Body
     
-            {
-                "resource_url": "/api/--/folder-path/",
-                "@error": {
-                    "@message": "Folder was empty or did not have jpeg images",
-                    "@messages": [null]
-                },
-                "@controls": {
-                    "profile": {
-                        "href": "/profiles/error/"
-                    }
-                }
-            }
+            ...
+            
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to access an image that doesn't exist.
+
+    + Body
+    
+            ...
+            
++ Response 500 (application/vnd.mason+json)
+
+    Saving image failed.
+
+    + Body
+    
+            ...
