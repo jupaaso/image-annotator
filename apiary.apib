@@ -1752,7 +1752,7 @@ Get a list of all images known to the API.
 
 ### Add an image [POST]
 
-Adds a new image. The image representation must be valid against the user schema.
+Adds a new image. The image representation must be valid against the image content schema.
 
 + Relation: add-image
 + Request (application/json)
@@ -2038,13 +2038,13 @@ Deletes the imageannotation.
 
 ## Photo Collection [/api/photos/]
 
-A list of all photos known to the API. Photos have their "is_private" attribute set to "Truee".
+A list of all photos known to the API. Photos have their "is_private" attribute set to "True".
 
 This collection can be sorted using the sortby query parameter. 
 For each photos only  ---  id is included, 
 more information can be found by following the `self` relation of each user. 
 
-### List all Photos [GET]
+### List all photos [GET]
 
 Get a list of all photos known to the API.
 
@@ -2139,7 +2139,7 @@ Get a list of all photos known to the API.
 
 ### Add a photo [POST]
 
-Adds a new photo to the system.
+Adds a new photo to the system. The phot's representation must be valid against the image content schema.
 
 + Relation: add-photo
 + Request (application/json)
@@ -2201,4 +2201,222 @@ Adds a new photo to the system.
 
     + Body
     
+            ...
+  
+
+## Photo [/api/photos/{photo}/]
+
+This is a single photo item by given user using the photo's unique id. 
+For each photo only --- photo id is included, 
+more information can be found by following the `self` relation of each artist. 
+
++ Parameters
+
+    + photo: 9 (integer) - photo's unique id
+
+
+### Photo information [GET]
+
+Get the photo representation.
+
++ Relation: self
++ Request
+
+    + Headers
+    
+            Accept: application/vnd.mason+json
+        
++ Response 200 (application/vnd.mason+json)
+
+ + Body
+
+            {
+                "@namespaces": {
+                    "annometa": {
+                        "name": "/link-relations#"
+                    }
+                },
+                "id": 9,
+                "user_id": 3,
+                "name": "Norja 2020",
+                "publish_date": null,
+                "location": "\\static\\photos\\Norja 2020.jpg",
+                "is_private": True,
+                "date": 2021-05-11 21:28:39,
+                "@controls": {
+                    "self": {
+                        "href": "/api/photos/9/"
+                    }, 
+                    "collection": {
+                        "href": "/api/photo/",
+                        "title": "API entry point to photo collection",
+                        "method": "GET"
+                    },
+                    "edit": {
+                        "href": "/api/photos/9/",
+                        "title": "Add this photo",
+                        "encoding": "json",
+                        "method": "PUT",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "description": "Image's unique id",
+                                    "type": "integer"
+                                },
+                                "user_id": {
+                                    "description": "User's unique id",
+                                    "type": "integer"
+                                },
+                                "name": {
+                                    "description": "Image's name",
+                                    "type": "string"
+                                },
+                                "publish_date": {
+                                    "description": "Image's publish date",
+                                    "type": "string"
+                                },
+                                "location": {
+                                    "description": "Image's location (where to find it)",
+                                    "type": "string"
+                                },
+                                "is_private": {
+                                    "description": "Public image is not private, private photo is private",
+                                    "type": "boolean"
+                                },
+                                "date": {
+                                    "description": "Date now",
+                                    "type": "datetime"
+                                }
+                            },
+                            "required": ["id","user_id","name","location","is_private","date"]
+                        }
+                    },
+                    "annometa:delete": {
+                        "href": "/api/photos/9/",
+                        "title": "Delete this photo",
+                        "method": "DELETE"
+                    }
+                },
+                "items": [
+                    {
+                        "id": 9,
+                        "user_id": 3,
+                        "name": "Norja 2020",
+                        "publish_date": null,
+                        "location": "\\static\\photos\\Norja 2020.jpg",
+                        "is_private": False,
+                        "date": 2021-05-11 21:28:39,
+                        "@controls": {
+                            "self": {
+                                "href": "/api/photos/9/"
+                            }, 
+                            "profile": {
+                                "href": "/profiles/photo/"
+                            }
+                        }
+                    }
+                ]
+            }
+
+
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to access an image that doesn't exist.
+
+    + Body
+
+            {
+                "resource_url": "/api/photos/1/",
+                "@error": {
+                    "@message": "Photo not found",
+                    "@messages": [null]
+                },
+                "@controls": {
+                    "profile": {
+                        "href": "/profiles/error/"
+                    }
+                }
+            }
+
+
+### Edit photo information [PUT]
+
+Replace the photo's representation with a new one. 
+Missing optional fields will be set to null. 
+Must validate against the user schema. 
+
++ Relation: edit
++ Request (application/json)
+
+    + Headers
+        
+            Accept: application/vnd.mason+json
+        
+    + Body
+
+            {
+                "id": 3,
+                "user_id": 1,
+                "name": "lampaat tauolla.jpg",
+                "publish_date": 2020-05-05 20:10:11,
+                "location": "\\static\\images\\kuha meemi3.jpg",
+                "is_private": False,
+                "date": 2021-05-11 21:28:39,
+            }
+        
++ Response 204
+
+
++ Response 400 (application/vnd.mason+json)
+
+    The client is trying to send a JSON document that doesn't validate against the schema, or has non-existent release date.
+
+    + Body
+    
+            ...
+
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to access an photo that doesn't exist.
+
+    + Body
+    
+            ...
+        
++ Response 415 (application/vnd.mason+json)
+
+    The client sent a request with the wrong content type or the request body was not valid JSON.
+
+    + Body
+        
+            ...
+
+### Delete photo [DELETE]
+
+Deletes the photo. quite.
+
++ Relation: delete
++ Request
+
+    + Headers
+        
+            Accept: application/vnd.mason+json
+        
++ Response 204
+
++ Response 404 (application/vnd.mason+json)
+
+    The client is trying to send a JSON document that doesn't validate against the schema, or has non-existent release date.
+
+    + Body
+    
+            ...
+
++ Response 415 (application/vnd.mason+json)
+
+    The client sent a request with the wrong content type or the request body was not valid JSON.
+
+    + Body
+        
             ...
