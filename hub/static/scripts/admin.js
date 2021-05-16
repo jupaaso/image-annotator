@@ -111,6 +111,9 @@ function backToImageCollection() {
 
 function getImageCollection(event) {
     event.preventDefault();
+    // TESTI TESTI $('.annotationMetaForm').hide();
+    $('.imageAnnotationForm').hide();
+    //$('#AnnoFormButtons').hide();
     getResource("http://localhost:5000/api/images/", renderImages);
 }
 
@@ -208,10 +211,11 @@ function renderStartup(body) {
 
     $("#userFormId").show();
     showUserFormButtons();
-    //$("#addUserBtnId").show();
-    //$("#loginUserBtnId").show();
     $("#editUserBtnId").hide();
     $("#deleteUserBtnId").hide();
+    $("#imageListBtnId").hide();
+    $("#photoListBtnId").hide();
+    $("#userAccountBtnId").hide();
 
     $("#user_name").attr('disabled', false);
 
@@ -280,6 +284,9 @@ function hideUserFormButtons() {
     $("#editUserBtnId").hide();
     $("#deleteUserBtnId").hide();
     $("#loginUserBtnId").hide();
+    $("#imageListBtnId").hide();
+    $("#photoListBtnId").hide();
+    $("#userAccountBtnId").hide();
 }
 
 function showUserFormButtons() {
@@ -287,6 +294,9 @@ function showUserFormButtons() {
     $("#editUserBtnId").show();
     $("#deleteUserBtnId").show();
     $("#loginUserBtnId").show();
+    $("#imageListBtnId").show();
+    $("#photoListBtnId").show();
+    $("#userAccountBtnId").show();
 }
 
 // USER ACCOUNT page -------------------------------------------------------------
@@ -300,7 +310,9 @@ function renderUserData(body) {
     $("#editUserBtnId").show();
     $("#addUserBtnId").hide();
     $("#loginUserBtnId").hide();
-    
+    $("#imageListBtnId").hide();
+    $("#photoListBtnId").hide();
+    $("#userAccountBtnId").hide();
     $("#user_name").attr("value", body.user_name);
     $("#user_name").attr('disabled', true);
     $("#user_password").attr("value", body.user_password);
@@ -348,14 +360,46 @@ function renderUserData(body) {
 // render device / user account selection
 function renderSelection(body) {
     console.log(body);
-    // define logged in cureent user
+    // define logged in current user
     sessionStorage.setItem("CurrentUser", body.user_name);
+    // define html form for device selection buttons
+    let form = $("#selectionFormId");
+    // show UI blocks
+    document.getElementById("leftSidebar").style.display = "block";
+    document.getElementById("rightSidebar").style.display = "block";
     // clear the view before rendering
     $("div.navigation").empty();
+    // show buttons
+    showUserFormButtons();
+    $("#imageListBtnId").show();
+    $("#photoListBtnId").show();
+    $("#userAccountBtnId").show();
+    // hide buttons and tables
+    $("#addUserBtnId").hide();
+    $("#editUserBtnId").hide();
+    $("#deleteUserBtnId").hide();
+    $("#loginUserBtnId").hide();
     $(".resulttable thead").empty();
     $(".resulttable tbody").empty();
     $("#uploadFileBtnId").hide();
     $("#userFormId").hide();
+
+    $("#imageListBtnId").on( "click", function(event) {
+        event.preventDefault();
+        getResource("http://localhost:5000/api/images/", renderImages);
+    });
+
+    $("#photoListBtnId").on( "click", function(event) {
+        event.preventDefault();
+        getResource("http://localhost:5000/api/photos/", renderPhotos);
+    });
+
+    $("#userAccountBtnId").on( "click", function(event) {
+        event.preventDefault();
+        getResource(body["@controls"]["self"]["href"], renderUserData);
+    });
+
+    /*
     // click handlers and link to imagecollection / photocollection resource
     $("div.navigation").html(
         "<a href='" +
@@ -368,6 +412,7 @@ function renderSelection(body) {
         body["@controls"].self.href +
         "' onClick='followLink(event, this, renderUserData)'>" + body.user_name + "</a>"
     );
+    */
 }
 
 // IMAGES / PHOTOS TABLE page ---------------------------------------------------------------
@@ -400,7 +445,7 @@ function ImageContentRow(item) {
 function PhotoContentRow(item) {    
     let imageLink  = "<a href='" +
     item["@controls"].self.href +    
-    "' onClick='followLink(event, this, renderPhotosTable)'>Modify Annotation</a>" +
+    "' onClick='followLink(event, this, renderPhotosTable)'> Modify Annotation </a>" +
     "<a href='" +
     item["@controls"].self.href + 
     "' onClick='followLink(event, this, deletePhotoContent)'> Delete Photo </a>"
@@ -507,7 +552,7 @@ function renderImageForm(ctrl) {
 function renderPhotos(body) {    
     $("div.navigation").html(
         "<a href='" +
-        "' onClick='followLink(event, this, renderSelection)'>Back to User Selection</a>"         
+        "' onClick='followLink(event, this, renderSelection)'>Back to Device Selection</a>"         
     );
     $(".resulttable thead").html(
         "<tr><th>Filename</th><th>Publish date</th><th>Privacy class</th><th>Photo</th></tr>"
@@ -535,13 +580,20 @@ function renderImagesTable(item) {
     $(".resulttable thead").empty();
     $(".resulttable tbody").empty();
     $(".imagemetaform").empty();
-    $(".form").empty();
+    // TESTI TESTI $(".imageListForm").empty();
+    $(".imageListForm").hide();
     $("#uploadFileBtnId").hide();
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     $("div.navigation").html(
         "<a href='" +
-        "' onClick=' $('.annotationMetaForm').hide(); hideAnnoFormButtons(); getImageCollection(event)'> Back to Images </a>"
+        "' onClick='getImageCollection(event)'> Back to Images </a>"
     );
+    
+    // $('.annotationMetaForm').hide(); $('#AnnoFormButtons').hide();
+
+    //////////////////////////////////////////////////////////////////////////////////////////
     
     let requiredItems = item["@controls"]["annometa:edit"]["schema"]["required"];
     let imageIdName = Object.keys(item.id);
@@ -576,9 +628,29 @@ function renderImagesTable(item) {
     }    
 }
 
+// MUUTOS ALKAA  -------------------------------------------------------
+
+function backToDeviceSelection(event) {
+    event.preventDefault();
+
+    hideAnnoFormButtons();
+    $(".annotationMetaForm").empty();
+    $(".annotationform").empty();
+    //$(".imagemetaform").empty();
+    //$("#testform").empty();
+
+    let currentUser = sessionStorage.getItem("CurrentUser");        
+    getResource("http://localhost:5000/api/users/" + currentUser, function(userData) {
+        renderSelection(userData);
+    });
+}
+// MUUTOS Päättyy-------------------------------------------------
+
 // function to render uploaded image data and metadata
 function renderImages(body) {
-    // clear the view before rendering
+    // clear the view before rendering    
+    document.getElementById("leftSidebar").style.display = "none";
+    document.getElementById("rightSidebar").style.display = "none";    
     $("div.navigation").empty();
     $(".resulttable thead").empty();
     $(".resulttable tbody").empty();
@@ -586,15 +658,27 @@ function renderImages(body) {
     $(".imagemetatable thead").empty();
     $(".imagecontent").empty();
     $(".annotationform").empty();
-    $(".imagemetaform").empty();
+    hideAnnoFormButtons();
+    $("#imageListFormId").show();
+
+    //$(".imagemetaform").empty();
+    //$(".annotationMetaForm").empty();
+    //$("#testform").empty();
+    
     // define navigation
+    // MUUTOS alkaa----------------------------------------------------
+    
     $("div.navigation").html(
-        "<a href='" +
-        "' onClick='followLink(event, this, renderSelection)'>Back to Resource Selection</a>"         
+        "<a href='" +        
+        "' onClick='backToDeviceSelection(event)'>Device Selection</a>"         
     );
+
+    // Muutos päättyy    --------------------------------------------------
+
     $(".resulttable thead").html(
         "<tr><th>Filename</th><th>Publish date</th><th>Privacy class</th><th>Image</th></tr>"
     );
+
     let tbody = $(".resulttable tbody");
     tbody.empty();
     body.items.forEach(function (item) {
@@ -911,6 +995,6 @@ $(document).ready(function () {
     // MUUTOS
     sessionStorage.clear();
     //$('.annotationMetaForm').hide(); // Hide annotation form
-    $("#testform").toggle();       
+    $("#testform").toggle();    
     getResource("http://localhost:5000/api/users/", renderStartup);
 });

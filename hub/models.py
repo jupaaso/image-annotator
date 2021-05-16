@@ -36,7 +36,7 @@ Set cofiguration setting class as 'development' or 'production' or 'default' or 
     (.venv) C:\PWPproject\ImageAnnotator>set FLASK_ENV=development
 
 In order to start the server set the package name 'hub' and run Flask in the hub folder:
-    (.venv) C:\PWPproject\ImageAnnotator\extracodes>set FLASK_APP=hub
+    (.venv) C:\PWPproject\ImageAnnotator>set FLASK_APP=hub
 
 Init flask database basedir hub:
     (.venv) C:\PWPproject\ImageAnnotator>flask init-db
@@ -54,6 +54,7 @@ and populates User, PhotoContent, PhotoAnnotation, ImageContent and ImageAnnotat
 # --------------------------------------------------------------------------------------------
 
 import os
+import sys
 import glob
 import base64
 from io import BytesIO

@@ -1,8 +1,10 @@
+/* Don't touch below --------------------------------- */
 
 form label {
     font-weight: bold;
     display:block;/*Necessary for the first letter*/
 }
+
 form label:first-letter{
     text-transform: uppercase;
 }
@@ -12,3 +14,36 @@ form label:first-letter{
 #file-input {
     display: none;
 }
+
+/* Don't touch above ----------------------------------- */
+
+
+/* Split the login screen in half */
+
+.usermetaform {
+    height: 100%;
+    width: 40%;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    overflow-x: hidden;
+    padding-top: 20px;
+}
+
+
+/* Control the left side */
+.left {
+    left: 0;
+    background-color: #737373;
+    padding: 60px;
+    color: white;
+    font-weight: 300;
+}
+
+/* Control the right side */
+.right {
+    right: 0;
+    width: 60%;
+    padding: 60px;
+}
+

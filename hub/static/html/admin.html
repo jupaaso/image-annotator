@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
+    <link rel="shortcut icon" href="#" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/static/css/admin.css">
     <title>ImageAnnotator hub admin site</title>
@@ -12,18 +13,95 @@
 
 <body style="margin-left: 50px; margin-right: 50px;">
     
-    <div class="notification"></div>    
-    <div class="navigation"></div>
-    <div class="contents">
-        <div class="imagemeta">
+    <div class="usermetaform left" id="leftSidebar">
+        <div class="login-main-text">
+            <h2>Application<br> Login Page</h2>
+            <p>Login or register from here to access.</p>
+        </div>
+    </div>
+    <div class="usermetaform right" id="rightSidebar">
+        <div class="notification"></div>    
+        <div class="navigation"></div>
+
+        <form class="row g-3 needs-validation" id = "selectionFormId" style="margin-top: 20px;" novalidate>
+            <div id="deviceSelectionButtonContainerId" class="container" style="margin-top: 20px;">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end" id="selectionButtonGroupId">
+                    <button class="btn btn-secondary me-md-2" id="imageListBtnId" type="button" style="display:none">Show Images</button>
+                    <button class="btn btn-secondary me-md-2" id="photoListBtnId" type="button" style="display:none">Show Photos</button>
+                    <button class="btn btn-secondary me-md-2" id="userAccountBtnId" type="button" style="display:none">User Account</button>
+                </div>
+            </div>
+        </form>
+
+        <form class="row g-3 needs-validation" id = "userFormId" style="margin-top: 50px;" novalidate>
+            <!-- div class="row"> -->
+                <!--<div class="col-md-2 col-form-label"> -->
+                <div class="col-md-6">   
+                    <label for="user_name" class="form-label">USER NAME</label>
+                </div>
+                <div class="col-sm">
+                    <input class="form-control" id="user_name" type="text" required>
+                    <div class="valid-feedback">
+                        Ok!
+                    </div>
+                    <div class="invalid-feedback">
+                        Please enter username.
+                    </div>
+                </div> 
+            <!-- </div> -->
+            <!-- <div class="row"> -->
+                <!-- <div class="col-md-2 col-form-label"> -->
+                <div class="col-md-6">                        
+                    <label for="user_password" class="form-label">USER PASSWORD</label>
+                </div>
+                <div class="col-sm">
+                    <input class="form-control" id="user_password" type="password" required>                            
+                </div>
+            <!-- </div> -->
+            <div id="userLoginButtonContainerId" class="container" style="margin-top: 20px;">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end" id="formButtonGroupId">
+                    <button class="btn btn-danger" id="deleteUserBtnId" type="button" style="display:none">Delete user</button>
+                    <button class="btn btn-warning me-md-2" id="editUserBtnId" type="button" style="display:none">Edit password</button>
+                    <button class="btn btn-primary me-md-2" id="addUserBtnId" type="submit" style="display:none">Add new user</button>
+                    <button class="btn btn-success me-md-2" id="loginUserBtnId" type="submit" style="display:none">Login user</button>
+                </div>
+            </div>
+        </form>                
+    </div>
+    <div class="imageListForm" id="imageListFormId">
+        <div class="notification"></div>    
+        <div class="navigation"></div>
+        
+        <table class="resulttable">
+            <thead>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <form class="imageUploadForm" id="imageUploadFormId">
+            <button class="btn btn-primary me-md-2" type="button" id="uploadFileBtnId" style="display:none">Add new image</button>
+            <input type="file" id="fileElem" accept="image/*" style="display:none">
+            <div class="fileList" id="fileList" style="margin-top: 10px;">
+                <p id="fileInfoId" style="display: none;">No files selected!</p>
+            </div>
+            <div class="d-grid gap-2 d-md-block">
+                <button class="btn btn-secondary" id="cancelUploadBtn" type="button" style="display:none">Cancel</button>
+                <button class="btn btn-primary" id="uploadBtn" type="submit" style="display:none">Upload</button>
+            </div>
+        </form>
+    </div>
+    <div class="imageAnnotationForm" id="imageAnnotationFormId">
+         <!-- MUUTOS-->
+         <div class="notification"></div>    
+         <div class="navigation"></div>
+         <div class="imagemeta">
             <form class="imagemetaform">
             </form>
         </div>
-        <div class="imagecontent"></div>        
-        <!-- MUUTOS-->
+        <div class="imagecontent"></div> 
         <form id = "testform" style="margin-top: 50px;">
-        <!-- <div class="annotationMetaForm" id="annotationMetaFormId" style="display:none"> -->
-            <div class="annotationMetaForm" id="annotationMetaFormId"></div>
+            <!-- <div class="annotationMetaForm" id="annotationMetaFormId" style="display:none"> -->
+            <div class="annotationMetaForm" id="annotationMetaFormId">
                 <div class="row g-3">
                     <div class='col-md-2 col-form-label'>
                         <label for="annotatorName" class="col-sm-2 col-form-label">Annotator</label>                
@@ -64,15 +142,15 @@
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="inlineRadioOptions" id="Polarity_classA_Positive" value="1" checked disabled>
                     <label class="form-check-label" for="Polarity_classA_Positive">Positive</label>
-                  </div>
-                  <div class="form-check form-check-inline">
+                </div>
+                <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="inlineRadioOptions" id="Polarity_classANeutral" value="0" disabled>
                     <label class="form-check-label" for="Polarity_classANeutral">Neutral</label>
-                  </div>
-                  <div class="form-check form-check-inline">
+                </div>
+                <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="inlineRadioOptions" id="Polarity_classA_Negative" value="-1" disabled>
                     <label class="form-check-label" for="Polarity_classA_Negative">Negative</label>
-                  </div>
+                </div>
             
                 <div class="row">
                     <label for="Polarity_classB" class="form-label Polarity_classB_header">Polarity_classB</label>
@@ -117,72 +195,6 @@
                     </div>
                 </div>
             </div>            
-        </form>
-        <!--<div class="annotation">
-            <form class="annotationform">                                
-            </form>
-        </div>        -->
-        <div class="tablecontrols"></div>
-        <div class="tablecontents">
-            <table class="resulttable">
-                <thead>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
-        <div class="tablecontrols"></div>
-
-        <!-- USER window and tables -->
-        <div class="usermetaform">       
-            <form class="row g-3 needs-validation" id = "userFormId" style="margin-top: 50px;" novalidate>
-                <!-- div class="row"> -->
-                    <!--<div class="col-md-2 col-form-label"> -->
-                    <div class="col-md-6">   
-                        <label for="user_name" class="form-label">USER NAME</label>
-                    </div>
-                    <div class="col-sm">
-                        <input class="form-control" id="user_name" type="text" required>
-                        <div class="valid-feedback">
-                            Ok!
-                        </div>
-                        <div class="invalid-feedback">
-                            Please enter username.
-                        </div>
-                    </div> 
-                <!-- </div> -->
-                <!-- <div class="row"> -->
-                    <!-- <div class="col-md-2 col-form-label"> -->
-                    <div class="col-md-6">                        
-                        <label for="user_password" class="form-label">USER PASSWORD</label>
-                    </div>
-                    <div class="col-sm">
-                        <input class="form-control" id="user_password" type="password" required>                            
-                    </div>
-                <!-- </div> -->
-                <div id="userLoginButtonContainerId" class="container" style="margin-top: 20px;">
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end" id="formButtonGroupId">
-                        <button class="btn btn-danger" id="deleteUserBtnId" type="button" style="display:none">Delete user</button>
-                        <button class="btn btn-warning me-md-2" id="editUserBtnId" type="button" style="display:none">Edit password</button>
-                        <button class="btn btn-primary me-md-2" id="addUserBtnId" type="submit" style="display:none">Add new user</button>
-                        <button class="btn btn-success me-md-2" id="loginUserBtnId" type="submit" style="display:none">Login user</button>
-                    </div>
-                </div>
-            </form>
-        </div> 
-
-    </div>
-    <div class="form">
-        <form class="imageUploadForm" id="imageUploadFormId">
-            <button class="btn btn-primary me-md-2" type="button" id="uploadFileBtnId" style="display:none">Add new image</button>
-            <input type="file" id="fileElem" accept="image/*" style="display:none">
-            <div class="fileList" id="fileList" style="margin-top: 10px;">
-                <p id="fileInfoId" style="display: none;">No files selected!</p>
-            </div>
-            <div class="d-grid gap-2 d-md-block">
-                <button class="btn btn-secondary" id="cancelUploadBtn" type="button" style="display:none">Cancel</button>
-                <button class="btn btn-primary" id="uploadBtn" type="submit" style="display:none">Upload</button>
-              </div>
         </form>
     </div>
 </body>
