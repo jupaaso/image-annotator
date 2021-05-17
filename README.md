@@ -63,25 +63,35 @@ Populate flask database:
 <li>	 (.venv) C:\image-annotator>flask populate-db
 
 ### Running database tests
-In order to test the database Flask settings need to be completed. Database implementation and population is not needed for these tests. Details about the tests can be found at the comments inside db_test.py. 
+In order to test the database "Flask settings" need to be completed. "Database implementation" and "Database population" is not needed for these tests. Details about the tests can be found at the comments inside db_test.py. 
 Note! As there is another test file in this same folder, the resource_test.py, please rename that temporarily as "resource_test_.py so that only db_test.py file is run by pytest. Pytest command runs all files with file name starting or ending with test word.
 
 Run the database tests inside "tests"-folder with following command:
 <li>  (.venv) C:\image-annotator>cd tests>
 <li>  (.venv) C:\image-annotator\tests>python -m pytest
-<li>                                or python -m pytest -s
+<li>                                or alternatively python -m pytest -s
  
-
-
 ### Running resource tests
-In order to test the resources Flask settings need to be completed. Database implementation and population is not needed for these tests. Details about the tests can be found at the comments inside resource_test.py
+In order to test the resources "Flask settings" need to be completed. "Database implementation" and "Database population" is not needed for these tests. Details about the tests can be found at the comments inside resource_test.py
 
 Run the resource tests inside "tests"-folder with following command:
 <li>  (.venv) C:\image-annotator>cd tests>
 <li>  (.venv) C:\image-annotator\tests>python -m pytest
-<li>                                or python -m pytest -s
+<li>                                or alternatively python -m pytest -s
 
 Note! As there is another test file in this same folder, the db_test.py, please rename that temporarily as "db_test_.py" so that only resource_test.py file is run by pytest. Pytest command runs all files with file name starting or ending with test word.
+
+## Instruction how to use the provided client
+We have prepared a small GUI for the image-annotator API. It runs on web-browser and it's based on HTML, CSS, JavaScript and jQuery. In order to use provided client "Flask settings", "Database implementation" and "Populating database" paragraph commands have to be completed. 
+
+Next, run flask local host at http://localhost:5000/admin/ with following command in image-annotator folder:
+<li>  (.venv) C:\image-annotator>flask run
+ 
+Keep command prompt open, and open web-browser. Open http://localhost:5000/admin/ URL. This is your gate to image-annotator API. Wih help of the our client you can import images into database and annotate saved images, and keep all those saved and available in the database.
+
+Open Image Annotator API at local host window by command:
+<li>	 http://localhost:5000/admin/ 
+
 
 ### LOPPU ON IHAN TURHAA TÄLLÄ HETKELLÄ
 
