@@ -21,7 +21,7 @@ Proceed into image-annotator folder
 <li>   C:\image-annotator> </code>
   
 Next in your command prompt (cmd) create virtual environment on image-annotator folder. In the command prompt give following command: 
-<li>  C:\image-annotator\python -m venv .venv </li>
+<li>  C:\image-annotator\python -m venv .venv 
 
 Next activate created python virtual environment (on cmd):
 <li>  C:\image-annotator>cd C:\ImageAnnotator\.venv\Scripts </li>
@@ -39,7 +39,7 @@ Install the required libraries in your virtual environment in order to use this 
 Install project with pip in editable (-e) mode with dot (.) 
 <li>	 (.venv) C:\image-annotator>pip install -e .
 
-There are many python libraries that is needed to be installed. The "requirements.txt" file on C:\image-annotator folder shows all those. These are all necessary to be installed in order ti use our code. 
+There are many python libraries that is needed to be installed. The "requirements.txt" file on C:\image-annotator folder shows all those. These are all necessary to be installed in order to use our code. 
 
 ## Running the tests
 Some data is needed to be able to run the tests. Pytest is used to test both the database and resources. Pytest is already installed, as it is part of "requirements.txt" library list.
@@ -64,7 +64,8 @@ Populate flask database:
 
 ### Running database tests
 In order to test the database "Flask settings" need to be completed. "Database implementation" and "Database population" is not needed for these tests. Details about the tests can be found at the comments inside db_test.py. 
-Note! As there is another test file in this same folder, the resource_test.py, please rename that temporarily as "resource_test_.py so that only db_test.py file is run by pytest. Pytest command runs all files with file name starting or ending with test word.
+
+Note! As there is another test file in this same folder, the resource_test.py, please rename that temporarily as "resource_test_.py so that only db_test.py file is run by pytest. Pytest command runs all files in folder with file name starting or ending with test word.
 
 Run the database tests inside "tests"-folder with following command:
 <li>  (.venv) C:\image-annotator>cd tests>
@@ -76,10 +77,10 @@ In order to test the resources "Flask settings" need to be completed. "Database 
 
 Run the resource tests inside "tests"-folder with following command:
 <li>  (.venv) C:\image-annotator>cd tests>
-<li>  (.venv) C:\image-annotator\tests>python -m pytest
-<li>                                or alternatively python -m pytest -s
+<li>  (.venv) C:\image-annotator\tests>python -m pytes
+                    or alternatively python -m pytest -s
 
-Note! As there is another test file in this same folder, the db_test.py, please rename that temporarily as "db_test_.py" so that only resource_test.py file is run by pytest. Pytest command runs all files with file name starting or ending with test word.
+Note! As there is another test file in this same folder, the db_test.py, please rename that temporarily as "db_test_.py" so that only resource_test.py file is run by pytest. Pytest command runs all files in folder with file name starting or ending with test word.
 
 ## Instruction how to use the provided client
 We have prepared a small GUI for the image-annotator API. It runs on web-browser and it's based on HTML, CSS, JavaScript and jQuery. In order to use provided client "Flask settings", "Database implementation" and "Populating database" paragraph commands have to be completed. 
