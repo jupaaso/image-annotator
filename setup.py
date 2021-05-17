@@ -14,6 +14,7 @@
 # In order for them to be included they also need to be listed in a file called MANIFEST.in.
 
 # requirements.txt file can be created with command
+# (.venv) C:\PWPproject\ImageAnnotator>pip freeze
 # (.venv) C:\PWPproject\ImageAnnotator>pip freeze > requirements.txt
 
 from setuptools import find_packages, setup
@@ -46,3 +47,25 @@ setup(
         "Werkzeug"
     ]
 )
+
+"""
+"alembic",
+"aniso8601",
+"atomicwrites",
+"attrs",
+"colorama",
+"coverage",
+"greenlet",
+"iniconfig",
+"Mako",
+"packaging",
+"pluggy",
+"py",
+"pyparsing",
+"pyrsistent",
+"python-dateutil",
+"python-editor",
+"pytz",
+"six",
+"toml"
+"""

@@ -526,6 +526,7 @@ def create_error_response(status_code, title, message=None):
 
 def set_photo_meta_data_to_dict(filename, is_private):
     # default publish_date is None - beacuse it is none for social media images
+    print("IS_PRIVATE : ", is_private)
     publish_date = None
     # get exifdata only from private photo items
     if is_private:

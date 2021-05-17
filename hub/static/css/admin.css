@@ -17,7 +17,6 @@ form label:first-letter{
 
 /* Don't touch above ----------------------------------- */
 
-
 /* Split the login screen in half */
 
 .usermetaform {
@@ -29,7 +28,6 @@ form label:first-letter{
     overflow-x: hidden;
     padding-top: 20px;
 }
-
 
 /* Control the left side */
 .left {

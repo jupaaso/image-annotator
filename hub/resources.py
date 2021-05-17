@@ -54,11 +54,10 @@ def create_image_item_from_request(req_content, image_object, upload_folder):
     # collect directory path
     basedir = os.path.abspath(os.path.dirname(__file__))             
     # does NOT return error response if the filename exists already
-    # --- but return as rename the file by adding a datetime to its name ---
-    db_photo_name_test = ImageContent.query.filter_by(name=image_object.filename).first()
-    
+    # --- but return as rename the file by adding a datetime to its name ---        
+    db_photo_name_test = ImageContent.query.filter_by(name=image_object.filename).first()    
     if db_photo_name_test is not None:
-
+        
         # datetime according to milliseconds - no
         time_now  = datetime.now().strftime('%m_%d_%Y_%H_%M_%S_%f')
 
@@ -77,7 +76,7 @@ def create_image_item_from_request(req_content, image_object, upload_folder):
     # NOTE paikka kuvien talletukseen, joka talletetaan tietokantaan ja palautetana clientille
     item_location = upload_folder + image_object.filename
 
-    # NOTE luodaan photon metadata ilman lokaatiotietoa dictionaryyn
+    # NOTE luodaan photon metadata ilman lokaatiotietoa dictionaryyn        
     item_dict = hub.utils.set_photo_meta_data_to_dict(upload, req_content["is_private"])
 
     # NOTE luodaan ImageContent olio, jossa käytetään photolocation tietoa, joka on clientille käytettävissä
@@ -208,9 +207,10 @@ class UserItem(Resource):
 
     def put(self, user_name):
         """
-        PUT method edits a user
+        PUT method edits user_password (and/or other user specific data)
         """
         db_user = User.query.filter_by(user_name=user_name).first()
+        
         if db_user is None:
             return create_error_response(404, "Not found", "No user was found with name {}".format(user_name))
         if not request.json:
@@ -219,14 +219,9 @@ class UserItem(Resource):
             validate(request.json, HubBuilder.user_schema())
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
-        
+                
         db_user.user_password = request.json["user_password"]
-
-        try:
-            db.session.commit()
-        except IntegrityError:
-            return create_error_response(409, "Username already exists", "User with name '{}' already exists in database. Choose new username.".format(request.json["user_name"]))
-
+        db.session.commit()
         return Response(status=204)
 
     def delete(self, user_name):
@@ -319,8 +314,7 @@ class PhotoCollection(Resource):
         
         # check if the post request has the file part
         if 'image' not in request.files:
-            return create_error_response(400, "No file provided", "No image file found in the request")
-
+            return create_error_response(400, "No file provided", "No image file found in the request")        
         # check if there's a file in the request
         image = request.files['image']
         if image.filename == '':
@@ -702,13 +696,16 @@ class ImageCollection(Resource):
 
         # check if there's a file in the request
         image = request.files['image']
-        if image.filename == '':
-            return create_error_response(400, "No file provided", "No image file found in the request")
+        if image:            
+            if image.filename == '':
+                return create_error_response(400, "No file provided", "No image file found in the request")
         
-        if image and allowed_file(image.filename):            
+            #if image and allowed_file(image.filename):            
+        
             try:
+                print("TRYING TO FIND " + image.filename)
                 imageUpload = create_image_item_from_request(req_content, image, UPLOAD_FOLDER_IMAGES)
-                print('PRINT image-item name and ID :  ', imageUpload.name)
+                print("PRINT image-item name and ID :  ", imageUpload.name)
 
             except Exception as e:
                 create_error_response(500, "Failed to save the file", str(e) + " Failed to save file '{}'".format(image.filename))
@@ -725,6 +722,7 @@ class ImageCollection(Resource):
                 # query photo item by name
                 db_image = ImageContent.query.filter_by(name=imageUpload.name).first()
                 print('PRINT db_image ID :  ' + str(db_image.id), file=sys.stderr)
+                return Response(status=201, headers={"Location": url_for("api.imageitem", id=db_image.id)})
 
             # return error response if the file exists already
             except IntegrityError:
@@ -739,11 +737,13 @@ class ImageCollection(Resource):
             # returns api/images/<id>/ - TOIMII - vastaus on 201
             
             # http://localhost:5000/api/images/21/ 
-            return Response(status=201, headers={"Location": url_for("api.imageitem", id=db_image.id)})
+            #return Response(status=201, headers={"Location": url_for("api.imageitem", id=db_image.id)})
 
             # http://localhost:5000/api/images/?id=22
             #return Response(status=201, headers={"Location": url_for("api.imagecollection", id=db_image.id)})
             # ------------------------------------------------------------
+        else:
+            return create_error_response(400, "No file provided", "No image file found in the request")
 
 
 class ImageItem(Resource):
