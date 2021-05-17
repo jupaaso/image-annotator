@@ -25,33 +25,50 @@ Next in your command prompt (cmd) create virtual environment on image-annotator 
 
 Next activate created python virtual environment (on cmd):
 <li>  C:\image-annotator>cd C:\ImageAnnotator\.venv\Scripts </li>
-<li> 	C:\image-annotator\.venv\Scripts>activate.bat </li>
-   
+<li> 	C:\image-annotator\.venv\Scripts>activate.bat
+
 You see the name of your virtual environment ".venv" in front of your command prompt now. Go back to image-annotator folder: (provide 'cd ..' on cmd twice)
 <li>  (.venv) C:\image-annotator\.venv\Scripts>cd .. </li>
-<li>	(.venv) C:\image-annotator\.venv>cd .. </li>
+<li>	 (.venv) C:\image-annotator\.venv>cd .. </li>
 <li>  (.venv) C:\image-annotator> </li>
 
 ### Installing required python libraries
 Install the required libraries in your virtual environment in order to use this project code. Use following command in cmd:
-<li>	(.venv) C:\image-annotator>pip install -r requirements.txt </li>
+<li>	 (.venv) C:\image-annotator>pip install -r requirements.txt
 
 Install project with pip in editable (-e) mode with dot (.) 
-<li>	(.venv) C:\image-annotator>pip install -e . </li>
+<li>	 (.venv) C:\image-annotator>pip install -e .
 
 There are many python libraries that is needed to be installed. The "requirements.txt" file on C:\image-annotator folder shows all those. These are all necessary to be installed in order ti use our code. 
 
+## Running the tests
+Some data is needed to be ablöe to run the tests.
 
 ### Data
 Data of memes and images was created by scraping Google image search with Beautiful Soup python library (https://pypi.org/project/beautifulsoup4/). Beautiful Soup library can be installed with ‘pip install beautifulsoup4’, if needed. Web scraping source code ‘WebScrapGoogle_images.py’ was used to collect raw data from web. Small test data folder ‘Data/ImageTest’ includes some original images scrapped from web. Private photographs were used to create ‘Data/PhotoTest’ -folder. ImageTest and PhotoTest are available at Data -folder.
 
-## Database implementation
-Populated database of Image Annotator can be created with test code ‘test_APIdb_populate4.py’. Example of created database ‘imageAnno_example1.db’ is available at Database -folder.
+### Flask settings
+Set Flask configuration setting class as 'development' or 'production' or 'default' or 'testing'
+<li>  (.venv) C:\image-annotator>set FLASK_ENV=development
 
-### Set up empty database
-The ‘imageAnnoAPI.py’ -file includes all models of ‘imageAnno.db’ SQLite database. Database can be created in python virtual environment (defined above) for example by command – ‘python imageAnnoAPI.py’. Image Annotator database ‘imageAnno’ is created on the same path and folder with ‘imageAnnoAPI.py’ -file which creates the database. Size of created empty 'imageAnno.db' database is about 24 kt.
+In order to start the server set the package name 'hub' and run Flask in the hub folder:
+<li>  (.venv) C:\image-annotator>set FLASK_APP=hub
+
+###Database implementation
+Init flask database basedir hub:
+<li>  (.venv) C:\image-annotator>flask init-db
 
 ### Populating database
+Populate flask database:
+<li>	 (.venv) C:\image-annotator>flask populate-db
+
+### Running database tests
+
+
+### Running resource tests
+
+### LOPPU ON IHAN TURHAA TÄLLÄ HETKELLÄ
+
 During development and testing phases database creation, population and query has been tested with a variety of testing codes. In order to populate database the "imageAnnoAPI.py" -file including database models, ImageTest and PhotoTest folders, and the population test code (for example ‘test_APIdb_populate4.py’) needs to be located in the same path and folder. 
 
 The test code ‘test_APIdb_populate4.py’ creates and populates all database models of Image Annotator.
