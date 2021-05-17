@@ -70,7 +70,7 @@ Note! As there is another test file in this same folder, the resource_test.py, p
 Run the database tests inside "tests"-folder with following command:
 <li>  (.venv) C:\image-annotator>cd tests>
 <li>  (.venv) C:\image-annotator\tests>python -m pytest
-<li>                                or alternatively python -m pytest -s
+<li>                  or alternatively python -m pytest -s
  
 ### Running resource tests
 In order to test the resources "Flask settings" need to be completed. "Database implementation" and "Database population" is not needed for these tests. Details about the tests can be found at the comments inside resource_test.py
@@ -78,7 +78,7 @@ In order to test the resources "Flask settings" need to be completed. "Database 
 Run the resource tests inside "tests"-folder with following command:
 <li>  (.venv) C:\image-annotator>cd tests>
 <li>  (.venv) C:\image-annotator\tests>python -m pytes
-                    or alternatively python -m pytest -s
+<li>                  or alternatively python -m pytest -s
 
 Note! As there is another test file in this same folder, the db_test.py, please rename that temporarily as "db_test_.py" so that only resource_test.py file is run by pytest. Pytest command runs all files in folder with file name starting or ending with test word.
 
@@ -88,43 +88,8 @@ We have prepared a small GUI for the image-annotator API. It runs on web-browser
 Next, run flask local host at http://localhost:5000/admin/ with following command in image-annotator folder:
 <li>  (.venv) C:\image-annotator>flask run
  
-Keep command prompt open, and open web-browser. Open http://localhost:5000/admin/ URL. This is your gate to image-annotator API. Wih help of the our client you can import images into database and annotate saved images, and keep all those saved and available in the database.
+Keep command prompt open, and open web-browser. Open http://localhost:5000/admin/ URL. This is your gate to image-annotator API. With help of the our client you can import images into database and annotate saved images, and keep all those saved and available in the database. API and database create an environment for multiple users.
 
 Open Image Annotator API at local host window by command:
 <li>	 http://localhost:5000/admin/ 
-
-
-### LOPPU ON IHAN TURHAA TÄLLÄ HETKELLÄ
-
-During development and testing phases database creation, population and query has been tested with a variety of testing codes. In order to populate database the "imageAnnoAPI.py" -file including database models, ImageTest and PhotoTest folders, and the population test code (for example ‘test_APIdb_populate4.py’) needs to be located in the same path and folder. 
-
-The test code ‘test_APIdb_populate4.py’ creates and populates all database models of Image Annotator.
-
-Activate python virtual environment before test code execution. Run the ‘test_APIdb_populate4.py’ with command  ‘python test_APIdb_populate4.py’. The test code will create the SQLite database and populate few instances into every data table with pre-set parameters. The test code copies images, image data, and ascii data into database. 
-
-Database is created into project folder and named as "imageAnno.db". Database population test codes are available at ‘Database_test_code’ -folder:
-<li> test_APIdb_populate1.py </li>
-<li> test_APIdb_populate2.py </li>
-<li> test_APIdb_populate3.py </li>
-<li> test_APIdb_populate4.py </li>
-
-## Testing during SW development phases
-During API SW development cycles the code was tested with Visual Studio Code (VSC) debugger, Postman, and DB Browser.
-
-VSC debugger utilized Python debugging support (Python extension for Visual Studio Code, GitHub homepage: https://github.com/Microsoft/vscode-python ), and required defined launch.json -file in order to function correctly. Utilized launch.json and settings.json -files are available at source_control -folder.
-
-During API SW development steps Postman API Client (Google Chrome app) was used in testing to send REST Post request queries, and to read their responses within Postman. (Link to Postman website: https://www.postman.com/ )
-
-DB Browser was used to check created and tested databases (DB Browser for SQLite, link to website: https://sqlitebrowser.org/ ). DB Browser provides possibility to execute for example simple integrity and foreign key checking. Created databases were check occasionally during API SW development steps.
-
-## Database testing
-
-... coming as soon as possible...
-
-Run the codes defined below to test the database. Test codes are available at ‘Database_test_code’ -folder.
-<li> test_APIdb_populate1.py </li>
-<li> test_APIdb_populate2.py </li>
-<li> test_APIdb_populate3.py </li>
-<li> test_APIdb_populate4.py </li>
-<li> test_APIdb_crudUser1.py </li>
 
