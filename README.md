@@ -11,17 +11,14 @@ It is recommended to use virtual environment for using and testing the code. Usa
 
 ### Setting up virtual environment
 Open command prompt (cmd) and proceed to C root folder. 
-<pre>
-   <code>   C:\> </code>
-</pre>
+<li>   C:\> </li>
+
 Then clone image-annotator project into your computer using following command. The command will create folder C:\image-annotator. 
 <li>   C:\>git clone https://github.com/jupaaso/image-annotator.git
  
 Proceed into image-annotator folder
-<pre>
-   <code>   C:\> cd image-annotator
-   <code>   C:\image-annotator> </code>
-´</pre>
+<li>   C:\> cd image-annotator
+<li>   C:\image-annotator> </code>
   
 Next in your command prompt (cmd) create virtual environment on image-annotator folder. In the command prompt give following command: 
 <li>  C:\image-annotator\python -m venv .venv </li>
