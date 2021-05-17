@@ -10,50 +10,40 @@ __Remember to include all required documentation and HOWTOs, including how to cr
 It is recommended to use virtual environment for using and testing the code. Usage of Python 3.7 or newer version is required. Use "pip install" to install virtual environment packages.
 
 ### Setting up virtual environment
-In order to create virtual environment, first create a folder in your computer where you want to install the virtual environment. For example on C:\ create ImageAnnotator folder
+Open command prompt (cmd) and proceed to C root folder. 
+<li>   C:\> </li>
 
-<li>   C:\ImageAnnotator>
-
-Next in your command prompt (cmd) create virtual environment on ImageAnnotator folder. In the command prompt give following command (either one): 
-
-<li>  C:\ImageAnnotator\python -m venv .venv </li>
+Then clone image-annotator project into your computer using following command. The command will create folder C:\image-annotator. 
+<li>   C:\>git clone https://github.com/jupaaso/image-annotator.git
+ 
+Proceed into image-annotator folder
+<li>   C:\> cd image-annotator
+<li>   C:\image-annotator>
+  
+Next in your command prompt (cmd) create virtual environment on image-annotator folder. In the command prompt give following command: 
+<li>  C:\image-annotator\python -m venv .venv </li>
 
 Next activate created python virtual environment (on cmd):
-
-<li>  C:\ImageAnnotator>cd C:\ImageAnnotator\.venv\Scripts </li>
-<li> 	C:\ImageAnnotator\.venv\Scripts>activate.bat </li>
+<li>  C:\image-annotator>cd C:\ImageAnnotator\.venv\Scripts </li>
+<li> 	C:\image-annotator\.venv\Scripts>activate.bat </li>
    
-You see the name of your virtual environment ".venv" in front of your command prompt now. Go back to ImageAnnotator folder: (provide 'cd ..' on cmd twice)
-    	(.venv) C:\ImageAnnotator>
+You see the name of your virtual environment ".venv" in front of your command prompt now. Go back to image-annotator folder: (provide 'cd ..' on cmd twice)
+<li>  (.venv) C:\image-annotator\.venv\Scripts>cd .. </li>
+<li>	(.venv) C:\image-annotator\.venv>cd .. </li>
+<li>  (.venv) C:\image-annotator> </li>
 
-### Installing project
+### Installing required python libraries
+Install the required libraries in your virtual environment in order to use this project code. Use following command in cmd:
+<li>	(.venv) C:\image-annotator>pip install -r requirements.txt </li>
 
-Download, open and copy files of image-annotator-master ZIP folder (from GitHub) to ImageAnnotator folder.
+Install project with pip in editable (-e) mode with dot (.) 
+<li>	(.venv) C:\image-annotator>pip install -e . </li>
 
-Step into terminal command line and install necessary packages for the virtualenvironment using these commands:
+There are many python libraries that is needed to be installed. The "requirements.txt" file on C:\image-annotator folder shows all those. These are all necessary to be installed in order ti use our code. 
 
-<li>  pip install Flask</li>
-<li>  pip install pysqlite3</li>
-<li>  pip install flask_sqlalchemy</li>
 
-### Installing required libraries
-Note! When you later run the code, there may be need to install some other missing package. You can install missing packages with pip install command inside the same virtual environment terminal when (.venv) is at the beginning of the command line. 
-
-Next check "launch.jason" file that it has right content. File is in sw_code folder. Correct location for this file in in ".vscode" folder.
-
-### requirements.txt with dependencies
-Image Annotator is created on python. The "requirements.txt" file is availabe from source_code folder.
-Inside virtual environment there are following libraries
-<li> click </li>
-<li> Flask-SQLAlchemy </li>
-<li> itsdangerous </li>
-<li> Jinja2 </li>
-<li> Markupsafe </li>
-<li> SQLAlchemy </li>
-<li> Werkzeug </li>
-
-## Data
-Data of memes and images was created by scraping Google image search with Beautiful Soup python library (https://pypi.org/project/beautifulsoup4/). Beautiful Soup library can be installed with ‘pip install beautifulsoup4’, if needed. Web scraping source code ‘WebScrapGoogle_images.py’ was used to collect raw data from web. Small test data folder ‘ImageTest’ includes some original images scrapped from web. Private photographs were used to create ‘PhotoTest’ -folder. ImageTest and PhotoTest are available at Data -folder.
+### Data
+Data of memes and images was created by scraping Google image search with Beautiful Soup python library (https://pypi.org/project/beautifulsoup4/). Beautiful Soup library can be installed with ‘pip install beautifulsoup4’, if needed. Web scraping source code ‘WebScrapGoogle_images.py’ was used to collect raw data from web. Small test data folder ‘Data/ImageTest’ includes some original images scrapped from web. Private photographs were used to create ‘Data/PhotoTest’ -folder. ImageTest and PhotoTest are available at Data -folder.
 
 ## Database implementation
 Populated database of Image Annotator can be created with test code ‘test_APIdb_populate4.py’. Example of created database ‘imageAnno_example1.db’ is available at Database -folder.
