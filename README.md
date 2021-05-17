@@ -11,8 +11,9 @@ It is recommended to use virtual environment for using and testing the code. Usa
 
 ### Setting up virtual environment
 Open command prompt (cmd) and proceed to C root folder. 
+<pre>
 <code>   C:\> </code>
-
+</pre>
 Then clone image-annotator project into your computer using following command. The command will create folder C:\image-annotator. 
 <li>   C:\>git clone https://github.com/jupaaso/image-annotator.git
  
