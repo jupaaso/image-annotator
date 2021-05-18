@@ -84,19 +84,16 @@ def client():
 def _getImageDatas(upload):
     image_list = []
     cwd = os.getcwd()
-    parent_folder = os.path.dirname(cwd)    # get parent directory from tests = "..\\ImageAnnotator"
+    # get parent directory from tests = "..\\ImageAnnotator"
+    parent_folder = os.path.dirname(cwd)
     folder = '\\Data\\ImageTest\\'
     source_images_folder = parent_folder + folder
-    #print("  _get: source_images_folder:", source_images_folder)
     
     for filename in glob.glob(source_images_folder + '*.jpg'):
-        #print("\n Print image data filename:  ", filename)
-        #filedate = os.path.getctime(filename)
-
+        
         with open(filename, "rb") as f:
             timestamp = os.path.getctime(filename)
             datetime_str = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
-
             thisdict = {
                 "name": os.path.basename(filename),
                 "publish_date": datetime.fromisoformat(datetime_str),
@@ -105,7 +102,6 @@ def _getImageDatas(upload):
                 "date": datetime.fromisoformat(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             }
         image_list.append(thisdict)
-    #print("_get: image_list:", image_list)
     return image_list
 
 # -------------------------------------------------------------------------------
@@ -116,20 +112,18 @@ def _getImageDatas(upload):
 def _getPhotoDatas(upload):
     photo_list = []
     cwd = os.getcwd()
-    parent_folder = os.path.dirname(cwd)    # get parent directory from tests = "..\\ImageAnnotator"
+    # get parent directory from tests = "..\\ImageAnnotator"
+    parent_folder = os.path.dirname(cwd)
     folder = '\\Data\\PhotoTest\\'
     source_photos_folder = parent_folder + folder
-    #print("_get..: source_photos_folder:", source_photos_folder)
+    
+    # NOTE!!! remember to set photo location, this is done differently in tests (test image folder -> static/photos)
+    # in development state image is saved from request (request.image -> static/photos)
 
-    #print("for looppiin")
     for filename in glob.glob(source_photos_folder + '*.jpg'):
         meta_data_dict = set_photo_meta_data_to_dict(filename, True)
-        # NOTE!!!
-        # remember to set photo location, this is done differently in tests (test image folder -> static/photos)
-        # in development state image is saved from request (request.image -> static/photos)
         meta_data_dict["location"] = hub.models.save_to_upload(upload, source_photos_folder, os.path.basename(filename))
         photo_list.append(meta_data_dict)
-    #print("_get: photo_list:", photo_list)
     return photo_list
 
 # -----------------------------------------------------------
@@ -255,61 +249,102 @@ def _get_user_json_newUser():
         "user_password": "test1234"
     }      
 
-def _get_photo_json():    
-    request = {
-        "user_name": "Meria Developer",
-        "is_private": True
-    }
+def _get_image_json():
     # according to helpful tip from stackoverflow
     # https://stackoverflow.com/questions/35684436/testing-file-uploads-in-flask
     # for testing purposis
     # create a dummy file called test.jpg and fill it with content (in binary) abcdef
+    request = {
+        "user_name": "Matti Meikäläinen",
+        "is_private": False
+    }
     content = {
         'request': json.dumps(request),        
         'image': (BytesIO(b"abcdef"), 'test.jpg')
     }
     return content
 
-def _get_photoannotation_json():    
-    # return  1
+
+def _get_image_json_nofilevalue():
+    request = {
+        "user_name": "Matti Meikäläinen",
+        "is_private": False
+    }
+    content = {
+        'request': json.dumps(request),        
+        'image': ""
+    }
+    return content
+
+
+def _get_image_json_nofileitem():
+    request = {
+        "user_name": "Matti Meikäläinen",
+        "is_private": False
+    }
+    content = {
+        'request': json.dumps(request)
+    }
+    return content
+
+
+def _get_imageannotation_json():
+    return  {
+        "image_id": 5,
+        "user_id": 3,
+        "meme_class": True,
+        "HS_class": False,
+        "text_class": True,
+        "polarity_classA": 3,
+        "polarity_classB": -3,
+        "HS_strength": -1,
+        "HS_category": "joke",
+        "text_text": "Tähän jotain suomenkielistä tekstiä ;-)))) !!",
+        "text_language": "finnish"
+    }
+
+def _get_imageannotation_json_newAnno():
+    return  {
+        "id": 1,
+        "image_id": 5,
+        "user_id": 3,
+        "meme_class": True,
+        "HS_class": True,
+        "text_class": True,
+        "polarity_classA": 2,
+        "polarity_classB": -2,
+        "HS_strength": -2,
+        "HS_category": "bully",
+        "text_text": "lisää tekstiä",
+        "text_language": "finnish"
+    }
+
+def _get_photo_json():
+    # according to helpful tip from stackoverflow
+    # https://stackoverflow.com/questions/35684436/testing-file-uploads-in-flask
+    # for testing purposis
+    # create a dummy file called test.jpg and fill it with content (in binary) abcdef
+    request = {
+        "user_name": "Meria Developer",
+        "is_private": True
+    }
+    content = {
+        'request': json.dumps(request),        
+        'image': (BytesIO(b"hijklm"), 'test.jpg')
+    }
+    return content
+
+def _get_photoannotation_json():
     # Creates a valid photoannotation JSON object to be used for PUT and POST tests.
     return  {	        
-        "photo_id": 4,
-        "user_id": 3,
+        "photo_id": 3,
+        "user_id": 1,
         "persons_class": True,
         "slideshow_class": True,
         "positivity_class": 4,
         "text_free_comment": "Norway on summer 2020",
         "text_persons": "norwegian sheep",
         "text_persons_comment": "Norwegian sheep having a nap on shore"
-    }
-
-def _get_image_json():
-    request = {
-        "user_name": "Matti Meikäläinen",
-        "is_private": False
-    }
-    # according to helpful tip from stackoverflow
-    # https://stackoverflow.com/questions/35684436/testing-file-uploads-in-flask
-    # for testing purposis
-    # create a dummy file called test.jpg and fill it with content (in binary) abcdef
-    content = {
-        'request': json.dumps(request),        
-        'image': (BytesIO(b"abcdef"), 'test.jpg')
-    }
-    return content
-
-def _get_imageannotation_json():
-    return  {
-        "meme_class": True,
-        "HS_class": False,
-        "text_class": True,
-        "polarity_classA": -1,
-        "polarity_classB": -3,
-        "HS_strength": -2,
-        "HS_category": "joke",
-        "text_text": "Tähän jotain suomenkielistä tekstiä ;-)))) !!",
-        "text_language": "finnish"
     }
 
 # -------------------------------------------------------------------------------------
@@ -321,9 +356,7 @@ def _check_namespace(client, response):
     that its "name" attribute is a URL that can be accessed.
     """
     ns_href = response["@namespaces"]["annometa"]["name"]
-    #print("_check_namespace:", ns_href)
     resp = client.get(ns_href)
-    #print("_check_namespace:", resp)
     assert resp.status_code == 200
     
 def _check_control_get_method(ctrl, client, obj):
@@ -332,12 +365,22 @@ def _check_control_get_method(ctrl, client, obj):
     in a collection. Also checks that the URL of the control can be accessed.
     """
     href = obj["@controls"][ctrl]["href"]
-    #print("_check_control_get_method:", href)
     resp = client.get(href)
-    #print("_check_control_get_method:", resp)
     assert resp.status_code == 200
+
+def _check_control_delete_method(ctrl, client, obj):
+    """
+    Checks a DELETE type control from a JSON object be it root document or an
+    item in a collection. Checks the contrl's method in addition to its "href".
+    Also checks that using the control results in the correct status code of 204.
+    """
+    href = obj["@controls"][ctrl]["href"]
+    method = obj["@controls"][ctrl]["method"].lower()
+    assert method == "delete"
+    resp = client.delete(href)
+    assert resp.status_code == 204
     
-def _check_control_post_method(ctrl, client, obj):
+def _check_control_post_method_forUser(ctrl, client, obj):
     """
     Checks a POST type control from a JSON object be it root document or an item
     in a collection. In addition to checking the "href" attribute, also checks
@@ -355,18 +398,10 @@ def _check_control_post_method(ctrl, client, obj):
     assert encoding == "json"
     body = _get_user_json()
     validate(body, schema)
-    #if expect_failure: # KOKEILU JUHAN KESKEN VIELA
-    #    with pytest.raises(ValidationError):
-    #        validate(body, schema)
-    #else: 
-    #    validate(body, schema)
-    #print("_check_control_post_method: href : " + href)
-    #print("_check_control_post_method: body : " + str(body))
     resp = client.post(href, json=body)
     assert resp.status_code == 201
 
-
-def _check_control_put_for_user_method(ctrl, client, obj):
+def _check_control_put_method_forUser(ctrl, client, obj):
     """
     Checks a PUT type control from a JSON object be it root document or an item
     in a collection. In addition to checking the "href" attribute, also checks
@@ -388,29 +423,15 @@ def _check_control_put_for_user_method(ctrl, client, obj):
     resp = client.put(href, json=body)
     assert resp.status_code == 204
 
-def _check_control_delete_method(ctrl, client, obj):
-    """
-    Checks a DELETE type control from a JSON object be it root document or an
-    item in a collection. Checks the contrl's method in addition to its "href".
-    Also checks that using the control results in the correct status code of 204.
-    """
-    href = obj["@controls"][ctrl]["href"]
-    method = obj["@controls"][ctrl]["method"].lower()
-    assert method == "delete"
-    resp = client.delete(href)
-    #print("_check_control_delete_method:", resp)
-    assert resp.status_code == 204
-
-def _check_control_post_for_photo_method(ctrl, client, obj):
+def _check_control_post_method_forImage(ctrl, client, obj):
     """
     Checks a POST type control from a JSON object be it root document or an item
     in a collection. In addition to checking the "href" attribute, also checks
     that method, encoding and schema can be found from the control. Also
-    validates a valid photo against the schema of the control to ensure that
+    validates a valid image against the schema of the control to ensure that
     they match. Finally checks that using the control results in the correct
-    status code of 201.
+    status code of 201 (created).
     """
-    
     ctrl_obj = obj["@controls"][ctrl]
     href = ctrl_obj["href"]
     method = ctrl_obj["method"].lower()
@@ -418,10 +439,52 @@ def _check_control_post_for_photo_method(ctrl, client, obj):
     schema = ctrl_obj["schema"]
     assert method == "post"
     assert encoding == "json"
-    body = _get_photo_json()    
+    body = _get_image_json()    
     resp = client.post(href, data=body, content_type="multipart/form-data")    
-    assert resp.status_code == 200
+    assert resp.status_code == 201
 
+def _check_control_post_method_forImageAnnotation(ctrl, client, obj):
+    """
+    Checks a POST type control from a JSON object be it root document or an item
+    in a collection. In addition to checking the "href" attribute, also checks
+    that method, encoding and schema can be found from the control. Also
+    validates a valid image annotation against the schema of the control to ensure that
+    they match. Finally checks that using the control results in the correct
+    status code of 201 (created).
+    """
+    ctrl_obj = obj["@controls"][ctrl]
+    href = ctrl_obj["href"]
+    method = ctrl_obj["method"].lower()
+    encoding = ctrl_obj["encoding"].lower()
+    schema = ctrl_obj["schema"]
+    assert method == "post"
+    assert encoding == "json"
+    body = _get_imageannotation_json()    
+    validate(body, schema)
+    resp = client.post(href, json=body)
+    assert resp.status_code == 201
+
+def _check_control_put_method_forImageAnnotation(ctrl, client, obj):
+    """
+    Checks a PUT type control from a JSON object be it root document or an item
+    in a collection. In addition to checking the "href" attribute, also checks
+    that method, encoding and schema can be found from the control. Also
+    validates a valid annotation against the schema of the control to ensure that
+    they match. Finally checks that using the control results in the correct
+    status code of 204.
+    """
+    ctrl_obj = obj["@controls"][ctrl]
+    href = ctrl_obj["href"]
+    method = ctrl_obj["method"].lower()
+    encoding = ctrl_obj["encoding"].lower()
+    schema = ctrl_obj["schema"]
+    assert method == "put"
+    assert encoding == "json"
+    body = _get_imageannotation_json_newAnno()
+    body["id"] = obj["id"]
+    validate(body, schema)
+    resp = client.put(href, json=body)
+    assert resp.status_code == 204
 
 # ---------------------------------------------------------------------------------------------
 # USERS
@@ -440,7 +503,7 @@ class TestUserCollection(object):
         
         body = json.loads(resp.data)
         _check_namespace(client, body)
-        _check_control_post_method("annometa:add-user", client, body)
+        _check_control_post_method_forUser("annometa:add-user", client, body)
         
         # 6 users populated to database
         assert len(body["items"]) == 6  
@@ -450,6 +513,7 @@ class TestUserCollection(object):
             _check_control_get_method("profile", client, item)
 
     def test_add_post(self, client):
+        
         valid = _get_user_json()
         
         # test with wrong content type
@@ -525,8 +589,9 @@ class TestUserItem(object):
         _check_namespace(client, body)
         _check_control_get_method("profile", client, body)
         _check_control_get_method("collection", client, body)
-        _check_control_put_for_user_method("edit", client, body)
+        _check_control_put_method_forUser("edit", client, body)
         _check_control_delete_method("annometa:delete", client, body)
+        
         resp = client.get(self.INVALID_URL_1)
         assert resp.status_code == 404
 
@@ -595,7 +660,7 @@ class TestImageCollection(object):
 
         body = json.loads(resp.data)
         _check_namespace(client, body)
-        _check_control_post_for_photo_method("annometa:add-image", client, body)
+        _check_control_post_method_forImage("annometa:add-image", client, body)
 
         assert len(body["items"]) > 0 and len(body["items"]) == 5
         for item in body["items"]:
@@ -615,30 +680,28 @@ class TestImageCollection(object):
         # that leads into the newly created resource.
         
         body = _get_image_json()
-        print("\n # BODY of image post: ", body)
         
         # test with valid and see that it exists
         resp = client.post(self.RESOURCE_URL, data=body, content_type="multipart/form-data")
-        print("\n # LOCATION of image post: ", resp.headers["Location"])
+        #print("\n # LOCATION of image post: ", resp.headers["Location"])
         assert resp.status_code == 201
 
         # test correct location and url
         data_dict = json.loads(client.get(self.RESOURCE_URL).data)
-        print("\n # DATADICT of image post: ", data_dict)
         id = data_dict["items"][-1]["id"]
         assert resp.headers["Location"].endswith(self.RESOURCE_URL + str(id) + "/")
         
         # test correct location with get
         resp = client.get(resp.headers["Location"])
         assert resp.status_code == 200
-        # <Response streamed [200 OK]>
         
         # test with wrong content type (data must be a dictionary with json part and binary part)
         resp = client.post(self.RESOURCE_URL, data=body, content_type="application/json")
         assert resp.status_code == 400
         
-        # remove user_name of request for 400
         body = _get_image_json()
+
+        # remove user_name of request for 400
         req_str = body["request"]
         req_dict = json.loads(req_str)
         # remove user_name field
@@ -646,36 +709,41 @@ class TestImageCollection(object):
         body["request"] = json.dumps(req_dict) 
         resp = client.post(self.RESOURCE_URL, data=body, content_type="multipart/form-data")
         assert resp.status_code == 400
-        # <Response streamed [400 BAD REQUEST]>
-        
-        # ------------------------------------------------------------------
 
-        """
-        HUOM ! virhe resurssitiedostossa !
-
-        # remove user name field of request for 400
         body = _get_image_json()
 
+        # remove user name field of request for 400
         req_string = body["request"]
-        print("\n # REQUEST STRING of image post:  ", req_string)
-        
-        # remove user_name field - req_string = {"is_private": false}
+        # remove user_name field with pop - req_string = {"is_private": false}
         req_dicts = json.loads(req_string)
         req_dicts.pop("user_name")
-        print("\n # REQUEST DICT of image post:  ", req_dicts)
-
-        # REQUEST DICT of image post:   {'user_name': 'Matti Meikäläinen', 'is_private': False}
-        # remove user_name field - req_dicts = {'is_private': False}
-
-        body["request"] = json.dumps(req_dicts) 
+        body["request"] = json.dumps(req_dicts)
         resp = client.post(self.RESOURCE_URL, data=body, content_type="multipart/form-data")
-        print("\n # print class TestImage - RESOURCE_URL:  ", resp)
-        print("\n # print class TestImage - resp.status_code:  ", resp.status_code)
         assert resp.status_code == 400
-        # <Response streamed [400 BAD REQUEST]>
-        """
+        
+        body = _get_image_json()
 
-        # ---------------------------------------------------------------------
+        # remove 'is_private' flag of request for 400
+        req_string = body["request"]
+        req_dicts = json.loads(req_string)
+        # remove is_private field with pop 
+        req_dicts.pop("is_private")
+        body["request"] = json.dumps(req_dicts)
+        resp = client.post(self.RESOURCE_URL, data=body, content_type="multipart/form-data")
+        assert resp.status_code == 400
+        
+        # remove image file value of request content for 400 (no file exeption)
+        body = _get_image_json_nofilevalue()
+        resp = client.post(self.RESOURCE_URL, data=body, content_type="multipart/form-data")
+        assert resp.status_code == 400
+        
+        # remove image file item of request content for 400 (no file exeption)
+        body = _get_image_json_nofileitem()
+        resp = client.post(self.RESOURCE_URL, data=body, content_type="multipart/form-data")
+        assert resp.status_code == 400
+
+        #print("\n -- # -- print class TestImage - RESOURCE_URL:  ", resp)
+        #print("\n -- # -- print class TestImage - resp.status_code:  ", resp.status_code)
 
 # ---------------------------------------------------------------------------------------------
 
@@ -683,9 +751,10 @@ class TestImageCollection(object):
        
 class TestImageItem(object):
     
-    RESOURCE_URL = "/api/images/3/"
+    RESOURCE_URL_3 = "/api/images/3/"
+    RESOURCE_URL_4 = "/api/images/4/"
     INVALID_URL = "/api/images/x/"
-    MODIFIED_URL = "/api/images/30/"
+    UNKNOWN_URL = "/api/images/30/"
     
     def test_get(self, client):
         
@@ -695,30 +764,37 @@ class TestImageItem(object):
         # and the controls work. 
         # Checks that all items of database populuation are present, 
         # and checks that all their controls are present.
-        # Image kuha meemi3.jpg 
-        #print("\n    * * * * DEF TEST GET OLLAAN * * * * \n")
-        resp = client.get(self.RESOURCE_URL)
-        #print("images test_get resp:", resp)
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
-        #print("images test_get body:", body)
 
-        #    mitä tähän merkitään ?       ##############################
-        #print("Test ImageItem - print out of body ", body)
+        # images/3/ --- kuha meemi3.jpg 
+        
+        resp = client.get(self.RESOURCE_URL_3)
+        #print("\n --- image item get RESP:  ", resp)
+        #print("\n --- image item get RESP status_code:  ", resp.status_code)
+        assert resp.status_code == 200
+
+        body = json.loads(resp.data)
+        #print("\n --- image item get body:", body)
+
         assert body["id"] == 3
+        assert body["user_id"] == 3
+        assert body["name"] == 'kuha meemi3.jpg'
+        assert body["publish_date"] == '2021-04-19 10:53:28'
         assert "\\static\\images\\" in body["location"]
         assert body["is_private"] == False
         
-
         _check_namespace(client, body)
         _check_control_get_method("profile", client, body)
         _check_control_get_method("collection", client, body)
-        #_check_control_put_method_image("edit", client, body) # NOT implemented in resource.py
-        _check_control_delete_method("annometa:delete", client, body) # ERRORIA PUKKAA TAMA
+        _check_control_delete_method("annometa:delete", client, body)
+        #_check_control_edit_image_item("edit", client, body) ----------- EI TOIMI --------
+
         resp = client.get(self.INVALID_URL)
         assert resp.status_code == 404
 
-    """      
+        resp = client.get(self.UNKNOWN_URL)
+        assert resp.status_code == 404
+
+
     def test_put(self, client):
         
         # Tests the PUT method. 
@@ -726,37 +802,47 @@ class TestImageItem(object):
         # and also checks that a valid request receives a 204 response. 
         # Also tests that when name is changed, the photo can be found from a its new URI. 
         
-        valid = _get_image_json()
+        request = {
+            "name": "newName.jpg"
+        }
         
         # test with wrong content type
-        resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))  # ERRORIA PUKKAA
+        resp = client.put(self.RESOURCE_URL_3, data=json.dumps(request))
         assert resp.status_code == 415
         
-        resp = client.put(self.INVALID_URL, json=valid)
+        resp = client.put(self.INVALID_URL, json=request)
         assert resp.status_code == 404
         
-        # test with another image's id
-        valid["id"] = 2
-        resp = client.put(self.RESOURCE_URL, json=valid)
+        # test with another image's name
+        duplicate_request = {
+            "name": "kuha meemi1.jpg"
+        }
+        
+        resp = client.put(self.RESOURCE_URL_4, json=duplicate_request)
         assert resp.status_code == 409
         
         # test with valid (only change id)
-        valid["id"] = 1
-        resp = client.put(self.RESOURCE_URL, json=valid)
+        
+        resp = client.put(self.RESOURCE_URL_3, json=request)
         assert resp.status_code == 204
         
         # remove field for 400
-        valid.pop("lammaskuva")     # TASSA KELPAAKO TAMA
-        resp = client.put(self.RESOURCE_URL, json=valid)
+        # try to name to the same as itself and the recently added 
+        resp = client.put(self.RESOURCE_URL_3, json=request)
+        assert resp.status_code == 409
+
+        empty_name_request = {
+            "name": ""
+        }
+        resp = client.put(self.RESOURCE_URL_3, json=empty_name_request)
         assert resp.status_code == 400
         
-        valid = _get_image_json()
-        resp = client.put(self.RESOURCE_URL, json=valid)
-        resp = client.get(self.MODIFIED_URL)
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
-        assert body["lammaskuva"] == valid["lammaskuva"]    # TASSA KELPAAKO TAMA
-    """           
+        empty_name_request = {
+            "" : ""
+        }
+        resp = client.put(self.RESOURCE_URL_3, json=empty_name_request)
+        assert resp.status_code == 400
+
 
     def test_delete(self, client):
         
@@ -765,13 +851,14 @@ class TestImageItem(object):
         # and that trying to GET the photo afterwards results in 404.
         # Also checks that trying to delete a photo that doesn't exist results in 404.
         
-        resp = client.delete(self.RESOURCE_URL)
+        resp = client.delete(self.RESOURCE_URL_3)
         assert resp.status_code == 204
-        resp = client.get(self.RESOURCE_URL)
+        resp = client.get(self.RESOURCE_URL_3)
         assert resp.status_code == 404
         resp = client.delete(self.INVALID_URL)
         assert resp.status_code == 404
-
+        resp = client.delete(self.UNKNOWN_URL)
+        assert resp.status_code == 404
 
 # ---------------------------------------------------------------------------------------------
 
@@ -784,20 +871,18 @@ class TestImageannotationCollection(object):
     def test_get(self, client):
         
         resp = client.get(self.RESOURCE_URL)
-        #print("\n print class TestImageannotationCollection - RESOURCE_URL:  ", resp)
-        #print("\n print class TestImageannotationCollection - resp.status_code:  ", resp.status_code)
+        #print("\n -- # -- get ImageannotationCollection - RESOURCE_URL:  ", resp)
+        #print("\n -- # -- get ImageannotationCollection - resp.status_code:  ", resp.status_code)
         assert resp.status_code == 200
         
         body = json.loads(resp.data)
-        #print("\n print class TestImageannotationCollection - BODY:  ", body)
+        #print("\n -- # -- get ImageannotationCollection - BODY:  ", body)
         _check_namespace(client, body)
 
-        #_check_control_post_method("annometa:add-imageannotation", client, body) 
-        # JUHA KOMMENTOI EDLLISEN RIVIN KUN SE TEKEE PERSONS CLASS VALIDATION ERRORIN
-        
-        # 1 photoannotation in database
-        #assert len(body["items"]) == 1
-        assert len(body["items"]) > 0
+        _check_control_post_method_forImageAnnotation("annometa:add-imageannotation", client, body)
+
+        # only 1 photoannotation in database
+        assert len(body["items"]) > 0 and len(body["items"]) == 1
     
         for item in body["items"]:
             assert "image_id" in item
@@ -812,173 +897,131 @@ class TestImageannotationCollection(object):
             assert "text_text" in item
             assert "text_language" in item
 
-
-# ---------------------------------------------------------------------------------------------
-# PHOTOS
-# ---------------------------------------------------------------------------------------------
-
-# test Photo and Photo Collection Resources
-
-class TestPhotoCollection(object):
-
-    RESOURCE_URL = "/api/photos/"
-
-    def test_get(self, client):        
-        resp = client.get(self.RESOURCE_URL)
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
-        #print("Test Photocollection Print out of body ", body)
-        _check_namespace(client, body)
-        _check_control_post_for_photo_method("annometa:add-photo", client, body)
-        assert len(body["items"]) > 0
-        for item in body["items"]:
-            assert "id" in item
-            assert "user_id" in item
-            assert "name" in item
-            assert "publish_date" in item
-            assert "location" in item
-            assert "is_private" in item
-            assert "date" in item
-
-    
     def test_post(self, client):
         
         # Tests the POST method. Checks all of the possible error codes, 
         # and also checks that a valid request receives a 201 response with a location header 
         # that leads into the newly created resource.
         
-        body = _get_photo_json()
-
-        # test with valid and see that it exists afterward
-        resp = client.post(self.RESOURCE_URL, data=body, content_type="multipart/form-data")
+        body = _get_imageannotation_json()
+        #print("\n -- # -- post ImageannotationCollection - BODY:  ", body)
         
-        #print("\n print photo resp:  ", resp)
-
+        # test with valid and see that it exists
+        resp = client.post(self.RESOURCE_URL, data=json.dumps(body), content_type="application/json")
+        assert resp.status_code == 201
+        
+        # test correct location and url
         data_dict = json.loads(client.get(self.RESOURCE_URL).data)
         id = data_dict["items"][-1]["id"]
-        #print("\n print photo DATADICT:  ", data_dict)
-
-        # alla oleva testi menee pieleen - antaa vastauksen 200
-        #assert resp.status_code == 201        
+        assert resp.headers["Location"].endswith(self.RESOURCE_URL + str(id) + "/")
         
-        #assert resp.headers["Location"]#.endswith(self.RESOURCE_URL + str(id) + "/") # ei voi tehdä, koska ei ole photoid talletettu Rsponse headeriin
-        # resp = client.get(resp.headers["Location"]) # sama syy
-        # assert resp.status_code == 200 # sama syy
-        # body = json.loads(resp.data) 
-
-        #    mitä tähän merkitään ?       ##############################
-
-        #assert body["id"] == 3
+        # test correct location with get
+        resp = client.get(resp.headers["Location"])
+        assert resp.status_code == 200
         
-                
-        #assert body["location"] == "xxx"
-        #assert body["is_private"] == "xxx xxx"
-        #assert body["date"] == "xxxx"
-
         # test with wrong content type (data must be a dictionary with json part and binary part)
         resp = client.post(self.RESOURCE_URL, data=body, content_type="application/json")
         assert resp.status_code == 400
-        
-        # remove user_name field for 400
-        req_str = body["request"]
-        req_dict = json.loads(req_str)
-        req_dict["user_name"] = ""
-        body["request"] = json.dumps(req_dict)        
-        
-        resp = client.post(self.RESOURCE_URL, data=body, content_type="multipart/form-data")
+
+        valid = _get_imageannotation_json()
+
+        # remove model user_id field for 400
+        valid.pop("user_id")
+        resp = client.post(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 400
+
+        valid = _get_imageannotation_json()
+
+        # remove model image_id field for 400
+        valid.pop("image_id")
+        resp = client.post(self.RESOURCE_URL, json=valid)
+        assert resp.status_code == 400
+
+        body = _get_imageannotation_json()
+
+        # test with wrong content type
+        resp = client.post(self.RESOURCE_URL, data=body, content_type="multipart/form-data")
+        assert resp.status_code == 415
 
 
 # ---------------------------------------------------------------------------------------------
 
-# Test photo item resources
-
-class TestPhotoItem(object):
+# test Imageannotation and Imageannotation Item Resources
+       
+class TestImageannotationItem(object):
     
-    RESOURCE_URL = "/api/photos/9/"
-    INVALID_URL = "/api/photos/x/"
-    MODIFIED_URL = "/api/photos/30/"
+    RESOURCE_URL = "/api/imageannotations/1/"
+    RESOURCE_URL_2 = "/api/imageannotations/2/"
+    INVALID_URL = "/api/imageannotations/x/"
+    UNKNOWN_URL = "/api/imageannotations/30/"
     
     def test_get(self, client):
-        
-        # Tests the GET method. 
-        # Checks that the response status code is 200, 
-        # and then checks that all of the expected attributes and controls are present, 
-        # and the controls work. 
-        # Checks that all items of database populuation are present, 
-        # and checks that all their controls are present.
-        # KUVA NORAJ  20202 tulee 
-        #print("\n    * * * * DEF TEST GET OLLAAN * * * * \n")
-        resp = client.get(self.RESOURCE_URL)
-        #print("photot test_get resp:", resp)
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
-        #print("photot test_get body:", body)
 
-        #    mitä tähän merkitään ?       ##############################
-        #print("Test PhotoItem - print out of body ", body)
-        assert body["id"] == 9  # JUHAN KOMMENTTI halla-aho32.jpg has id=1
-        assert "\\static\\photos\\" in body["location"]
-        assert body["is_private"] == True  # JUHA KOMMENTIKSI KUN TULEE ERROR
+        # /api/imageannotations/1/ --- "kuha meemi1.jpg"
+
+        #body = _get_imageannotation_json()
         
+        resp = client.get(self.RESOURCE_URL)
+        print("\n -- # -- imageannotation get - RESOURCE_URL:  ", resp)
+        print("\n -- # -- imageannotation get - resp.status_code:  ", resp.status_code)
+        assert resp.status_code == 200
+
+        body = json.loads(resp.data)
+        print("\n --- image annotation get body:", body)
+
+        assert body["id"] == 1
+        assert body["image_id"] == 2
+        assert body["user_id"] == 3
+        assert body["meme_class"] == True
+        assert body["HS_class"] == False
+        assert body["text_class"] == True
+        assert body["polarity_classA"] == -1
+        assert body["polarity_classB"] == -3
+        assert body["HS_strength"] == -2
+        assert body["HS_category"] == 'bully'
+        assert body["text_text"] == 'Tähän jotain suomenkielistä tekstiä ;-)))) !!'
+        assert body["text_language"] == 'finnish'
 
         _check_namespace(client, body)
         _check_control_get_method("profile", client, body)
         _check_control_get_method("collection", client, body)
-        #_check_control_put_method_photo("edit", client, body) NOT implemented in resource.py
         _check_control_delete_method("annometa:delete", client, body)
+        #_check_control_put_method_forImageAnnotation("edit", client, body)
+
         resp = client.get(self.INVALID_URL)
         assert resp.status_code == 404
 
-    
-    """
+        resp = client.get(self.UNKNOWN_URL)
+        assert resp.status_code == 404
+
+
     def test_put(self, client):
         
         # Tests the PUT method. 
         # Checks all of the possible error codes, 
         # and also checks that a valid request receives a 204 response. 
-        # Also tests that when name is changed, the photo can be found from a its new URI. 
+        # Also tests that when id is changed, the annotation can be found from a its new URI. 
         
-        valid = _get_photo_json()
+        request = _get_imageannotation_json()
         
         # test with wrong content type
-        print("   Z Z Z Z Z Z Z Z Z Z Z valid:", valid)
-        #print("   Z Z Z Z Z Z Z Z Z Z Z data:", json.dumps(valid))
-        #resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))  # ERRORIA PUKKAA
-        #assert resp.status_code == 415
+        resp = client.put(self.RESOURCE_URL, data=json.dumps(request))
+        assert resp.status_code == 415
         
-        resp = client.put(self.INVALID_URL, json=valid)
+        resp = client.put(self.INVALID_URL, json=request)
         assert resp.status_code == 404
-        
-        # test with another photo's id
-        valid["id"] = 2
-        resp = client.put(self.RESOURCE_URL, json=valid)
-        assert resp.status_code == 409
-        
-        # test with valid (only change id)
-        valid["id"] = 1
-        resp = client.put(self.RESOURCE_URL, json=valid)
+
+        # test with valid (do not change annotation id)
+        resp = client.put(self.RESOURCE_URL, json=request)
         assert resp.status_code == 204
-        
-        # remove field for 400
-        valid.pop("lammaskuva")
-        resp = client.put(self.RESOURCE_URL, json=valid)
-        assert resp.status_code == 400
-        
-        valid = _get_photo_json()
-        resp = client.put(self.RESOURCE_URL, json=valid)
-        resp = client.get(self.MODIFIED_URL)
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
-        assert body["lammaskuva"] == valid["lammaskuva"]
-    """
-    
+
+
     def test_delete(self, client):
         
         # Tests the DELETE method. 
         # Checks that a valid request reveives 204 response, 
-        # and that trying to GET the photo afterwards results in 404.
-        # Also checks that trying to delete a photo that doesn't exist results in 404.
+        # and that trying to GET the annotation afterwards results in 404.
+        # Also checks that trying to delete annotation that doesn't exist results in 404.
         
         resp = client.delete(self.RESOURCE_URL)
         assert resp.status_code == 204
@@ -986,40 +1029,5 @@ class TestPhotoItem(object):
         assert resp.status_code == 404
         resp = client.delete(self.INVALID_URL)
         assert resp.status_code == 404
-
-
-# ---------------------------------------------------------------------------------------------
-
-# test Photoannotation and Photoannotation Collection Resources
-
-class TestPhotoannotationCollection(object):
-
-    RESOURCE_URL = "/api/photoannotations/"
-
-    def test_get(self, client):
-        
-        resp = client.get(self.RESOURCE_URL)
-        #print("\n print class TestPhotoannotationCollection - RESOURCE_URL:  ", resp)
-        #print("\n print class TestPhotoannotationCollection - resp.status_code:  ", resp.status_code)
-        assert resp.status_code == 200
-        
-        body = json.loads(resp.data)
-        #print("\n print class TestPhotoannotationCollection - BODY:  ", body)
-        _check_namespace(client, body)
-        #_check_control_post_method("annometa:add-photoannotation", client, body) 
-        # JUHA KOMMENTOI EDLLISEN RIVIN KUN SE TEKEE PERSONS CLASS VALIDATION ERRORIN
-        
-        # 1 photoannotation in database
-        #assert len(body["items"]) == 1
-        assert len(body["items"]) > 0
-        
-        for item in body["items"]:
-            assert "id" in item
-            assert "photo_id" in item
-            assert "user_id" in item
-            assert "persons_class" in item
-            assert "slideshow_class" in item
-            assert "positivity_class" in item
-            assert "text_free_comment" in item
-            assert "text_persons" in item
-            assert "text_persons_comment" in item
+        resp = client.delete(self.UNKNOWN_URL)
+        assert resp.status_code == 404

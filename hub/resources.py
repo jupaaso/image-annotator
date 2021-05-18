@@ -646,7 +646,6 @@ class ImageCollection(Resource):
                 is_private = image.is_private,
                 date = image.date
             )
-
             item.add_control("self", url_for("api.imageitem", id=image.id))
             item.add_control("profile", IMAGE_PROFILE)
             if image.image_annotations != []:
@@ -659,17 +658,8 @@ class ImageCollection(Resource):
 
     def post(self):
         """
-        POST method adds a new image to collection
-        """
-        # VALIDOINNIT TULEE EHKÄ MÄÄRITTÄÄ ---------------
-        #if not request.json:
-            #return create_error_response(415, "Unsupported media type", "Requests must be JSON")
-        #try:
-        #    validate(request.json, HubBuilder.photo_schema())
-        #except ValidationError as e:
-        #    return create_error_response(400, "Invalid JSON document", str(e))
-        # ------------------------------------------------
-
+        POST method adds a new image to ImageCollection
+        """       
         # req_content changes request form to json
         # exception if something goes wrong
         try:
@@ -680,15 +670,22 @@ class ImageCollection(Resource):
 
         # request content = req_content - includes user and private flag
         # user must be provided for photos / images
-        if req_content["user_name"] == "" or req_content["user_name"] == None:
+        if "user_name" in req_content:
+            if req_content["user_name"] == "" or req_content["user_name"] == None:
+                return create_error_response(400, "Invalid JSON document", "No user provided")
+        else:
             return create_error_response(400, "Invalid JSON document", "No user provided")
-
-        print('Post currentUser RECEIVED : ' + str(req_content["user_name"]), file=sys.stderr)
         
+        # is_private must be provided for photos / images
+        if "is_private" in req_content:
+            if req_content["is_private"] == "" or req_content["is_private"] == None:
+                return create_error_response(400, "Invalid JSON document", "No privacy flag provided")
+        else:
+            return create_error_response(400, "Invalid JSON document", "No privacy provided")
+
         # query current user from database
         currentUser = User.query.filter_by(user_name=req_content["user_name"]).first()        
-        # print out queried current user
-        print('Query db currentUser : ' + str(currentUser.user_name), file=sys.stderr)
+        # print('Query db currentUser : ' + str(currentUser.user_name), file=sys.stderr)
         
         # check if the post request has the file part
         if 'image' not in request.files:
@@ -699,29 +696,21 @@ class ImageCollection(Resource):
         if image:            
             if image.filename == '':
                 return create_error_response(400, "No file provided", "No image file found in the request")
-        
-            #if image and allowed_file(image.filename):            
-        
-            try:
-                print("TRYING TO FIND " + image.filename)
+            try:                
                 imageUpload = create_image_item_from_request(req_content, image, UPLOAD_FOLDER_IMAGES)
-                print("PRINT image-item name and ID :  ", imageUpload.name)
-
             except Exception as e:
                 create_error_response(500, "Failed to save the file", str(e) + " Failed to save file '{}'".format(image.filename))
 
-            #db_image = None
-
             try:
-                print("Image publish date", imageUpload.publish_date)
-                print("Image upload date", imageUpload.date)
-                
+                #print("Image publish date", imageUpload.publish_date)
+                #print("Image upload date", imageUpload.date)
+
                 currentUser.image_user.append(imageUpload)
                 db.session.commit()
 
                 # query photo item by name
                 db_image = ImageContent.query.filter_by(name=imageUpload.name).first()
-                print('PRINT db_image ID :  ' + str(db_image.id), file=sys.stderr)
+                #print('PRINT db_image ID :  ' + str(db_image.id), file=sys.stderr)
                 return Response(status=201, headers={"Location": url_for("api.imageitem", id=db_image.id)})
 
             # return error response if the file exists already
@@ -784,37 +773,31 @@ class ImageItem(Resource):
         # definition default=str below because of datetime objects
         return Response(json.dumps(body, default=str), status=200, mimetype=MASON)
 
-
     def put(self, id):
         """
         PUT method edits one single image 
         """
-        db_imageid = Image.query.filter_by(id=id).first()
+        db_imageid = ImageContent.query.filter_by(id=id).first()
 
         if db_imageid is None:
             return create_error_response(404, "Not found", "No image was found with id {}".format(id))
         if not request.json:
             return create_error_response(415, "Unsupported media type", "Requests must be JSON")
-        try:
-            validate(request.json, HubBuilder.image_schema())
-        except ValidationError as e:
-            return create_error_response(400, "Invalid JSON document", str(e))
 
-        db_imageid.id = request.json["id"]
-        db_imageid.user_id = request.json["user_id"]
-        db_imageid.name = request.json["name"]
-        db_imageid.publish_date = request.json["publish_date"]
-        db_imageid.location = request.json["location"]
-        db_imageid.is_private = request.json["is_private"]
-        db_imageid.date = request.json["date"]
-
-        try:
+        if "name" in request.json:
+            if request.json["name"] == "" or request.json["name"] == None:
+                return create_error_response(400, "Invalid JSON document", "No file name provided")
+        else:
+            return create_error_response(400, "Invalid JSON document", "No file name provided")      
+        
+        is_db_image_name = ImageContent.query.filter_by(name=request.json["name"]).first()
+        if is_db_image_name is None:
+            db_imageid.name = request.json["name"]
             db.session.commit()
-        except IntegrityError:
-            return create_error_response(409, "Already exists", "Image with id '{}' already exists".format(request.json["id"]))
+        else:
+            return create_error_response(409, "Already exists", "Image with name '{}' already exists".format(request.json["name"]))
         
         return Response(status=204, headers={"Location": url_for("api.imageitem", id=db_imageid.id)})
-
 
     def delete(self, id):
         """
@@ -848,6 +831,7 @@ class ImageannotationCollection(Resource):
         body.add_control("self", url_for("api.imageannotationcollection"))
         body.add_control_add_imageannotation()
         body["items"] = []
+
         for db_imageanno_id in ImageAnnotation.query.all():
 
             item = HubBuilder(
@@ -873,17 +857,29 @@ class ImageannotationCollection(Resource):
     def post(self):
         """
         POST method adds a new imageannotation to collection
-        """
+        """        
         if not request.json:
             return create_error_response(415, "Unsupported media type", "Requests must be JSON")
         try:
             validate(request.json, HubBuilder.imageannotation_schema())
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
+        
+        if "image_id" in request.json:
+            if request.json["image_id"] == "" or request.json["image_id"] == None:
+                return create_error_response(400, "Invalid JSON document", "No image id provided")
+        else:
+            return create_error_response(400, "Invalid JSON document", "No image id provided")   
+       
+        if "user_id" in request.json:
+            if request.json["user_id"] == "" or request.json["user_id"] == None:
+                return create_error_response(400, "Invalid JSON document", "No user id provided")
+        else:
+            return create_error_response(400, "Invalid JSON document", "No user id provided")
 
         new_imageannotation = ImageAnnotation(
             image_id = request.json["image_id"],
-            user_id=request.json["user_id"],
+            user_id = request.json["user_id"],
             meme_class = request.json["meme_class"],
             HS_class = request.json["HS_class"],
             text_class = request.json["text_class"],
@@ -962,13 +958,24 @@ class ImageannotationItem(Resource):
             return create_error_response(404, "Not found", "No imageannotation was found with id {}".format(id))
         if not request.json:
             return create_error_response(415, "Unsupported media type", "Requests must be JSON")
+
+        if "image_id" in request.json:
+            if request.json["image_id"] == "" or request.json["image_id"] == None:
+                return create_error_response(400, "Invalid JSON document", "No image id provided")
+        else:
+            return create_error_response(400, "Invalid JSON document", "No image id provided")   
+
+        if "user_id" in request.json:
+            if request.json["user_id"] == "" or request.json["user_id"] == None:
+                return create_error_response(400, "Invalid JSON document", "No user id provided")
+        else:
+            return create_error_response(400, "Invalid JSON document", "No user id provided")   
+
         try:
             validate(request.json, HubBuilder.imageannotation_schema())
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        db_imageanno_id.id = request.json["id"]
-        db_imageanno_id.image_id = request.json["image_id"]
         db_imageanno_id.user_id=request.json["user_id"]
         db_imageanno_id.meme_class = request.json["meme_class"]
         db_imageanno_id.HS_class = request.json["HS_class"]

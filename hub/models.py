@@ -56,7 +56,7 @@ and populates User, PhotoContent, PhotoAnnotation, ImageContent and ImageAnnotat
 import os
 import sys
 import glob
-import base64
+#import base64
 from io import BytesIO
 
 from datetime import datetime
