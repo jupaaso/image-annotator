@@ -381,7 +381,7 @@ function renderSelection(body) {
     $("#loginUserBtnId").hide();
     $(".resulttable thead").empty();
     $(".resulttable tbody").empty();
-    $("#uploadFileBtnId").hide();
+    //$("#uploadFileBtnId").hide();
     $("#userFormId").hide();
 
     $("#imageListBtnId").on( "click", function(event) {
@@ -477,14 +477,18 @@ function getSubmittedImageContent(data, status, jqxhr) {
 }
 
 // UPLOAD or CANCEL new IMAGES / PHOTOS on file list
-// file select windiw for image files
+// file select window for image files
 function handleFileSelectImages (e) {
     var files = e.target.files;
     if (files.length < 1) {
         alert('Select a file...');
         return;
     }
-    $("#uploadFileBtnId").attr('disabled', true);
+    // -------------------------------------
+    //$("#uploadFileBtnId").attr('disabled', true);
+    $("#fileElem").attr('disabled', true);
+    $("div.fileElem").empty();
+    $("#fileList").empty();
 
     var file = files[0];
     fileList.innerHTML = "";
@@ -510,16 +514,20 @@ function handleFileSelectImages (e) {
 
     $("#cancelUploadBtn").on("click", function(event) {        
         event.preventDefault();
+        // ----------------
         $("div.fileList").empty();
-        $("#uploadFileBtnId").attr('disabled', false);
+        $("div.fileElem").empty();
+        //$("#uploadFileBtnId").attr('disabled', false);
         $("#cancelUploadBtn").hide();
         $("#uploadBtn").hide();
+        $("#fileElem").val(null);
+        $("#fileElem").attr('disabled', false);
     });
 
     $("#uploadBtn").on("click", function(event) {        
         event.preventDefault();
         $("div.fileList").empty();
-        $("#uploadFileBtnId").attr('disabled', false);
+        //$("#uploadFileBtnId").attr('disabled', false);
         $("#cancelUploadBtn").hide();
         $("#uploadBtn").hide();
 
@@ -530,6 +538,11 @@ function handleFileSelectImages (e) {
         // file select for images: "is_private" = false
         data.is_private = false;
         fd.append('request', JSON.stringify(data));
+        file = undefined;
+        $("#fileElem").val(null);
+        // --------------
+        $("div.fileElem").empty();
+        $("#fileElem").attr('disabled', false);
         sendImageData($("#imageUploadFormId").attr("action"), $("#imageUploadFormId").attr("method"), fd, getSubmittedImageContent);
     }); 
 }
@@ -537,14 +550,17 @@ function handleFileSelectImages (e) {
 // for adding a new image and photo - define render for ImageContent
 function renderImageForm(ctrl) {
     $("imageUploadFormId").toggle();
-    $("#uploadFileBtnId").show();
+    //$("#uploadFileBtnId").show();
     $("#imageUploadFormId").attr("action", ctrl.href);
     $("#imageUploadFormId").attr("method", ctrl.method);
     $(function () {
-        $('#uploadFileBtnId').click(function(e) {
-            $('#fileElem').click();
-        });
-        $('#fileElem').change(handleFileSelectImages);
+        //$('#uploadFileBtnId').click(function(e) {
+        //    $('#fileElem').click();
+        //});
+        //$('#fileElem').change(handleFileSelectImages);
+        // TÄSSÄ BUGI - cancel kuva filet jäävat muistiin listaksi ----------------------------
+        const inputElement = document.getElementById("fileElem");
+        inputElement.addEventListener("change", handleFileSelectImages, false);
     });
 }
 
@@ -582,19 +598,14 @@ function renderImagesTable(item) {
     $(".imagemetaform").empty();
     // TESTI TESTI $(".imageListForm").empty();
     $(".imageListForm").hide();
-    $("#uploadFileBtnId").hide();
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
+    //$("#uploadFileBtnId").hide();
 
     $("div.navigation").html(
         "<a href='" +
         "' onClick='getImageCollection(event)'> Back to Images </a>"
     );
-    
     // $('.annotationMetaForm').hide(); $('#AnnoFormButtons').hide();
 
-    //////////////////////////////////////////////////////////////////////////////////////////
-    
     let requiredItems = item["@controls"]["annometa:edit"]["schema"]["required"];
     let imageIdName = Object.keys(item.id);
     console.log(imageIdName);
@@ -634,8 +645,8 @@ function backToDeviceSelection(event) {
     event.preventDefault();
 
     hideAnnoFormButtons();
-    $(".annotationMetaForm").empty();
-    $(".annotationform").empty();
+    // TESTI; POISTA ??? $(".annotationMetaForm").empty();
+    // VANHA; POISTA $(".annotationform").empty();
     //$(".imagemetaform").empty();
     //$("#testform").empty();
 
@@ -657,7 +668,7 @@ function renderImages(body) {
     $(".imagemetatable tbody").empty();
     $(".imagemetatable thead").empty();
     $(".imagecontent").empty();
-    $(".annotationform").empty();
+    // VANHA; POISTA  $(".annotationform").empty();
     hideAnnoFormButtons();
     $("#imageListFormId").show();
 
@@ -890,7 +901,10 @@ function populateImageAnnotationForm(annotationItem, annotationExists) {
     let requiredItems = annotationItem["@controls"]["edit"]["schema"]["required"];    
     console.log(requiredItems);
 
+    // ----------------------------------------------
     //let annotationForm =  $(".annotationform");
+    $(".imageAnnotationForm").show();
+    $("#testform").show();
 
     $.each(requiredItems, function(index, item) {
         if (annotationItem.hasOwnProperty(item)) 
@@ -958,7 +972,9 @@ function populateImageAnnotationForm(annotationItem, annotationExists) {
             }
             // Show annotation form - $('.imageAnnoMetaForm').show();
             // define add-post button for new annotation
-            $("#testform").show();
+            //$(".imageAnnotationForm").show();
+            //$("#testform").show();
+            
             $("#testform").find('*').attr('disabled', true);
             showAnnoFormButtons();
             $("#addAnnotationBtnId").prop("disabled", true);            

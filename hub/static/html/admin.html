@@ -15,8 +15,8 @@
     
     <div class="usermetaform left" id="leftSidebar">
         <div class="login-main-text">
-            <h2>Application<br> Login Page</h2>
-            <p>Login or register from here to access.</p>
+            <h2>Image Annotator <br>Application <br>Login Page </h2>
+            <p>Login or register from here with username and password to access.</p>
         </div>
     </div>
     <div class="usermetaform right" id="rightSidebar">
@@ -79,8 +79,9 @@
             </tbody>
         </table>
         <form class="imageUploadForm" id="imageUploadFormId">
-            <button class="btn btn-primary me-md-2" type="button" id="uploadFileBtnId" style="display:none">Add new image</button>
-            <input type="file" id="fileElem" accept="image/*" style="display:none">
+            <!--button class="btn btn-primary me-md-2" type="button" id="uploadFileBtnId" style="display:none">Add new image</button> -->
+            <!--<input type="file" id="fileElem" accept="image/*" style="display:none"> -->
+            <input type="file" id="fileElem" accept="image/*" onclick="this.value = null">
             <div class="fileList" id="fileList" style="margin-top: 10px;">
                 <p id="fileInfoId" style="display: none;">No files selected!</p>
             </div>
@@ -132,37 +133,35 @@
                         </label>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="HS_class" disabled>                
-                        <label class="form-check-label" for="HS_class">Image is or contains hatespeech</label>
-                    </div>                         
-                </div>        
-                <label class="Polarity_classA_header">Polarity_classA</label>
+                <label class="Polarity_classA_header">Negative - Neutral - Positive Classifier </label>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="Polarity_classA_Positive" value="1" checked disabled>
-                    <label class="form-check-label" for="Polarity_classA_Positive">Positive</label>
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="Polarity_classA_Negative" value="-1" checked disabled>
+                    <label class="form-check-label" for="Polarity_classA_Negative">Negative</label>
                 </div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="inlineRadioOptions" id="Polarity_classANeutral" value="0" disabled>
                     <label class="form-check-label" for="Polarity_classANeutral">Neutral</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="Polarity_classA_Negative" value="-1" disabled>
-                    <label class="form-check-label" for="Polarity_classA_Negative">Negative</label>
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="Polarity_classA_Positive" value="1" disabled>
+                    <label class="form-check-label" for="Polarity_classA_Positive">Positive</label>
                 </div>
-            
                 <div class="row">
-                    <label for="Polarity_classB" class="form-label Polarity_classB_header">Polarity_classB</label>
+                    <label for="Polarity_classB" class="form-label Polarity_classB_header">Positivity - Negativity Classifier</label>
                     <input id="Polarity_classB" type="range" value="0" name="rangeInputclassB" min="-5" max="5" onchange="updatePolarityClassB(this.value);" disabled>
                     <input type="text" id="valuePolarity_classB" value="" readonly>
                 </div>
                 <div class="row">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="HS_class" disabled>                
+                        <label class="form-check-label" for="HS_class">Image is or contains hatespeech</label>
+                    </div>
+                </div>
+                <div class="row">
                     <label for="HS_strength" class="form-label HS_strength_header">HS_strength</label>
-                    <input id="HS_strength" type="range" value="-1" name="rangeInputclassHS" min="-7" max="-1" onchange="updateHSStrength(this.value);" disabled>
+                    <input id="HS_strength" type="range" value="0" name="rangeInputclassHS" min="-7" max="0" onchange="updateHSStrength(this.value);" disabled>
                     <input type="text" id="valueHS_strength" value="" readonly>            
                 </div>
-            
                 <div class="row">
                     <div class="col-md-2 col-form-label"><label class="HS_category_header">HS_category</label></div>
                     <div class="col-sm">
@@ -171,18 +170,18 @@
                 </div>
                 <div class="row">
                     <div class="form-check">
-                        <label class="form-check-label" for="text_class">Image contains text</label>
                         <input class="form-check-input" type="checkbox" value="" id="text_class" onclick="enableTextFields()" disabled>
+                        <label class="form-check-label" for="text_class">Image contains text</label>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-2 col-form-label"><label class="Text_language_header">Text_language</label></div>
+                    <div class="col-md-2 col-form-label"><label class="Text_language_header">Language of text</label></div>
                     <div class="col-sm">
                         <input class="form-control" id="text_language" type="text" disabled>                            
                     </div> 
                 </div>
                 <div class="row">
-                    <div class="col-md-2 col-form-label"><label class="Text_text_header">Text_text</label></div>
+                    <div class="col-md-2 col-form-label"><label class="Text_text_header">Write text of image here</label></div>
                     <div class="col-sm">
                         <input class="form-control" id="text_text" type="text" disabled>                            
                     </div> 
